@@ -31,18 +31,18 @@ public class UserEntity {
   private String password;
 
 //  @Enumerated(EnumType.STRING)
-//  private OauthProviderType provider;
+//  private OauthProviderType providerType;
 //  private String providerId;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, updatable = false)
-  private RoleType role;
+  private RoleType roleType;
 
-  public UserEntity(Long id, String nickName, String email, String password, RoleType role) {
+  public UserEntity(Long id, String nickName, String email, String password, RoleType roleType) {
     this.id = id;
     this.nickName = nickName;
     this.email = email;
     this.password = password;
-    this.role = role;
+    this.roleType = roleType;
   }
 }
