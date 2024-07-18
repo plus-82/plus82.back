@@ -1,6 +1,6 @@
-package com.etplus.user.adapter.persistence;
+package com.etplus.repository.domain;
 
-import com.etplus.user.domain.code.RoleType;
+import com.etplus.repository.domain.code.RoleType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

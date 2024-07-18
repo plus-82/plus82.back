@@ -1,4 +1,4 @@
-package com.etplus.user.domain.code;
+package com.etplus.repository.domain.code;
 
 public enum RoleType {
   ADMIN,
