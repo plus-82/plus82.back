@@ -1,4 +1,4 @@
-package com.etplus.config;
+package com.etplus.config.security;
 
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.UserRepository;

@@ -1,5 +1,6 @@
-package com.etplus.config;
+package com.etplus.config.security;
 
+import com.etplus.provider.PasswordProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;

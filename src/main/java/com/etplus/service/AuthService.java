@@ -1,6 +1,6 @@
 package com.etplus.service;
 
-import com.etplus.config.PasswordProvider;
+import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.UserEntity;

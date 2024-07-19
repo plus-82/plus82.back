@@ -1,4 +1,4 @@
-package com.etplus.config;
+package com.etplus.config.security;
 
 import com.etplus.repository.domain.code.RoleType;
 import java.io.Serial;

@@ -1,4 +1,4 @@
-package com.etplus.config;
+package com.etplus.config.security;
 
 import com.etplus.provider.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;

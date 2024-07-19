@@ -1,4 +1,4 @@
-package com.etplus.config;
+package com.etplus.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
