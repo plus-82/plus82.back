@@ -16,13 +16,13 @@ public class JwtProvider {
   private long TOKEN_VALID_TIME;
 
   // TODO refreshToken 까지 포함한 DTO 반환
-  public String generateToken(Long userId, String email, RoleType roleType) {
+  public String generateToken(LoginUser loginUser) {
     Date now = new Date();
 
     return Jwts.builder()
-        .claim("id", userId)
-        .claim("name", email)
-        .claim("role", roleType)
+        .claim("id", loginUser.getUserId())
+        .claim("name", loginUser.getEmail())
+        .claim("role", loginUser.getRoleType())
         .setIssuedAt(now)
         .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
         .signWith(SignatureAlgorithm.HS512, JWT_SECRET_KEY)

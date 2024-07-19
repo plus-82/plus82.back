@@ -25,8 +25,7 @@ public class RestLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandl
       Authentication authentication) throws IOException {
     LoginUser loginUser = (LoginUser) authentication.getPrincipal();
 
-    String accessToken = jwtProvider.generateToken(loginUser.getUserId(), loginUser.getEmail(),
-        loginUser.getRoleType());
+    String accessToken = jwtProvider.generateToken(loginUser);
 
     // TODO CommonResponse
     jsonConverter.write(Map.of("accessToken", accessToken),
