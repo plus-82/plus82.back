@@ -25,6 +25,7 @@ public class SecurityConfig {
   private final ObjectPostProcessor<Object> objectPostProcessor;
   private final RestLoginSuccessHandler restLoginSuccessHandler;
   private final RestLoginFailureHandler restLoginFailureHandler;
+  private final JwtFilter jwtFilter;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,7 +38,8 @@ public class SecurityConfig {
             SessionCreationPolicy.STATELESS))
         // 로그인 Filter 추가
         .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-        // TODO 검증 필터 추가
+        // 검증 Filter 추가
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .authorizeHttpRequests(authorize -> authorize
             // TODO 범위 설정, Swagger 설정
 //            .requestMatchers("/api/v1/login").permitAll()
