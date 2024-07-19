@@ -41,10 +41,13 @@ public class SecurityConfig {
         // 검증 Filter 추가
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .authorizeHttpRequests(authorize -> authorize
-            // TODO 범위 설정, Swagger 설정
-//            .requestMatchers("/api/v1/login").permitAll()
-//            .requestMatchers("/api/v1/**").authenticated()
+            // TODO 범위 설정
+            .requestMatchers("/api/v1/auth/**").permitAll()
+            .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
+            .requestMatchers("/api/v1/temp/guest").permitAll()
+            .requestMatchers("/api/v1/**").authenticated()
             .anyRequest().permitAll()
+//            .anyRequest().denyAll()
         )
     ;
     return http.build();
