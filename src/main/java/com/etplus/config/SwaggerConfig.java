@@ -1,5 +1,6 @@
 package com.etplus.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,12 +31,10 @@ public class SwaggerConfig {
 
   @Bean
   public OpenAPI openAPI() {
-    Info info = new Info()
-        .title("82PLUS API")
-        .description("Swagger")
-        .version("1.0.0");
-
-    return new OpenAPI().info(info);
+    return new OpenAPI()
+        .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+        .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
+        .info(createAppInfo());
   }
 
   @Bean
@@ -41,6 +42,19 @@ public class SwaggerConfig {
     return openAPI -> {
       openAPI.getPaths().addPathItem(SIGN_IN_PATH, loginPathItem());
     };
+  }
+
+  private Info createAppInfo() {
+    return new Info()
+        .title("82PLUS API")
+        .description("Swagger")
+        .version("1.0.0");
+  }
+
+  private SecurityScheme createAPIKeyScheme() {
+    return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+        .bearerFormat("JWT")
+        .scheme("bearer");
   }
 
   // 로그인 API 정의
