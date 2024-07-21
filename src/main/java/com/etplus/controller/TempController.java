@@ -1,5 +1,7 @@
 package com.etplus.controller;
 
+import com.etplus.common.CommonResponse;
+import com.etplus.common.CommonResponseCode;
 import com.etplus.config.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class TempController {
 
   @GetMapping("/user")
-  public String getUser(@AuthenticationPrincipal LoginUser loginUser) {
-    return "hello " + loginUser.getEmail();
+  public CommonResponse<String> getUser(@AuthenticationPrincipal LoginUser loginUser) {
+    return new CommonResponse<>("hello " + loginUser.getEmail(), CommonResponseCode.SUCCESS);
   }
 
   @GetMapping("/guest")
-  public String getAdmin() {
-    return "guest";
+  public CommonResponse<String> getAdmin() {
+    return new CommonResponse<>("hello guest", CommonResponseCode.SUCCESS);
   }
 
 }

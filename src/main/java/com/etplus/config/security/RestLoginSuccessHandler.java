@@ -1,10 +1,12 @@
 package com.etplus.config.security;
 
+import com.etplus.common.CommonResponse;
+import com.etplus.common.CommonResponseCode;
 import com.etplus.provider.JwtProvider;
+import com.etplus.vo.TokenVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -25,10 +27,9 @@ public class RestLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandl
       Authentication authentication) throws IOException {
     LoginUser loginUser = (LoginUser) authentication.getPrincipal();
 
-    String accessToken = jwtProvider.generateToken(loginUser);
+    TokenVO tokenVO = new TokenVO(jwtProvider.generateToken(loginUser));
 
-    // TODO CommonResponse
-    jsonConverter.write(Map.of("accessToken", accessToken),
+    jsonConverter.write(new CommonResponse<>(tokenVO, CommonResponseCode.SUCCESS),
         MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
   }
 }

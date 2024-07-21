@@ -1,5 +1,7 @@
 package com.etplus.controller;
 
+import com.etplus.common.CommonResponse;
+import com.etplus.common.CommonResponseCode;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.service.AuthService;
 import jakarta.validation.Valid;
@@ -17,8 +19,9 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/sign-up")
-  public void signUp(@RequestBody @Valid SignUpDto dto) {
+  public CommonResponse<Void> signUp(@RequestBody @Valid SignUpDto dto) {
     authService.signUp(dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
 }
