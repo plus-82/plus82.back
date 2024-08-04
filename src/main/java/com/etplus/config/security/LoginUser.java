@@ -15,12 +15,15 @@ public class LoginUser extends org.springframework.security.core.userdetails.Use
   private final Long userId;
   private final String email;
   private final RoleType roleType;
+  private final boolean isVerified;
 
-  public LoginUser(Long userId, String email, String password, RoleType roleType) {
+  public LoginUser(Long userId, String email, String password, RoleType roleType,
+      boolean isVerified) {
     super(email, password, List.of(new SimpleGrantedAuthority("ROLE_" + roleType.toString().toUpperCase())));
     this.userId = userId;
     this.email = email;
     this.roleType = roleType;
+    this.isVerified = isVerified;
   }
 
 }
