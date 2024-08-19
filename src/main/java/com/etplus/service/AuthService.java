@@ -1,5 +1,6 @@
 package com.etplus.service;
 
+import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
@@ -54,6 +55,27 @@ public class AuthService {
     // send email
     emailProvider.send(dto.email(), "[Plus82] Verify your email",
         "visit here: https://plus82.co/verify-email?code=" + emailEntity.getCode());
+  }
+
+  @Transactional
+  public void verifyEmail(VerifyEmailDto dto) {
+    EmailEntity emailEntity = emailRepository.findByCode(dto.code())
+        .orElseThrow(() -> new IllegalArgumentException("Email not found"));
+
+    if (emailEntity.isCompleted()) {
+      throw new IllegalArgumentException("Already verified");
+    }
+
+    if (emailEntity.getExpiredDate().isBefore(LocalDate.now())) {
+      throw new IllegalArgumentException("Expired code");
+    }
+
+    emailEntity.setCompleted(true);
+    emailRepository.save(emailEntity);
+
+    UserEntity userEntity = emailEntity.getToUser();
+    userEntity.setVerified(true);
+    userRepository.save(userEntity);
   }
 
 }
