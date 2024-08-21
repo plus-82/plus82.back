@@ -32,11 +32,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
       throw new BadCredentialsException("check your email");
     }
 
-    if (!loginUser.isVerified()) {
-      log.error("NOT_VERIFIED");
-      throw new BadCredentialsException("need to verify your email");
-    }
-
     if (!passwordProvider.matches(password, loginUser.getPassword())) {
       log.error("PW_NOT_CORRECT");
       throw new BadCredentialsException("check your password");

@@ -29,13 +29,12 @@ public class UserEntity {
   private String country;
   private GenderType genderType;
   private LocalDate birthDate;
+  private String backupEmail;
 
   @Column(nullable = false, updatable = false)
   private String email;
   @Column(nullable = false)
   private String password;
-
-  private boolean isVerified;
 
 //  @Enumerated(EnumType.STRING)
 //  private OauthProviderType providerType;
@@ -46,16 +45,15 @@ public class UserEntity {
   private RoleType roleType;
 
   public UserEntity(Long id, String name, String country, GenderType genderType,
-      LocalDate birthDate,
-      String email, String password, boolean isVerified, RoleType roleType) {
+      LocalDate birthDate, String backupEmail, String email, String password, RoleType roleType) {
     this.id = id;
     this.name = name;
     this.country = country;
     this.genderType = genderType;
     this.birthDate = birthDate;
+    this.backupEmail = backupEmail;
     this.email = email;
     this.password = password;
-    this.isVerified = isVerified;
     this.roleType = roleType;
   }
 }
