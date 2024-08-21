@@ -45,6 +45,7 @@ public class AuthService {
         dto.country(),
         dto.genderType(),
         dto.birthDate(),
+        dto.backupEmail(),
         dto.email(),
         passwordProvider.encode(dto.password()),
         RoleType.TEACHER
