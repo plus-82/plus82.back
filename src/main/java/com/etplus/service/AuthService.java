@@ -33,6 +33,12 @@ public class AuthService {
       throw new IllegalArgumentException("Email already exists");
     }
 
+    boolean isEmailVerified = emailVerificationCodeRepository.existsByEmailAndVerifiedIsTrue(dto.email());
+
+    if (!isEmailVerified) {
+      throw new IllegalArgumentException("Email is not verified");
+    }
+
     UserEntity userEntity = new UserEntity(
         null,
         dto.name(),
