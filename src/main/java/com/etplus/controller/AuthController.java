@@ -4,6 +4,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.SignUpDto;
+import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
