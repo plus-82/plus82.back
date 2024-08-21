@@ -20,10 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     UserEntity user = userJpaRepository.findByEmail(email).orElse(null);
 
     if (user != null) {
-      if (!user.isVerified()) {
-        throw new UsernameNotFoundException("need to verify your email");
-      }
-
       // UserDetails에 담아서 return하면 AutneticationManager가 검증
       return new LoginUser(user.getId(), user.getEmail(), user.getPassword(), user.getRoleType(),
           user.isVerified());
