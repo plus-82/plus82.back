@@ -2,6 +2,7 @@ package com.etplus.controller;
 
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
+import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.service.AuthService;
 import jakarta.validation.Valid;
@@ -21,6 +22,12 @@ public class AuthController {
   @PostMapping("/sign-up")
   public CommonResponse<Void> signUp(@RequestBody @Valid SignUpDto dto) {
     authService.signUp(dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/request-verification")
+  public CommonResponse<Void> requestVerification(@RequestBody @Valid RequestEmailVerificationDto dto) {
+    authService.requestVerification(dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
