@@ -44,8 +44,7 @@ public class JwtProvider {
           body.get("id", Long.class),
           body.get("name", String.class),
           "",
-          RoleType.valueOf(body.get("role", String.class)),
-          true
+          RoleType.valueOf(body.get("role", String.class))
       );
     } catch (ExpiredJwtException e) {
       throw new BadCredentialsException("Expired token");

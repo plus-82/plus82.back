@@ -41,7 +41,6 @@ public class AuthService {
         dto.birthDate(),
         dto.email(),
         passwordProvider.encode(dto.password()),
-        false,
         RoleType.TEACHER
     );
 
