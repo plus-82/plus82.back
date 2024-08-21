@@ -31,4 +31,10 @@ public class AuthController {
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/verify-code")
+  public CommonResponse<Void> verifyCode(@RequestBody @Valid VerifyEmailDto dto) {
+    authService.verifyCode(dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
 }
