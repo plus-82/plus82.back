@@ -66,7 +66,7 @@ public class AuthService {
     emailVerificationCodeRepository.save(emailVerificationCode);
 
     emailProvider.send(dto.email(), "[Plus82] Verify your email",
-        "input the code: " + emailVerificationCode.getCode());
+        "input this code: " + emailVerificationCode.getCode());
   }
 
   @Transactional
