@@ -2,8 +2,10 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.VerifyEmailDto;
-import com.etplus.exception.EmailVerificationException;
-import com.etplus.exception.EmailVerificationException.EmailVerificationExceptionCode;
+import com.etplus.exception.EmailVerificationCodeException;
+import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
+import com.etplus.exception.ResourceNotFoundException;
+import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.exception.UserException;
 import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
@@ -69,7 +71,7 @@ public class AuthService {
     int numberOfEmailVerification = emailVerificationCodeRepository
         .countByEmailAndExpireDateTimeAfter(dto.email(), LocalDateTime.now());
     if (numberOfEmailVerification > 3) {
-      throw new EmailVerificationException(EmailVerificationExceptionCode.TOO_MANY_REQUEST);
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
     EmailVerificationCode emailVerificationCode = new EmailVerificationCode(
@@ -89,14 +91,16 @@ public class AuthService {
   public void verifyCode(VerifyEmailDto dto) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
         .findByEmailAndCode(dto.email(), dto.code())
-        .orElseThrow(() -> new IllegalArgumentException("Invalid code"));
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
+        );
 
     if (emailVerificationCode.isVerified()) {
-      throw new IllegalArgumentException("Already verified");
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
     }
 
     if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
-      throw new IllegalArgumentException("Expired code");
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
     }
 
     emailVerificationCode.setVerified(true);
