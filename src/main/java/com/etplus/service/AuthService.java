@@ -2,6 +2,10 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.VerifyEmailDto;
+import com.etplus.exception.EmailVerificationException;
+import com.etplus.exception.EmailVerificationException.EmailVerificationExceptionCode;
+import com.etplus.exception.UserException;
+import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
@@ -56,6 +60,18 @@ public class AuthService {
 
   @Transactional
   public void requestVerification(RequestEmailVerificationDto dto) {
+    // 이미 가입한 이메일인 경우 예외 처리
+    if (userRepository.existsByEmail(dto.email())) {
+      throw new UserException(UserExceptionCode.USED_EMAIL);
+    }
+
+    // 3회 이상 요청한 경우 예외 처리
+    int numberOfEmailVerification = emailVerificationCodeRepository
+        .countByEmailAndExpireDateTimeAfter(dto.email(), LocalDateTime.now());
+    if (numberOfEmailVerification > 3) {
+      throw new EmailVerificationException(EmailVerificationExceptionCode.TOO_MANY_REQUEST);
+    }
+
     EmailVerificationCode emailVerificationCode = new EmailVerificationCode(
         null,
         dto.email(),
