@@ -33,16 +33,15 @@ public class AuthService {
 
   @Transactional
   public void signUp(SignUpDto dto) {
-    boolean existsByEmail = userRepository.existsByEmail(dto.email());
-
-    if (existsByEmail) {
-      throw new IllegalArgumentException("Email already exists");
+    // 이미 가입한 이메일인 경우 예외 처리
+    if (userRepository.existsByEmail(dto.email())) {
+      throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
     }
 
+    // 인증된 이메일이 있는지 확인 후 예외 처리
     boolean isEmailVerified = emailVerificationCodeRepository.existsByEmailAndVerifiedIsTrue(dto.email());
-
     if (!isEmailVerified) {
-      throw new IllegalArgumentException("Email is not verified");
+      throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
     UserEntity userEntity = new UserEntity(
@@ -64,7 +63,7 @@ public class AuthService {
   public void requestVerification(RequestEmailVerificationDto dto) {
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
-      throw new UserException(UserExceptionCode.USED_EMAIL);
+      throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
     }
 
     // 3회 이상 요청한 경우 예외 처리
