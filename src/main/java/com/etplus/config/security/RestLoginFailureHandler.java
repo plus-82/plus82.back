@@ -29,7 +29,11 @@ public class RestLoginFailureHandler extends SimpleUrlAuthenticationFailureHandl
       AuthenticationException exception) throws IOException {
     CommonResponse<?> responseData;
     if (exception instanceof BadCredentialsException) {
-      responseData = new CommonResponse<>(AuthExceptionCode.ID_OR_PW_NOT_CORRECT);
+      if (exception.getMessage().equals(AuthExceptionCode.EMAIL_NOT_CORRECT.getMessage())) {
+        responseData = new CommonResponse<>(AuthExceptionCode.EMAIL_NOT_CORRECT);
+      } else {
+        responseData = new CommonResponse<>(AuthExceptionCode.PW_NOT_CORRECT);
+      }
     } else {
       log.error("Authentication Unknown Exception", exception);
       responseData = new CommonResponse<>(CommonResponseCode.FAIL);

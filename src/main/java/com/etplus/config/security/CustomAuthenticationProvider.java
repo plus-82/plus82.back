@@ -1,5 +1,6 @@
 package com.etplus.config.security;
 
+import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.provider.PasswordProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +30,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     if (loginUser == null) {
       log.info("EMAIL_NOT_CORRECT");
-      throw new BadCredentialsException("check your email");
+      throw new BadCredentialsException(AuthExceptionCode.EMAIL_NOT_CORRECT.getMessage());
     }
 
     if (!passwordProvider.matches(password, loginUser.getPassword())) {
       log.info("PW_NOT_CORRECT");
-      throw new BadCredentialsException("check your password");
+      throw new BadCredentialsException(AuthExceptionCode.PW_NOT_CORRECT.getMessage());
     }
 
     return new UsernamePasswordAuthenticationToken(loginUser, loginUser.getPassword(),
