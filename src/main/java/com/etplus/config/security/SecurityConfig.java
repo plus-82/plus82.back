@@ -40,6 +40,10 @@ public class SecurityConfig {
         .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         // 검증 Filter 추가
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling(handler -> handler
+            .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+//            .accessDeniedHandler()
+        )
         .authorizeHttpRequests(authorize -> authorize
             // TODO 범위 설정
             .requestMatchers("/api/v1/auth/**").permitAll()

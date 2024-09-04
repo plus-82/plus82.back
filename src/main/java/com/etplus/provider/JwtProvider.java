@@ -1,6 +1,8 @@
 package com.etplus.provider;
 
 import com.etplus.config.security.LoginUser;
+import com.etplus.exception.AuthException;
+import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.repository.domain.code.RoleType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,7 +12,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,7 +36,7 @@ public class JwtProvider {
         .compact();
   }
 
-  public LoginUser decrypt(String jwtToken) {
+  public LoginUser decrypt(String jwtToken) throws AuthException {
     try {
       Claims body = Jwts.parserBuilder().setSigningKey(JWT_SECRET_KEY).build()
           .parseClaimsJws(jwtToken).getBody();
@@ -47,11 +48,11 @@ public class JwtProvider {
           RoleType.valueOf(body.get("role", String.class))
       );
     } catch (ExpiredJwtException e) {
-      throw new BadCredentialsException("Expired token");
+      throw new AuthException(AuthExceptionCode.EXPIRED_TOKEN);
     } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-      throw new BadCredentialsException("Invalid token type");
+      throw new AuthException(AuthExceptionCode.INVALID_TOKEN_TYPE);
     } catch (Exception e) {
-      throw new BadCredentialsException("Invalid token");
+      throw new AuthException(AuthExceptionCode.INVALID_TOKEN);
     }
   }
 
