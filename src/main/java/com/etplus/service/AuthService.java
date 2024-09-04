@@ -2,6 +2,12 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.VerifyEmailDto;
+import com.etplus.exception.EmailVerificationCodeException;
+import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
+import com.etplus.exception.ResourceNotFoundException;
+import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
+import com.etplus.exception.UserException;
+import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
@@ -27,16 +33,15 @@ public class AuthService {
 
   @Transactional
   public void signUp(SignUpDto dto) {
-    boolean existsByEmail = userRepository.existsByEmail(dto.email());
-
-    if (existsByEmail) {
-      throw new IllegalArgumentException("Email already exists");
+    // 이미 가입한 이메일인 경우 예외 처리
+    if (userRepository.existsByEmail(dto.email())) {
+      throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
     }
 
+    // 인증된 이메일이 있는지 확인 후 예외 처리
     boolean isEmailVerified = emailVerificationCodeRepository.existsByEmailAndVerifiedIsTrue(dto.email());
-
     if (!isEmailVerified) {
-      throw new IllegalArgumentException("Email is not verified");
+      throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
     UserEntity userEntity = new UserEntity(
@@ -56,6 +61,18 @@ public class AuthService {
 
   @Transactional
   public void requestVerification(RequestEmailVerificationDto dto) {
+    // 이미 가입한 이메일인 경우 예외 처리
+    if (userRepository.existsByEmail(dto.email())) {
+      throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
+    }
+
+    // 3회 이상 요청한 경우 예외 처리
+    int numberOfEmailVerification = emailVerificationCodeRepository
+        .countByEmailAndExpireDateTimeAfter(dto.email(), LocalDateTime.now());
+    if (numberOfEmailVerification > 3) {
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
+    }
+
     EmailVerificationCode emailVerificationCode = new EmailVerificationCode(
         null,
         dto.email(),
@@ -66,21 +83,23 @@ public class AuthService {
     emailVerificationCodeRepository.save(emailVerificationCode);
 
     emailProvider.send(dto.email(), "[Plus82] Verify your email",
-        "input the code: " + emailVerificationCode.getCode());
+        "input this code: " + emailVerificationCode.getCode());
   }
 
   @Transactional
   public void verifyCode(VerifyEmailDto dto) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
         .findByEmailAndCode(dto.email(), dto.code())
-        .orElseThrow(() -> new IllegalArgumentException("Invalid code"));
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
+        );
 
     if (emailVerificationCode.isVerified()) {
-      throw new IllegalArgumentException("Already verified");
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
     }
 
     if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
-      throw new IllegalArgumentException("Expired code");
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
     }
 
     emailVerificationCode.setVerified(true);

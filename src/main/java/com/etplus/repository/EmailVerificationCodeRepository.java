@@ -1,6 +1,7 @@
 package com.etplus.repository;
 
 import com.etplus.repository.domain.EmailVerificationCode;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,4 +10,6 @@ public interface EmailVerificationCodeRepository extends JpaRepository<EmailVeri
   Optional<EmailVerificationCode> findByEmailAndCode(String email, String code);
 
   boolean existsByEmailAndVerifiedIsTrue(String email);
+
+  int countByEmailAndExpireDateTimeAfter(String email, LocalDateTime nowDateTime);
 }
