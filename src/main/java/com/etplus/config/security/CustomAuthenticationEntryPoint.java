@@ -36,7 +36,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
   private void setResponse(HttpServletResponse response, ResponseCode responseCode)
       throws IOException {
     CommonResponse<?> responseData = new CommonResponse<>(responseCode);
-    response.setStatus(HttpStatus.BAD_REQUEST.value());
+    response.setStatus(HttpStatus.UNAUTHORIZED.value());
     jsonConverter.write(responseData, MediaType.APPLICATION_JSON,
         new ServletServerHttpResponse(response));
   }
