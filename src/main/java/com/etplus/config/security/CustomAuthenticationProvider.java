@@ -28,12 +28,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     LoginUser loginUser = (LoginUser) userDetailsService.loadUserByUsername(username);
 
     if (loginUser == null) {
-      log.error("EMAIL_NOT_CORRECT");
+      log.info("EMAIL_NOT_CORRECT");
       throw new BadCredentialsException("check your email");
     }
 
     if (!passwordProvider.matches(password, loginUser.getPassword())) {
-      log.error("PW_NOT_CORRECT");
+      log.info("PW_NOT_CORRECT");
       throw new BadCredentialsException("check your password");
     }
 
