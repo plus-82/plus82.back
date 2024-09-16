@@ -1,6 +1,7 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.RequestEmailVerificationDto;
+import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.exception.EmailVerificationCodeException;
 import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
@@ -14,6 +15,7 @@ import com.etplus.controller.dto.SignUpDto;
 import com.etplus.repository.EmailVerificationCodeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.EmailVerificationCode;
+import com.etplus.repository.domain.PasswordResetCode;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.util.UuidProvider;
@@ -104,6 +106,24 @@ public class AuthService {
 
     emailVerificationCode.setVerified(true);
     emailVerificationCodeRepository.save(emailVerificationCode);
+  }
+
+  @Transactional
+  public void requestResetPassword(RequestResetPasswordDto dto) {
+    UserEntity user = userRepository.findByEmail(dto.email())
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    // todo 3회 이상 요청한 경우 예외 처리
+
+    PasswordResetCode passwordResetCode = new PasswordResetCode(
+        null,
+        UuidProvider.generateCode(),
+        LocalDateTime.now().plusMinutes(10),
+        user
+    );
+    // todo PasswordResetCode 저장
+
+    // todo 해당 유저에게 메일 발송
   }
 
 }
