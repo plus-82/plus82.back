@@ -1,7 +1,10 @@
 package com.etplus.repository.domain;
 
+import com.etplus.repository.domain.code.EmailVerificationCodeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,12 +34,17 @@ public class EmailVerificationCode {
   private LocalDateTime expireDateTime;
   private boolean verified;
 
-  public EmailVerificationCode(Long id, String email, String code,
-      LocalDateTime expireDateTime, boolean verified) {
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, updatable = false)
+  private EmailVerificationCodeType emailVerificationCodeType;
+
+  public EmailVerificationCode(Long id, String email, String code, LocalDateTime expireDateTime,
+      boolean verified, EmailVerificationCodeType emailVerificationCodeType) {
     this.id = id;
     this.email = email;
     this.code = code;
     this.expireDateTime = expireDateTime;
     this.verified = verified;
+    this.emailVerificationCodeType = emailVerificationCodeType;
   }
 }
