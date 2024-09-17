@@ -2,6 +2,7 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
+import com.etplus.controller.dto.ResetPasswordDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.exception.EmailVerificationCodeException;
 import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
@@ -136,4 +137,30 @@ public class AuthService {
         "visit here: https://plus82.co/reset-password?code=" + emailVerificationCode.getCode());
   }
 
+  @Transactional
+  public void resetPassword(ResetPasswordDto dto) {
+    EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
+        .findByEmailAndCodeAndEmailVerificationCodeType(dto.email(), dto.code(), EmailVerificationCodeType.RESET_PASSWORD)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
+        );
+
+    if (emailVerificationCode.isVerified()) {
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
+    }
+
+    if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
+    }
+
+    emailVerificationCode.setVerified(true);
+    emailVerificationCodeRepository.save(emailVerificationCode);
+
+    // 비밀번호 변경
+    UserEntity userEntity = userRepository.findByEmail(dto.email()).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    userEntity.setPassword(passwordProvider.encode(dto.password()));
+    userRepository.save(userEntity);
+  }
 }
