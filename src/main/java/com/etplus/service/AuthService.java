@@ -1,6 +1,7 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.RequestEmailVerificationDto;
+import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.exception.EmailVerificationCodeException;
 import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
@@ -107,6 +108,32 @@ public class AuthService {
 
     emailVerificationCode.setVerified(true);
     emailVerificationCodeRepository.save(emailVerificationCode);
+  }
+
+  @Transactional
+  public void requestResetPassword(RequestResetPasswordDto dto) {
+    userRepository.findByEmail(dto.email()).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    // 3회 이상 요청한 경우 예외 처리
+    int numberOfEmailVerification = emailVerificationCodeRepository
+        .countByEmailAndExpireDateTimeAfter(dto.email(), LocalDateTime.now());
+    if (numberOfEmailVerification > 3) {
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
+    }
+
+    EmailVerificationCode emailVerificationCode = new EmailVerificationCode(
+        null,
+        dto.email(),
+        UuidProvider.generateCode(),
+        LocalDateTime.now().plusMinutes(10),
+        false,
+        EmailVerificationCodeType.RESET_PASSWORD
+    );
+    emailVerificationCodeRepository.save(emailVerificationCode);
+
+    emailProvider.send(dto.email(), "[Plus82] Reset your password",
+        "visit here: https://plus82.co/reset-password?code=" + emailVerificationCode.getCode());
   }
 
 }

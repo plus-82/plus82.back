@@ -3,6 +3,7 @@ package com.etplus.controller;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
+import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.service.AuthService;
@@ -35,6 +36,12 @@ public class AuthController {
   @PostMapping("/verify-code")
   public CommonResponse<Void> verifyCode(@RequestBody @Valid VerifyEmailDto dto) {
     authService.verifyCode(dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/reset-password/request")
+  public CommonResponse<Void> requestResetPassword(@RequestBody @Valid RequestResetPasswordDto dto) {
+    authService.requestResetPassword(dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
