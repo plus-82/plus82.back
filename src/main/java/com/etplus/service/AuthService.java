@@ -40,7 +40,8 @@ public class AuthService {
     }
 
     // 인증된 이메일이 있는지 확인 후 예외 처리
-    boolean isEmailVerified = emailVerificationCodeRepository.existsByEmailAndVerifiedIsTrue(dto.email());
+    boolean isEmailVerified = emailVerificationCodeRepository
+        .existsByEmailAndEmailVerificationCodeTypeAndVerifiedIsTrue(dto.email(), EmailVerificationCodeType.SIGN_UP);
     if (!isEmailVerified) {
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
@@ -91,7 +92,7 @@ public class AuthService {
   @Transactional
   public void verifyCode(VerifyEmailDto dto) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
-        .findByEmailAndCode(dto.email(), dto.code())
+        .findByEmailAndCodeAndEmailVerificationCodeType(dto.email(), dto.code(), EmailVerificationCodeType.SIGN_UP)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
