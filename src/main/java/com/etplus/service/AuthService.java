@@ -15,6 +15,7 @@ import com.etplus.repository.EmailVerificationCodeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.EmailVerificationCode;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.repository.domain.code.EmailVerificationCodeType;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.util.UuidProvider;
 import jakarta.transaction.Transactional;
@@ -78,7 +79,8 @@ public class AuthService {
         dto.email(),
         UuidProvider.generateCode(),
         LocalDateTime.now().plusMinutes(10),
-        false
+        false,
+        EmailVerificationCodeType.SIGN_UP
     );
     emailVerificationCodeRepository.save(emailVerificationCode);
 
