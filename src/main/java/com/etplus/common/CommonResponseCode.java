@@ -1,17 +1,16 @@
 package com.etplus.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 @Getter
 public enum CommonResponseCode implements ResponseCode {
-  SUCCESS("success"),
-  FAIL("fail"),
+  SUCCESS("CM-001", "success"),
+  FAIL("CM-002", "fail"),
   ;
 
+  private String code;
   private String message;
-
-  CommonResponseCode(String message) {
-    this.message = message;
-  }
 
 }

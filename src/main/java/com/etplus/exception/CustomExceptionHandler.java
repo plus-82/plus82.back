@@ -4,6 +4,7 @@ import com.etplus.common.CustomBadRequestException;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.CustomUnauthorizedException;
+import com.etplus.exception.InvalidInputValueException.InvalidInputValueExceptionCode;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,8 @@ public class CustomExceptionHandler {
       String errorMessage = error.getDefaultMessage();
       errors.put(fieldName, errorMessage);
     });
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CommonResponse<>(errors, e.getBody().getDetail()));
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        new CommonResponse<>(errors, InvalidInputValueExceptionCode.INVALID_INPUT_VALUE));
   }
 
   /**
