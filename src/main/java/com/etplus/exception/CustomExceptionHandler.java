@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -39,6 +40,7 @@ public class CustomExceptionHandler {
    */
   @ExceptionHandler(value = {MethodArgumentNotValidException.class})
   protected ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException e) {
+    // @Valid 유효성 검사 실패 시
     log.info("handleValidationException {}", e);
     Map<String, String> errors = new HashMap<>();
     e.getBindingResult().getAllErrors().forEach((error) -> {
@@ -48,6 +50,13 @@ public class CustomExceptionHandler {
     });
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
         new CommonResponse<>(errors, InvalidInputValueExceptionCode.INVALID_INPUT_VALUE));
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<String> handleNoResourceFoundException(NoResourceFoundException e) {
+    // 없는 url로 요청이 들어왔을 때
+    log.info("handleNoResourceFoundException : {}", e);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
   }
 
   /**
