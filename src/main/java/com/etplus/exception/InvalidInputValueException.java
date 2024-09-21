@@ -5,20 +5,19 @@ import com.etplus.common.ResponseCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class UserException extends CustomBadRequestException {
+public class InvalidInputValueException extends CustomBadRequestException {
 
   @AllArgsConstructor
   @Getter
-  public enum UserExceptionCode implements ResponseCode {
-    ALREADY_USED_EMAIL("UE-001","already used email"),
-    NOT_VERIFIED_EMAIL("UE-002","not verified email"),
+  public enum InvalidInputValueExceptionCode implements ResponseCode {
+    INVALID_INPUT_VALUE("IIV-001", "invalid input value"),
     ;
 
     private String code;
     private String message;
   }
 
-  public UserException(ResponseCode responseCode) {
+  public InvalidInputValueException(ResponseCode responseCode) {
     super(responseCode);
   }
 }
