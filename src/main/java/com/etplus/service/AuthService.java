@@ -113,7 +113,7 @@ public class AuthService {
 
   @Transactional
   public void requestResetPassword(RequestResetPasswordDto dto) {
-    userRepository.findByEmail(dto.email()).orElseThrow(
+    userRepository.findByEmailAndDeletedIsFalse(dto.email()).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     // 3회 이상 요청한 경우 예외 처리
@@ -157,7 +157,7 @@ public class AuthService {
     emailVerificationCodeRepository.save(emailVerificationCode);
 
     // 비밀번호 변경
-    UserEntity userEntity = userRepository.findByEmail(dto.email()).orElseThrow(
+    UserEntity userEntity = userRepository.findByEmailAndDeletedIsFalse(dto.email()).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     userEntity.setPassword(passwordProvider.encode(dto.password()));

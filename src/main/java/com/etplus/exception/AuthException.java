@@ -16,6 +16,7 @@ public class AuthException extends CustomBadRequestException {
     EXPIRED_TOKEN("AE-004", "expired token"),
     INVALID_TOKEN_TYPE("AE-005", "invalid token type"),
     INVALID_TOKEN("AE-006", "invalid token"),
+    DELETED_USER("AE-007", "deleted user"),
     ;
 
     private String code;

@@ -31,6 +31,8 @@ public class RestLoginFailureHandler extends SimpleUrlAuthenticationFailureHandl
     if (exception instanceof BadCredentialsException) {
       if (exception.getMessage().equals(AuthExceptionCode.EMAIL_NOT_CORRECT.getMessage())) {
         responseData = new CommonResponse<>(AuthExceptionCode.EMAIL_NOT_CORRECT);
+      } else if (exception.getMessage().equals(AuthExceptionCode.DELETED_USER.getMessage())) {
+        responseData = new CommonResponse<>(AuthExceptionCode.DELETED_USER);
       } else {
         responseData = new CommonResponse<>(AuthExceptionCode.PW_NOT_CORRECT);
       }

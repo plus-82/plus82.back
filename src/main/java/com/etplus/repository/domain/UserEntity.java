@@ -41,6 +41,9 @@ public class UserEntity {
 //  private OauthProviderType providerType;
 //  private String providerId;
 
+  @Column(nullable = false)
+  private boolean deleted;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, updatable = false)
   private RoleType roleType;
