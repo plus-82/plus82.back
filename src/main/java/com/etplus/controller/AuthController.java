@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponseCode;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
+import com.etplus.controller.dto.SignUpAcademyDto;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.service.AuthService;
@@ -25,6 +26,12 @@ public class AuthController {
   @PostMapping("/sign-up")
   public CommonResponse<Void> signUp(@RequestBody @Valid SignUpDto dto) {
     authService.signUp(dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/sign-up/academy")
+  public CommonResponse<Void> signUpAcademy(@RequestBody @Valid SignUpAcademyDto dto) {
+    authService.signUpAcademy(dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 

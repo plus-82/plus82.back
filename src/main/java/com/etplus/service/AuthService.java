@@ -3,7 +3,10 @@ package com.etplus.service;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
+import com.etplus.controller.dto.SignUpAcademyDto;
 import com.etplus.controller.dto.VerifyEmailDto;
+import com.etplus.exception.AcademyException;
+import com.etplus.exception.AcademyException.AcademyExceptionCode;
 import com.etplus.exception.EmailVerificationCodeException;
 import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -13,8 +16,10 @@ import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
+import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.EmailVerificationCodeRepository;
 import com.etplus.repository.UserRepository;
+import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.EmailVerificationCode;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.EmailVerificationCodeType;
@@ -30,6 +35,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
   private final UserRepository userRepository;
+  private final AcademyRepository academyRepository;
   private final EmailVerificationCodeRepository emailVerificationCodeRepository;
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
@@ -48,18 +54,62 @@ public class AuthService {
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
+    // 사용자 저장
     UserEntity userEntity = new UserEntity(
         null,
         dto.name(),
         dto.country(),
         dto.genderType(),
         dto.birthDate(),
-        dto.backupEmail(),
         dto.email(),
         passwordProvider.encode(dto.password()),
-        RoleType.TEACHER
+        RoleType.TEACHER,
+        null
     );
+    userRepository.save(userEntity);
+  }
 
+  @Transactional
+  public void signUpAcademy(SignUpAcademyDto dto) {
+    // 이미 가입한 이메일인 경우 예외 처리
+    if (userRepository.existsByEmail(dto.email())) {
+      throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
+    }
+
+    // 이미 등록된 사업자 등록번호인 경우 예외 처리
+    if (academyRepository.existsByBusinessRegistrationNumber(dto.businessRegistrationNumber())) {
+      throw new AcademyException(AcademyExceptionCode.ALREADY_USED_BUSINESS_REGISTRATION_NUMBER);
+    }
+
+    // 인증된 이메일이 있는지 확인 후 예외 처리
+    boolean isEmailVerified = emailVerificationCodeRepository
+        .existsByEmailAndEmailVerificationCodeTypeAndVerifiedIsTrue(dto.email(), EmailVerificationCodeType.SIGN_UP);
+    if (!isEmailVerified) {
+      throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
+    }
+
+    // 학원 저장
+    AcademyEntity academy = academyRepository.save(
+        new AcademyEntity(
+            null,
+            dto.academyName(),
+            null,
+            dto.businessRegistrationNumber(),
+            null, null, false, false, false, false, false
+        ));
+
+    // 사용자 저장
+    UserEntity userEntity = new UserEntity(
+        null,
+        dto.name(),
+        "South Korea", // TODO 기본값으로 변경
+        dto.genderType(),
+        dto.birthDate(),
+        dto.email(),
+        passwordProvider.encode(dto.password()),
+        RoleType.TEACHER,
+        academy
+    );
     userRepository.save(userEntity);
   }
 
