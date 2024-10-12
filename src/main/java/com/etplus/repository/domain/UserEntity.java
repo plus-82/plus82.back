@@ -30,7 +30,7 @@ public class UserEntity {
   private Long id;
 
   private String name;
-  private String country;
+  private String country;   // TODO enum 클래스나 테이블로 변경
   private GenderType genderType;
   private LocalDate birthDate;
 
