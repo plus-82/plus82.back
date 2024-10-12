@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum LocationType {
+  // https://www.gaok.or.kr/gaok/main/contents.do?menuNo=200107
+
   SEOUL("서울특별시"),
   BUSAN("부산광역시"),
   DAEGU("대구광역시"),
