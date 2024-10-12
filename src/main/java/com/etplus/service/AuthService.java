@@ -57,7 +57,8 @@ public class AuthService {
         dto.backupEmail(),
         dto.email(),
         passwordProvider.encode(dto.password()),
-        RoleType.TEACHER
+        RoleType.TEACHER,
+        null
     );
 
     userRepository.save(userEntity);
