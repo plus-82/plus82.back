@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
 @Entity
-@Table(name = "academy_entity")
+@Table(name = "academy")
 public class AcademyEntity {
 
   @Id
