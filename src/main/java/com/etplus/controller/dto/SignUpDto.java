@@ -18,8 +18,6 @@ public record SignUpDto(
     String password,    // 비밀번호
 
     // 사용자 정보
-    @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "Invalid email format")
-    String backupEmail,     // 보조 이메일
     @NotBlank
     String name,            // 이름
     @NotBlank

@@ -33,7 +33,6 @@ public class UserEntity {
   private String country;
   private GenderType genderType;
   private LocalDate birthDate;
-  private String backupEmail;
 
   @Column(nullable = false, updatable = false)
   private String email;
@@ -56,14 +55,13 @@ public class UserEntity {
   private AcademyEntity academy;
 
   public UserEntity(Long id, String name, String country, GenderType genderType,
-      LocalDate birthDate, String backupEmail, String email, String password, RoleType roleType,
+      LocalDate birthDate, String email, String password, RoleType roleType,
       AcademyEntity academy) {
     this.id = id;
     this.name = name;
     this.country = country;
     this.genderType = genderType;
     this.birthDate = birthDate;
-    this.backupEmail = backupEmail;
     this.email = email;
     this.password = password;
     this.roleType = roleType;
