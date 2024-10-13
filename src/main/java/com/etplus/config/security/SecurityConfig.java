@@ -49,6 +49,7 @@ public class SecurityConfig {
             // TODO 범위 설정
             .requestMatchers("/api/v1/auth/**").permitAll()
             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
+            .requestMatchers("/api/v1/counties").permitAll()
             .requestMatchers("/api/v1/temp/guest").permitAll()
             .requestMatchers("/api/v1/**").authenticated()
             .anyRequest().permitAll()
