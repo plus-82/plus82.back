@@ -1,68 +1,74 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.7'
-	id 'io.spring.dependency-management' version '1.1.5'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.7'
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'com'
 version = '0.0.1'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencyManagement {
-	imports {
-		// aws
-		mavenBom "com.amazonaws:aws-java-sdk-bom:1.11.932"
-	}
+    imports {
+        // aws
+        mavenBom "com.amazonaws:aws-java-sdk-bom:1.11.932"
+    }
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	// database
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+    // database
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-	// securty
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
+    // querydsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	// jwt
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    // securty
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
 
-	// aws ses
-	implementation 'com.amazonaws:aws-java-sdk-ses'
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
-	// swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    // aws ses
+    implementation 'com.amazonaws:aws-java-sdk-ses'
 
-	// validation
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
