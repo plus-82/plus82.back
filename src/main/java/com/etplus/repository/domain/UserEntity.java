@@ -30,7 +30,6 @@ public class UserEntity {
   private Long id;
 
   private String name;
-  private String country;   // TODO enum 클래스나 테이블로 변경
   private GenderType genderType;
   private LocalDate birthDate;
 
@@ -51,20 +50,24 @@ public class UserEntity {
   private RoleType roleType;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "academy_id", referencedColumnName = "id", nullable = true, updatable = false)
+  @JoinColumn(name = "academy_id", referencedColumnName = "id", updatable = false)
   private AcademyEntity academy;
 
-  public UserEntity(Long id, String name, String country, GenderType genderType,
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "country_id", referencedColumnName = "id")
+  private CountryEntity country;
+
+  public UserEntity(Long id, String name, GenderType genderType,
       LocalDate birthDate, String email, String password, RoleType roleType,
-      AcademyEntity academy) {
+      AcademyEntity academy, CountryEntity country) {
     this.id = id;
     this.name = name;
-    this.country = country;
     this.genderType = genderType;
     this.birthDate = birthDate;
     this.email = email;
     this.password = password;
     this.roleType = roleType;
     this.academy = academy;
+    this.country = country;
   }
 }

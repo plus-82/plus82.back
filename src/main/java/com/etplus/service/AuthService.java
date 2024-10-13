@@ -17,9 +17,11 @@ import com.etplus.provider.EmailProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.repository.AcademyRepository;
+import com.etplus.repository.CountryRepository;
 import com.etplus.repository.EmailVerificationCodeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
+import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.EmailVerificationCode;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.EmailVerificationCodeType;
@@ -36,6 +38,7 @@ public class AuthService {
 
   private final UserRepository userRepository;
   private final AcademyRepository academyRepository;
+  private final CountryRepository countryRepository;
   private final EmailVerificationCodeRepository emailVerificationCodeRepository;
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
@@ -54,17 +57,20 @@ public class AuthService {
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
+    CountryEntity country = countryRepository.findById(dto.countryId()).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
+
     // 사용자 저장
     UserEntity userEntity = new UserEntity(
         null,
         dto.name(),
-        dto.country(),
         dto.genderType(),
         dto.birthDate(),
         dto.email(),
         passwordProvider.encode(dto.password()),
         RoleType.TEACHER,
-        null
+        null,
+        country
     );
     userRepository.save(userEntity);
   }
@@ -102,13 +108,13 @@ public class AuthService {
     UserEntity userEntity = new UserEntity(
         null,
         dto.name(),
-        "South Korea", // TODO 기본값으로 변경
         dto.genderType(),
         dto.birthDate(),
         dto.email(),
         passwordProvider.encode(dto.password()),
         RoleType.TEACHER,
-        academy
+        academy,
+        null
     );
     userRepository.save(userEntity);
   }

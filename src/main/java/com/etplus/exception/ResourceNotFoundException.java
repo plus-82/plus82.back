@@ -12,6 +12,7 @@ public class ResourceNotFoundException extends CustomBadRequestException {
   public enum ResourceNotFoundExceptionCode implements ResponseCode {
     EMAIL_VERIFICATION_CODE_NOT_FOUND("RNF-001", "email verification code not found"),
     USER_NOT_FOUND("RNF-002", "user not found"),
+    COUNTRY_NOT_FOUND("RNF-003", "country not found"),
     ;
 
     private String code;
