@@ -59,6 +59,8 @@ dependencies {
 
     // aws ses
     implementation 'com.amazonaws:aws-java-sdk-ses'
+    // aws s3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
