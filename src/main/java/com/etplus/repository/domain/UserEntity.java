@@ -29,7 +29,8 @@ public class UserEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
+  private String firstName;
+  private String lastName;
   private GenderType genderType;
   private LocalDate birthDate;
 
@@ -57,11 +58,12 @@ public class UserEntity {
   @JoinColumn(name = "country_id", referencedColumnName = "id")
   private CountryEntity country;
 
-  public UserEntity(Long id, String name, GenderType genderType,
+  public UserEntity(Long id, String firstName, String lastName, GenderType genderType,
       LocalDate birthDate, String email, String password, RoleType roleType,
       AcademyEntity academy, CountryEntity country) {
     this.id = id;
-    this.name = name;
+    this.firstName = firstName;
+    this.lastName = lastName;
     this.genderType = genderType;
     this.birthDate = birthDate;
     this.email = email;

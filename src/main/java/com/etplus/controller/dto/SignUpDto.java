@@ -19,7 +19,9 @@ public record SignUpDto(
 
     // 사용자 정보
     @NotBlank
-    String name,            // 이름
+    String firstName,
+    @NotBlank
+    String lastName,
     @NotNull
     GenderType genderType,  // 성별
     @NotNull
