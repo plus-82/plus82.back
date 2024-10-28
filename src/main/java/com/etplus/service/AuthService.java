@@ -195,6 +195,22 @@ public class AuthService {
         "visit here: https://plus82.co/reset-password?code=" + emailVerificationCode.getCode());
   }
 
+  public void validateResetPasswordCode(String code, String email) {
+    EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
+        .findByEmailAndCodeAndEmailVerificationCodeType(email, code, EmailVerificationCodeType.RESET_PASSWORD)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
+        );
+
+    if (emailVerificationCode.isVerified()) {
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
+    }
+
+    if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
+      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
+    }
+  }
+
   @Transactional
   public void resetPassword(ResetPasswordDto dto) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
