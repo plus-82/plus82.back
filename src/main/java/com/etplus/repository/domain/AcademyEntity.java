@@ -1,7 +1,9 @@
 package com.etplus.repository.domain;
 
 import com.etplus.repository.domain.code.LocationType;
+import com.etplus.repository.domain.converter.StringArrayConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +45,9 @@ public class AcademyEntity {
   private boolean forHighSchool;
   private boolean forAdult;
 
-  // todo image list?
+  // Image List
+  @Convert(converter = StringArrayConverter.class)
+  private List<String> imageUrls;
 
   public AcademyEntity(Long id, String name, String description, String businessRegistrationNumber,
       LocationType locationType, String detailedAddress, boolean forKindergarten,
