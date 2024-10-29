@@ -3,6 +3,7 @@ package com.etplus.exception;
 import com.etplus.common.CustomBadRequestException;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
+import com.etplus.common.CustomForbiddenException;
 import com.etplus.common.CustomUnauthorizedException;
 import com.etplus.exception.InvalidInputValueException.InvalidInputValueExceptionCode;
 import java.util.HashMap;
@@ -33,6 +34,12 @@ public class CustomExceptionHandler {
   public ResponseEntity<Object> handleCustomUnauthorizedException(CustomUnauthorizedException e) {
     log.warn("handleCustomUnauthorizedException : {}", e);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CommonResponse(e.getResponseCode()));
+  }
+
+  @ExceptionHandler(value = CustomForbiddenException.class)
+  public ResponseEntity<Object> handleCustomForbiddenException(CustomForbiddenException e) {
+    log.warn("handleCustomForbiddenException : {}", e);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new CommonResponse(e.getResponseCode()));
   }
 
   /**
