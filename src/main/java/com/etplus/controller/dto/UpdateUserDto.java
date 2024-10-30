@@ -14,7 +14,6 @@ public record UpdateUserDto(
     GenderType genderType,  // 성별
     @NotNull
     LocalDate birthDate,    // 생년월일
-    @NotNull
     Long countryId          // 국가
 ) {
 

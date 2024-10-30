@@ -37,7 +37,7 @@ public class UserService {
         user.getGenderType(),
         user.getBirthDate(),
         user.getEmail(),
-        country.getCountryNameEn()
+        country == null ? null : country.getCountryNameEn()
     );
   }
 
@@ -45,14 +45,17 @@ public class UserService {
   public void updateMe(long userId, UpdateUserDto dto) {
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-    CountryEntity country = countryRepository.findById(dto.countryId()).orElseThrow(
-        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
 
     user.setFirstName(dto.firstName());
     user.setLastName(dto.lastName());
     user.setGenderType(dto.genderType());
     user.setBirthDate(dto.birthDate());
-    user.setCountry(country);
+
+    if (dto.countryId() != null) {
+      CountryEntity country = countryRepository.findById(dto.countryId()).orElseThrow(
+          () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
+      user.setCountry(country);
+    }
     userRepository.save(user);
   }
 

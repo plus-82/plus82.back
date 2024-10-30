@@ -54,6 +54,7 @@ public class UserEntity {
   @JoinColumn(name = "academy_id", referencedColumnName = "id", updatable = false)
   private AcademyEntity academy;
 
+  // academy 는 country null
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "country_id", referencedColumnName = "id")
   private CountryEntity country;
