@@ -114,7 +114,7 @@ public class AuthService {
         dto.birthDate(),
         dto.email(),
         passwordProvider.encode(dto.password()),
-        RoleType.TEACHER,
+        RoleType.ACADEMY,
         academy,
         null
     );
