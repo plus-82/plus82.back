@@ -1,11 +1,13 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.UpdatePasswordDto;
+import com.etplus.controller.dto.UpdateUserDto;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.PasswordProvider;
+import com.etplus.repository.CountryRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.UserEntity;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final CountryRepository countryRepository;
   private final PasswordProvider passwordProvider;
 
   public UserVO getMe(long userId) {
@@ -36,6 +39,21 @@ public class UserService {
         user.getEmail(),
         country.getCountryNameEn()
     );
+  }
+
+  @Transactional
+  public void updateMe(long userId, UpdateUserDto dto) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    CountryEntity country = countryRepository.findById(dto.countryId()).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
+
+    user.setFirstName(dto.firstName());
+    user.setLastName(dto.lastName());
+    user.setGenderType(dto.genderType());
+    user.setBirthDate(dto.birthDate());
+    user.setCountry(country);
+    userRepository.save(user);
   }
 
   @Transactional

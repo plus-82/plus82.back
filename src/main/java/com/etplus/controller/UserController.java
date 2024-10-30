@@ -4,6 +4,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.config.security.LoginUser;
 import com.etplus.controller.dto.UpdatePasswordDto;
+import com.etplus.controller.dto.UpdateUserDto;
 import com.etplus.service.UserService;
 import com.etplus.vo.UserVO;
 import jakarta.validation.Valid;
@@ -27,6 +28,13 @@ public class UserController {
   public CommonResponse<UserVO> getMe(@AuthenticationPrincipal LoginUser loginUser) {
     UserVO vo = userService.getMe(loginUser.getUserId());
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/me")
+  public CommonResponse<Void> updateMe(@AuthenticationPrincipal LoginUser loginUser,
+      @RequestBody @Valid UpdateUserDto dto) {
+    userService.updateMe(loginUser.getUserId(), dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
   @DeleteMapping("/me")
