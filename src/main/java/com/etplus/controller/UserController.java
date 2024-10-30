@@ -5,10 +5,12 @@ import com.etplus.common.CommonResponseCode;
 import com.etplus.config.security.LoginUser;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.service.UserService;
+import com.etplus.vo.UserVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
+
+  @GetMapping("/me")
+  public CommonResponse<UserVO> getMe(@AuthenticationPrincipal LoginUser loginUser) {
+    UserVO vo = userService.getMe(loginUser.getUserId());
+    return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
 
   @DeleteMapping("/me")
   public CommonResponse<Void> deleteMe(@AuthenticationPrincipal LoginUser loginUser) {

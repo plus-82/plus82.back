@@ -7,7 +7,9 @@ import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.repository.UserRepository;
+import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.vo.UserVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,23 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordProvider passwordProvider;
+
+  public UserVO getMe(long userId) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    CountryEntity country = user.getCountry();
+
+    return new UserVO(
+        user.getId(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getGenderType(),
+        user.getBirthDate(),
+        user.getEmail(),
+        country.getCountryNameEn()
+    );
+  }
 
   @Transactional
   public void deleteUser(long userId) {
