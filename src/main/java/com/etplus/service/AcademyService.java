@@ -12,6 +12,7 @@ import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.AcademyDetailVO;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,33 @@ public class AcademyService {
   private final AcademyRepository academyRepository;
   private final UserRepository userRepository;
   private final S3ImageUploader s3ImageUploader;
+
+  public AcademyDetailVO getMyAcademy(LoginUser loginUser) {
+    UserEntity user = userRepository.findById(loginUser.getUserId())
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    AcademyEntity academy = user.getAcademy();
+
+    if (!RoleType.ACADEMY.equals(user.getRoleType()) || academy == null) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.INVALID_ROLE);
+    }
+
+    return new AcademyDetailVO(
+        academy.getId(),
+        academy.getName(),
+        academy.getDescription(),
+        academy.getBusinessRegistrationNumber(),
+        academy.getLocationType(),
+        academy.getDetailedAddress(),
+        academy.isForKindergarten(),
+        academy.isForElementary(),
+        academy.isForMiddleSchool(),
+        academy.isForHighSchool(),
+        academy.isForAdult(),
+        academy.getImageUrls()
+    );
+  }
 
   @Transactional
   public void updateMyAcademy(UpdateAcademyDto dto, LoginUser loginUser) {
