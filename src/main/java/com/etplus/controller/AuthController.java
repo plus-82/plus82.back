@@ -46,8 +46,8 @@ public class AuthController {
   }
 
   @PostMapping("/request-verification")
-  public CommonResponse<Void> requestVerification(@RequestBody @Valid RequestEmailVerificationDto dto) {
-    authService.requestVerification(dto);
+  public CommonResponse<Void> requestEmailVerification(@RequestBody @Valid RequestEmailVerificationDto dto) {
+    authService.requestEmailVerification(dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
@@ -64,9 +64,8 @@ public class AuthController {
   }
 
   @GetMapping("/reset-password/validate")
-  public CommonResponse<Void> validateResetPasswordCode(@RequestParam(name = "code") String code,
-      @RequestParam(name = "email") String email) {
-    authService.validateResetPasswordCode(code, email);
+  public CommonResponse<Void> validateResetPasswordCode(@RequestParam(name = "code") String code) {
+    authService.validateResetPasswordCode(code);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
