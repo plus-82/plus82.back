@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "email_verification_code")
-public class EmailVerificationCode {
+public class EmailVerificationCodeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class EmailVerificationCode {
   @Column(nullable = false, updatable = false)
   private EmailVerificationCodeType emailVerificationCodeType;
 
-  public EmailVerificationCode(Long id, String email, String code, LocalDateTime expireDateTime,
+  public EmailVerificationCodeEntity(Long id, String email, String code, LocalDateTime expireDateTime,
       boolean verified, EmailVerificationCodeType emailVerificationCodeType) {
     this.id = id;
     this.email = email;

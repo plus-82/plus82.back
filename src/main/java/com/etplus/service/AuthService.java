@@ -27,7 +27,7 @@ import com.etplus.repository.EmailVerificationCodeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.CountryEntity;
-import com.etplus.repository.domain.EmailVerificationCode;
+import com.etplus.repository.domain.EmailVerificationCodeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.EmailVerificationCodeType;
 import com.etplus.repository.domain.code.RoleType;
@@ -165,7 +165,7 @@ public class AuthService {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
-    EmailVerificationCode emailVerificationCode = new EmailVerificationCode(
+    EmailVerificationCodeEntity emailVerificationCodeEntity = new EmailVerificationCodeEntity(
         null,
         dto.email(),
         UuidProvider.generateCode(),
@@ -173,31 +173,31 @@ public class AuthService {
         false,
         EmailVerificationCodeType.SIGN_UP
     );
-    emailVerificationCodeRepository.save(emailVerificationCode);
+    emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
     emailProvider.send(dto.email(), "[Plus82] Verify your email",
-        "input this code: " + emailVerificationCode.getCode());
+        "input this code: " + emailVerificationCodeEntity.getCode());
   }
 
   @Transactional
   public void verifyCode(VerifyEmailDto dto) {
-    EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
+    EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
         .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
             EmailVerificationCodeType.SIGN_UP, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
 
-    if (emailVerificationCode.isVerified()) {
+    if (emailVerificationCodeEntity.isVerified()) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
     }
 
-    if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
+    if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
     }
 
-    emailVerificationCode.setVerified(true);
-    emailVerificationCodeRepository.save(emailVerificationCode);
+    emailVerificationCodeEntity.setVerified(true);
+    emailVerificationCodeRepository.save(emailVerificationCodeEntity);
   }
 
   @Transactional
@@ -212,7 +212,7 @@ public class AuthService {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
-    EmailVerificationCode emailVerificationCode = new EmailVerificationCode(
+    EmailVerificationCodeEntity emailVerificationCodeEntity = new EmailVerificationCodeEntity(
         null,
         dto.email(),
         UuidProvider.generateCode(),
@@ -220,51 +220,51 @@ public class AuthService {
         false,
         EmailVerificationCodeType.RESET_PASSWORD
     );
-    emailVerificationCodeRepository.save(emailVerificationCode);
+    emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
     emailProvider.send(dto.email(), "[Plus82] Reset your password",
-        "visit here: https://plus82.co/reset-password?code=" + emailVerificationCode.getCode());
+        "visit here: https://plus82.co/reset-password?code=" + emailVerificationCodeEntity.getCode());
   }
 
   public void validateResetPasswordCode(String code) {
-    EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
+    EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
         .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(code,
             EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
 
-    if (emailVerificationCode.isVerified()) {
+    if (emailVerificationCodeEntity.isVerified()) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
     }
 
-    if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
+    if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
     }
   }
 
   @Transactional
   public void resetPassword(ResetPasswordDto dto) {
-    EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
+    EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
         .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
             EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
 
-    if (emailVerificationCode.isVerified()) {
+    if (emailVerificationCodeEntity.isVerified()) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
     }
 
-    if (emailVerificationCode.getExpireDateTime().isBefore(LocalDateTime.now())) {
+    if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
     }
 
-    emailVerificationCode.setVerified(true);
-    emailVerificationCodeRepository.save(emailVerificationCode);
+    emailVerificationCodeEntity.setVerified(true);
+    emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
     // 비밀번호 변경
-    UserEntity userEntity = userRepository.findByEmailAndDeletedIsFalse(emailVerificationCode.getEmail()).orElseThrow(
+    UserEntity userEntity = userRepository.findByEmailAndDeletedIsFalse(emailVerificationCodeEntity.getEmail()).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     userEntity.setPassword(passwordProvider.encode(dto.password()));
