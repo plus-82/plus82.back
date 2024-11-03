@@ -1,12 +1,16 @@
 package com.etplus.service;
 
+import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
+import com.etplus.controller.dto.SignInDto;
 import com.etplus.controller.dto.SignUpAcademyDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.exception.AcademyException;
 import com.etplus.exception.AcademyException.AcademyExceptionCode;
+import com.etplus.exception.AuthException;
+import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.EmailVerificationCodeException;
 import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -14,6 +18,7 @@ import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionC
 import com.etplus.exception.UserException;
 import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
+import com.etplus.provider.JwtProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.repository.AcademyRepository;
@@ -27,6 +32,7 @@ import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.EmailVerificationCodeType;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.util.UuidProvider;
+import com.etplus.vo.TokenVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +48,7 @@ public class AuthService {
   private final EmailVerificationCodeRepository emailVerificationCodeRepository;
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
+  private final JwtProvider jwtProvider;
 
   @Transactional
   public void signUp(SignUpDto dto) {
@@ -119,6 +126,23 @@ public class AuthService {
         null
     );
     userRepository.save(userEntity);
+  }
+
+  public TokenVO signIn(SignInDto dto) {
+    UserEntity user = userRepository.findByEmail(dto.email()).orElseThrow(
+        () -> new AuthException(AuthExceptionCode.EMAIL_NOT_CORRECT));
+
+    if (user.isDeleted()) {
+      throw new AuthException(AuthExceptionCode.DELETED_USER);
+    }
+
+    if (!passwordProvider.matches(dto.password(), user.getPassword())) {
+      throw new AuthException(AuthExceptionCode.PW_NOT_CORRECT);
+    }
+
+    String token = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
+
+    return new TokenVO(token);
   }
 
   @Transactional
