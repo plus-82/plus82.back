@@ -1,11 +1,11 @@
 package com.etplus.exception;
 
-import com.etplus.common.CustomBadRequestException;
+import com.etplus.common.CustomUnauthorizedException;
 import com.etplus.common.ResponseCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class AuthException extends CustomBadRequestException {
+public class AuthException extends CustomUnauthorizedException {
 
   @AllArgsConstructor
   @Getter

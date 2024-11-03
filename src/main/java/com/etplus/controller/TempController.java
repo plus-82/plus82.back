@@ -1,10 +1,10 @@
 package com.etplus.controller;
 
+import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
-import com.etplus.config.security.LoginUser;
+import com.etplus.common.LoginUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TempController {
 
   @GetMapping("/user")
-  public CommonResponse<String> getUser(@AuthenticationPrincipal LoginUser loginUser) {
-    return new CommonResponse<>("hello " + loginUser.getEmail(), CommonResponseCode.SUCCESS);
+  public CommonResponse<String> getUser(@AuthUser LoginUser loginUser) {
+    return new CommonResponse<>("hello " + loginUser.email(), CommonResponseCode.SUCCESS);
   }
 
   @GetMapping("/guest")

@@ -1,15 +1,15 @@
 package com.etplus.controller;
 
+import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
-import com.etplus.config.security.LoginUser;
+import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.service.AcademyService;
 import com.etplus.vo.AcademyDetailVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,14 +25,14 @@ public class AcademyController {
 
   @GetMapping(value = "/me")
   public CommonResponse<AcademyDetailVO> getMyAcademy(
-      @AuthenticationPrincipal LoginUser loginUser) {
+      @AuthUser LoginUser loginUser) {
     AcademyDetailVO vo = academyService.getMyAcademy(loginUser);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
   @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> updateMyAcademy(@ModelAttribute @Valid UpdateAcademyDto dto,
-      @AuthenticationPrincipal LoginUser loginUser) {
+      @AuthUser LoginUser loginUser) {
     academyService.updateMyAcademy(dto, loginUser);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
