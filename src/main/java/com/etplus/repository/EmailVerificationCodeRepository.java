@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface EmailVerificationCodeRepository extends
     JpaRepository<EmailVerificationCode, Long> {
 
-  Optional<EmailVerificationCode> findByEmailAndCodeAndEmailVerificationCodeType(
-      String email, String code, EmailVerificationCodeType emailVerificationCodeType);
+  Optional<EmailVerificationCode> findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(
+      String code, EmailVerificationCodeType emailVerificationCodeType, LocalDateTime expireDateTime);
 
   boolean existsByEmailAndEmailVerificationCodeTypeAndVerifiedIsTrue(String email, EmailVerificationCodeType emailVerificationCodeType);
 

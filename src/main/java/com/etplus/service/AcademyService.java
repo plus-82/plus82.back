@@ -1,6 +1,6 @@
 package com.etplus.service;
 
-import com.etplus.config.security.LoginUser;
+import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
@@ -29,7 +29,7 @@ public class AcademyService {
   private final S3ImageUploader s3ImageUploader;
 
   public AcademyDetailVO getMyAcademy(LoginUser loginUser) {
-    UserEntity user = userRepository.findById(loginUser.getUserId())
+    UserEntity user = userRepository.findById(loginUser.userId())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
@@ -57,7 +57,7 @@ public class AcademyService {
 
   @Transactional
   public void updateMyAcademy(UpdateAcademyDto dto, LoginUser loginUser) {
-    UserEntity user = userRepository.findById(loginUser.getUserId())
+    UserEntity user = userRepository.findById(loginUser.userId())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 

@@ -1,12 +1,16 @@
 package com.etplus.service;
 
+import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
+import com.etplus.controller.dto.SignInDto;
 import com.etplus.controller.dto.SignUpAcademyDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.exception.AcademyException;
 import com.etplus.exception.AcademyException.AcademyExceptionCode;
+import com.etplus.exception.AuthException;
+import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.EmailVerificationCodeException;
 import com.etplus.exception.EmailVerificationCodeException.EmailVerificationCodeExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -14,6 +18,7 @@ import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionC
 import com.etplus.exception.UserException;
 import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
+import com.etplus.provider.JwtProvider;
 import com.etplus.provider.PasswordProvider;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.repository.AcademyRepository;
@@ -27,14 +32,21 @@ import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.EmailVerificationCodeType;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.util.UuidProvider;
+import com.etplus.vo.TokenVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class AuthService {
+
+  @Value("${email.expiration-minute}")
+  private Integer EMAIL_EXPIRATION_MINUTE;
+  @Value("${email.max-try-count}")
+  private Integer EMAIL_MAX_TRY_COUNT;
 
   private final UserRepository userRepository;
   private final AcademyRepository academyRepository;
@@ -42,6 +54,7 @@ public class AuthService {
   private final EmailVerificationCodeRepository emailVerificationCodeRepository;
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
+  private final JwtProvider jwtProvider;
 
   @Transactional
   public void signUp(SignUpDto dto) {
@@ -121,8 +134,25 @@ public class AuthService {
     userRepository.save(userEntity);
   }
 
+  public TokenVO signIn(SignInDto dto) {
+    UserEntity user = userRepository.findByEmail(dto.email()).orElseThrow(
+        () -> new AuthException(AuthExceptionCode.EMAIL_NOT_CORRECT));
+
+    if (user.isDeleted()) {
+      throw new AuthException(AuthExceptionCode.DELETED_USER);
+    }
+
+    if (!passwordProvider.matches(dto.password(), user.getPassword())) {
+      throw new AuthException(AuthExceptionCode.PW_NOT_CORRECT);
+    }
+
+    String token = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
+
+    return new TokenVO(token);
+  }
+
   @Transactional
-  public void requestVerification(RequestEmailVerificationDto dto) {
+  public void requestEmailVerification(RequestEmailVerificationDto dto) {
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
       throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
@@ -131,7 +161,7 @@ public class AuthService {
     // 3회 이상 요청한 경우 예외 처리
     int numberOfEmailVerification = emailVerificationCodeRepository
         .countByEmailAndExpireDateTimeAfter(dto.email(), LocalDateTime.now());
-    if (numberOfEmailVerification > 3) {
+    if (numberOfEmailVerification >= EMAIL_MAX_TRY_COUNT) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
@@ -139,7 +169,7 @@ public class AuthService {
         null,
         dto.email(),
         UuidProvider.generateCode(),
-        LocalDateTime.now().plusMinutes(10),
+        LocalDateTime.now().plusMinutes(EMAIL_EXPIRATION_MINUTE),
         false,
         EmailVerificationCodeType.SIGN_UP
     );
@@ -152,7 +182,8 @@ public class AuthService {
   @Transactional
   public void verifyCode(VerifyEmailDto dto) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
-        .findByEmailAndCodeAndEmailVerificationCodeType(dto.email(), dto.code(), EmailVerificationCodeType.SIGN_UP)
+        .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
+            EmailVerificationCodeType.SIGN_UP, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
@@ -177,7 +208,7 @@ public class AuthService {
     // 3회 이상 요청한 경우 예외 처리
     int numberOfEmailVerification = emailVerificationCodeRepository
         .countByEmailAndExpireDateTimeAfter(dto.email(), LocalDateTime.now());
-    if (numberOfEmailVerification > 3) {
+    if (numberOfEmailVerification >= EMAIL_MAX_TRY_COUNT) {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
@@ -185,7 +216,7 @@ public class AuthService {
         null,
         dto.email(),
         UuidProvider.generateCode(),
-        LocalDateTime.now().plusMinutes(10),
+        LocalDateTime.now().plusMinutes(EMAIL_EXPIRATION_MINUTE),
         false,
         EmailVerificationCodeType.RESET_PASSWORD
     );
@@ -195,9 +226,10 @@ public class AuthService {
         "visit here: https://plus82.co/reset-password?code=" + emailVerificationCode.getCode());
   }
 
-  public void validateResetPasswordCode(String code, String email) {
+  public void validateResetPasswordCode(String code) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
-        .findByEmailAndCodeAndEmailVerificationCodeType(email, code, EmailVerificationCodeType.RESET_PASSWORD)
+        .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(code,
+            EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
@@ -214,7 +246,8 @@ public class AuthService {
   @Transactional
   public void resetPassword(ResetPasswordDto dto) {
     EmailVerificationCode emailVerificationCode = emailVerificationCodeRepository
-        .findByEmailAndCodeAndEmailVerificationCodeType(dto.email(), dto.code(), EmailVerificationCodeType.RESET_PASSWORD)
+        .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
+            EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
         );
@@ -231,7 +264,7 @@ public class AuthService {
     emailVerificationCodeRepository.save(emailVerificationCode);
 
     // 비밀번호 변경
-    UserEntity userEntity = userRepository.findByEmailAndDeletedIsFalse(dto.email()).orElseThrow(
+    UserEntity userEntity = userRepository.findByEmailAndDeletedIsFalse(emailVerificationCode.getEmail()).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     userEntity.setPassword(passwordProvider.encode(dto.password()));

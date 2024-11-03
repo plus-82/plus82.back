@@ -1,10 +1,11 @@
 package com.etplus.controller;
 
+import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
-import com.etplus.config.security.LoginUser;
+import com.etplus.common.LoginUser;
+import com.etplus.repository.domain.code.RoleType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,9 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/temp")
 public class TempController {
 
-  @GetMapping("/user")
-  public CommonResponse<String> getUser(@AuthenticationPrincipal LoginUser loginUser) {
-    return new CommonResponse<>("hello " + loginUser.getEmail(), CommonResponseCode.SUCCESS);
+  @GetMapping("/user/teacher")
+  public CommonResponse<String> getTeacher(@AuthUser(RoleType.TEACHER) LoginUser loginUser) {
+    return new CommonResponse<>("hello " + loginUser.email(), CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/user/academy")
+  public CommonResponse<String> getAcademy(@AuthUser(RoleType.ACADEMY) LoginUser loginUser) {
+    return new CommonResponse<>("hello " + loginUser.email(), CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/user/all-user")
+  public CommonResponse<String> getUser(@AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
+    return new CommonResponse<>("hello " + loginUser.email(), CommonResponseCode.SUCCESS);
   }
 
   @GetMapping("/guest")

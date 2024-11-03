@@ -1,6 +1,6 @@
 package com.etplus.provider;
 
-import com.etplus.config.security.LoginUser;
+import com.etplus.common.LoginUser;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.repository.domain.code.RoleType;
@@ -27,9 +27,9 @@ public class JwtProvider {
     Date now = new Date();
 
     return Jwts.builder()
-        .claim("id", loginUser.getUserId())
-        .claim("name", loginUser.getEmail())
-        .claim("role", loginUser.getRoleType())
+        .claim("id", loginUser.userId())
+        .claim("name", loginUser.email())
+        .claim("role", loginUser.roleType())
         .setIssuedAt(now)
         .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
         .signWith(SignatureAlgorithm.HS512, JWT_SECRET_KEY)
@@ -44,7 +44,6 @@ public class JwtProvider {
       return new LoginUser(
           body.get("id", Long.class),
           body.get("name", String.class),
-          "",
           RoleType.valueOf(body.get("role", String.class))
       );
     } catch (ExpiredJwtException e) {

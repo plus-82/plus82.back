@@ -5,10 +5,12 @@ import com.etplus.common.CommonResponseCode;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
+import com.etplus.controller.dto.SignInDto;
 import com.etplus.controller.dto.SignUpAcademyDto;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.service.AuthService;
+import com.etplus.vo.TokenVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +39,15 @@ public class AuthController {
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/sign-in")
+  public CommonResponse<TokenVO> signIn(@RequestBody @Valid SignInDto dto) {
+    TokenVO token = authService.signIn(dto);
+    return new CommonResponse<>(token, CommonResponseCode.SUCCESS);
+  }
+
   @PostMapping("/request-verification")
-  public CommonResponse<Void> requestVerification(@RequestBody @Valid RequestEmailVerificationDto dto) {
-    authService.requestVerification(dto);
+  public CommonResponse<Void> requestEmailVerification(@RequestBody @Valid RequestEmailVerificationDto dto) {
+    authService.requestEmailVerification(dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
@@ -56,9 +64,8 @@ public class AuthController {
   }
 
   @GetMapping("/reset-password/validate")
-  public CommonResponse<Void> validateResetPasswordCode(@RequestParam(name = "code") String code,
-      @RequestParam(name = "email") String email) {
-    authService.validateResetPasswordCode(code, email);
+  public CommonResponse<Void> validateResetPasswordCode(@RequestParam(name = "code") String code) {
+    authService.validateResetPasswordCode(code);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
