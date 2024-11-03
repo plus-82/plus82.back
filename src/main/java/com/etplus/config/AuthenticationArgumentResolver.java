@@ -5,6 +5,8 @@ import com.etplus.common.LoginUser;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.provider.JwtProvider;
+import com.etplus.repository.domain.code.RoleType;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -34,7 +36,16 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
   public LoginUser resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
       NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
     String token = parseJwt(webRequest);
-    return jwtProvider.decrypt(token);
+    LoginUser loginUser = jwtProvider.decrypt(token);
+
+    AuthUser authUserAnnotation = parameter.getParameterAnnotation(AuthUser.class);
+    RoleType[] allowedRoles = authUserAnnotation.value();
+
+    if (Arrays.stream(allowedRoles).noneMatch(role -> role.equals(loginUser.roleType()))) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    return loginUser;
   }
 
   private String parseJwt(NativeWebRequest request) {

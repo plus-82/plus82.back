@@ -17,6 +17,7 @@ public class AuthException extends CustomUnauthorizedException {
     INVALID_TOKEN_TYPE("AE-005", "invalid token type"),
     INVALID_TOKEN("AE-006", "invalid token"),
     DELETED_USER("AE-007", "deleted user"),
+    ACCESS_DENIED("AE-008", "access denied"),
     ;
 
     private String code;

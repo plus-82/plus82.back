@@ -6,6 +6,7 @@ import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateUserDto;
+import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.UserService;
 import com.etplus.vo.UserVO;
 import jakarta.validation.Valid;
@@ -25,27 +26,31 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping("/me")
-  public CommonResponse<UserVO> getMe(@AuthUser LoginUser loginUser) {
+  public CommonResponse<UserVO> getMe(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
     UserVO vo = userService.getMe(loginUser.userId());
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
   @PutMapping("/me")
-  public CommonResponse<Void> updateMe(@AuthUser LoginUser loginUser,
+  public CommonResponse<Void> updateMe(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
       @RequestBody @Valid UpdateUserDto dto) {
     userService.updateMe(loginUser.userId(), dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
   @DeleteMapping("/me")
-  public CommonResponse<Void> deleteMe(@AuthUser LoginUser loginUser) {
+  public CommonResponse<Void> deleteMe(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
     userService.deleteUser(loginUser.userId());
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
   @PutMapping("/me/password")
-  public CommonResponse<Void> updatePassword(@AuthUser LoginUser loginUser,
-  @RequestBody @Valid UpdatePasswordDto dto) {
+  public CommonResponse<Void> updatePassword(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @RequestBody @Valid UpdatePasswordDto dto) {
     userService.updatePassword(loginUser.userId(), dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }

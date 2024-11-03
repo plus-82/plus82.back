@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.UpdateAcademyDto;
+import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.AcademyService;
 import com.etplus.vo.AcademyDetailVO;
 import jakarta.validation.Valid;
@@ -25,14 +26,14 @@ public class AcademyController {
 
   @GetMapping(value = "/me")
   public CommonResponse<AcademyDetailVO> getMyAcademy(
-      @AuthUser LoginUser loginUser) {
+      @AuthUser(RoleType.ACADEMY) LoginUser loginUser) {
     AcademyDetailVO vo = academyService.getMyAcademy(loginUser);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
   @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> updateMyAcademy(@ModelAttribute @Valid UpdateAcademyDto dto,
-      @AuthUser LoginUser loginUser) {
+      @AuthUser(RoleType.ACADEMY) LoginUser loginUser) {
     academyService.updateMyAcademy(dto, loginUser);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
