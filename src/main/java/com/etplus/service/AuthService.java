@@ -111,7 +111,6 @@ public class AuthService {
     // 학원 저장
     AcademyEntity academy = academyRepository.save(
         new AcademyEntity(
-            null,
             dto.academyName(),
             null,
             dto.businessRegistrationNumber(),

@@ -49,10 +49,9 @@ public class AcademyEntity {
   @Convert(converter = StringArrayConverter.class)
   private List<String> imageUrls;
 
-  public AcademyEntity(Long id, String name, String description, String businessRegistrationNumber,
+  public AcademyEntity(String name, String description, String businessRegistrationNumber,
       LocationType locationType, String detailedAddress, boolean forKindergarten,
       boolean forElementary, boolean forMiddleSchool, boolean forHighSchool, boolean forAdult) {
-    this.id = id;
     this.name = name;
     this.description = description;
     this.businessRegistrationNumber = businessRegistrationNumber;
