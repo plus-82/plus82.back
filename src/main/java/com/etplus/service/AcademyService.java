@@ -10,6 +10,7 @@ import com.etplus.provider.S3ImageUploader;
 import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
+import com.etplus.repository.domain.ImageFileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.AcademyDetailVO;
@@ -51,7 +52,7 @@ public class AcademyService {
         academy.isForMiddleSchool(),
         academy.isForHighSchool(),
         academy.isForAdult(),
-        academy.getImageUrls()
+        null  // TODO
     );
   }
 
@@ -76,12 +77,16 @@ public class AcademyService {
     academy.setForAdult(dto.forAdult());
 
     // 이미지 업로드
-    List<String> uploadedImageUrls = new ArrayList<>();
+    List<ImageFileEntity> uploadedImageFiles = new ArrayList<>();
     for (MultipartFile image : dto.images()) {
-      uploadedImageUrls.add(s3ImageUploader.upload(image));
+      uploadedImageFiles.add(s3ImageUploader.uploadAndSaveRepository(image, user));
     }
 
-    academy.setImageUrls(uploadedImageUrls);
+    List<Long> uploadedImageFileIds = uploadedImageFiles.stream()
+        .map(ImageFileEntity::getId)
+        .toList();
+
+    academy.setImageFileIdList(uploadedImageFileIds);
     academyRepository.save(academy);
   }
 }

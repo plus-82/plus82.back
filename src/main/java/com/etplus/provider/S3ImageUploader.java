@@ -3,6 +3,9 @@ package com.etplus.provider;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.etplus.repository.ImageFileRepository;
+import com.etplus.repository.domain.ImageFileEntity;
+import com.etplus.repository.domain.UserEntity;
 import com.etplus.util.UuidProvider;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -17,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class S3ImageUploader {
 
   private final AmazonS3Client client;
+  private final ImageFileRepository imageFileRepository;
 
   @Value("${aws.s3.bucket}")
   private String BUCKET;
@@ -45,7 +49,8 @@ public class S3ImageUploader {
 //    return s3PathKey;
 //  }
 
-  public String upload(MultipartFile file) {
+  @Transactional
+  public ImageFileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
     String s3PathKey = PATH_ROOT + "/" + UuidProvider.generateUuid();
     ObjectMetadata metaData = new ObjectMetadata();
     metaData.setContentLength(file.getSize());
@@ -57,6 +62,14 @@ public class S3ImageUploader {
 //      throw new FileException(FileExceptionCode.FAILED_TO_STORE);
       throw new RuntimeException(e.getMessage());
     }
-    return s3PathKey;
+
+    return imageFileRepository.save(new ImageFileEntity(
+            null,
+            file.getOriginalFilename(),
+            s3PathKey,
+            file.getSize(),
+            file.getContentType(),
+            owner
+    ));
   }
 }

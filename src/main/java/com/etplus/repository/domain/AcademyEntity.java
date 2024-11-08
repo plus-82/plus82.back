@@ -1,7 +1,7 @@
 package com.etplus.repository.domain;
 
 import com.etplus.repository.domain.code.LocationType;
-import com.etplus.repository.domain.converter.StringArrayConverter;
+import com.etplus.repository.domain.converter.LongListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -46,8 +46,8 @@ public class AcademyEntity {
   private boolean forAdult;
 
   // Image List
-  @Convert(converter = StringArrayConverter.class)
-  private List<String> imageUrls;
+  @Convert(converter = LongListConverter.class)
+  private List<Long> imageFileIdList;
 
   public AcademyEntity(String name, String description, String businessRegistrationNumber,
       LocationType locationType, String detailedAddress, boolean forKindergarten,
