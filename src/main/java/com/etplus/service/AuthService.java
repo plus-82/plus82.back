@@ -222,7 +222,7 @@ public class AuthService {
     emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
     emailProvider.send(dto.email(), "[Plus82] Reset your password",
-        "visit here: https://plus82.co/reset-password?code=" + emailVerificationCodeEntity.getCode());
+        "visit here: https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode());
   }
 
   public void validateResetPasswordCode(String code) {
