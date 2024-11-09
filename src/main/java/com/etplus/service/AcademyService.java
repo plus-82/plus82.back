@@ -31,6 +31,32 @@ public class AcademyService {
   private final S3ImageUploader s3ImageUploader;
   private final ImageFileRepository imageFileRepository;
 
+  public AcademyDetailVO getAcademyDetail(Long academyId) {
+    AcademyEntity academy = academyRepository.findById(academyId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    List<Long> imageFileIdList = academy.getImageFileIdList();
+    List<ImageFileEntity> imageFileList = imageFileRepository.findAllByIdIn(imageFileIdList);
+
+    List<String> imagePathList = imageFileList.stream().map(ImageFileEntity::getPath).toList();
+
+    return new AcademyDetailVO(
+        academy.getId(),
+        academy.getName(),
+        academy.getDescription(),
+        academy.getBusinessRegistrationNumber(),
+        academy.getLocationType(),
+        academy.getDetailedAddress(),
+        academy.isForKindergarten(),
+        academy.isForElementary(),
+        academy.isForMiddleSchool(),
+        academy.isForHighSchool(),
+        academy.isForAdult(),
+        imagePathList
+    );
+  }
+
   public AcademyDetailVO getMyAcademy(LoginUser loginUser) {
     UserEntity user = userRepository.findById(loginUser.userId())
         .orElseThrow(() -> new ResourceNotFoundException(

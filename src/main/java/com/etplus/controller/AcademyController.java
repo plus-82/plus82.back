@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AcademyController {
 
   private final AcademyService academyService;
+
+  @GetMapping("/{academy-id}")
+  public CommonResponse<AcademyDetailVO> getAcademyDetail(@PathVariable("academy-id") Long academyId) {
+    AcademyDetailVO academy = academyService.getAcademyDetail(academyId);
+    return new CommonResponse<>(academy, CommonResponseCode.SUCCESS);
+  }
 
   @GetMapping(value = "/me")
   public CommonResponse<AcademyDetailVO> getMyAcademy(
