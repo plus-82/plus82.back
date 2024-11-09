@@ -3,12 +3,17 @@ package com.etplus.provider;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.etplus.exception.FileException;
+import com.etplus.repository.ImageFileRepository;
+import com.etplus.repository.domain.ImageFileEntity;
+import com.etplus.repository.domain.UserEntity;
 import com.etplus.util.UuidProvider;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
@@ -17,36 +22,20 @@ import org.springframework.web.multipart.MultipartFile;
 public class S3ImageUploader {
 
   private final AmazonS3Client client;
+  private final ImageFileRepository imageFileRepository;
 
   @Value("${aws.s3.bucket}")
   private String BUCKET;
   @Value("${aws.s3.path}")
   private String PATH_ROOT;
 
-//  public String upload(MultipartFile multipartFile) {
-//    String originalFilename = multipartFile.getOriginalFilename();
-//
-//    ObjectMetadata metadata = new ObjectMetadata();
-//    metadata.setContentLength(multipartFile.getSize());
-//    metadata.setContentType(multipartFile.getContentType());
-//
-//    try {
-//      client.putObject(BUCKET, originalFilename, multipartFile.getInputStream(), metadata);
-//    } catch (IOException exception) {
-////            throw new S3ImageUploadException(exception.getMessage());
-//      throw new RuntimeException(exception.getMessage());
-//    }
-//    return client.getUrl(BUCKET, originalFilename).toString();
-//  }
+  @Transactional
+  public ImageFileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
+    verifyFile(file.getContentType());
 
-//  public String upload(File file) {
-//    String s3PathKey = PATH_ROOT + "/" + UuidProvider.generateUuid();
-//    client.putObject(new PutObjectRequest(BUCKET, s3PathKey, file));
-//    return s3PathKey;
-//  }
+    String fileExtension = file.getContentType().substring(file.getContentType().lastIndexOf('/') + 1);
 
-  public String upload(MultipartFile file) {
-    String s3PathKey = PATH_ROOT + "/" + UuidProvider.generateUuid();
+    String s3PathKey = PATH_ROOT + "/" + UuidProvider.generateUuid() + "." + fileExtension;
     ObjectMetadata metaData = new ObjectMetadata();
     metaData.setContentLength(file.getSize());
     try {
@@ -57,6 +46,22 @@ public class S3ImageUploader {
 //      throw new FileException(FileExceptionCode.FAILED_TO_STORE);
       throw new RuntimeException(e.getMessage());
     }
-    return s3PathKey;
+
+    return imageFileRepository.save(new ImageFileEntity(
+            null,
+            file.getOriginalFilename(),
+            s3PathKey,
+            file.getSize(),
+            file.getContentType(),
+            owner
+    ));
   }
+
+
+  private void verifyFile(String contentType) {
+    // 확장자가 jpeg, png인 파일들만 받아서 처리
+    if (ObjectUtils.isEmpty(contentType) | (!contentType.contains("image/jpeg") & !contentType.contains("image/png")))
+      throw new FileException(FileException.FileExceptionCode.INVALID_FILE_EXTENSION);
+  }
+
 }
