@@ -28,15 +28,15 @@ public class AcademyEntity {
   private Long id;
 
   @Column(nullable = false)
-  private String name;
+  private String name;                        // 학원 이름
   @Column(length = 1000)
-  private String description;
+  private String description;                 // 학원 설명
   @Column(nullable = false, unique = true, length = 20)
   private String businessRegistrationNumber;  // 사업자등록번호
 
   @Enumerated(EnumType.STRING)
-  private LocationType locationType;
-  private String detailedAddress;
+  private LocationType locationType;          // 위치 (시,도)
+  private String detailedAddress;             // 상세 주소
 
   // 대상
   private boolean forKindergarten;
