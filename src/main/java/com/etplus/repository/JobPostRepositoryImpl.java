@@ -41,8 +41,8 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
             academy.forElementary,
             academy.forMiddleSchool,
             academy.forHighSchool,
-            academy.forAdult
-//            null // todo image list
+            academy.forAdult,
+            academy.imageFileIdList
         ))
         .from(jobPost)
         .innerJoin(jobPost.academy, academy)

@@ -22,7 +22,15 @@ public class JobPostService {
   private final ImageFileRepository imageFileRepository;
 
   public Slice<JobPostVO> getJobPosts(SearchJobPostDTO dto) {
-    return jobPostRepository.findAllJobPost(dto);
+    Slice<JobPostVO> allJobPost = jobPostRepository.findAllJobPost(dto);
+
+    for (JobPostVO jobPost : allJobPost) {
+      List<String> imageUrls = imageFileRepository.findAllByIdIn(jobPost.getImageFileIdList())
+          .stream().map(ImageFileEntity::getPath).toList();
+      jobPost.setImageUrls(imageUrls);
+    }
+
+    return allJobPost;
   }
 
   public JobPostDetailVO getJobPostDetail(Long jobPostId) {
