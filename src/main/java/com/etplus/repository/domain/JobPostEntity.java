@@ -38,7 +38,7 @@ public class JobPostEntity {
   private LocalDate dueDate;          // 마감일
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "academy_id", referencedColumnName = "id")
+  @JoinColumn(name = "academy_id", referencedColumnName = "id", nullable = false)
   private AcademyEntity academy;
 
   public JobPostEntity(Long id, String title, String description, Integer salary,

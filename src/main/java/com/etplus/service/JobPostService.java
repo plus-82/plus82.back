@@ -1,5 +1,6 @@
 package com.etplus.service;
 
+import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.repository.ImageFileRepository;
@@ -7,8 +8,10 @@ import com.etplus.repository.JobPostRepository;
 import com.etplus.repository.domain.ImageFileEntity;
 import com.etplus.repository.domain.JobPostEntity;
 import com.etplus.vo.JobPostDetailVO;
+import com.etplus.vo.JobPostVO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -17,6 +20,18 @@ public class JobPostService {
 
   private final JobPostRepository jobPostRepository;
   private final ImageFileRepository imageFileRepository;
+
+  public Slice<JobPostVO> getJobPosts(SearchJobPostDTO dto) {
+    Slice<JobPostVO> allJobPost = jobPostRepository.findAllJobPost(dto);
+
+    for (JobPostVO jobPost : allJobPost) {
+      List<String> imageUrls = imageFileRepository.findAllByIdIn(jobPost.getImageFileIdList())
+          .stream().map(ImageFileEntity::getPath).toList();
+      jobPost.setImageUrls(imageUrls);
+    }
+
+    return allJobPost;
+  }
 
   public JobPostDetailVO getJobPostDetail(Long jobPostId) {
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId).orElseThrow(
