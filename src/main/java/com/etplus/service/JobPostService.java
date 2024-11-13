@@ -22,8 +22,7 @@ public class JobPostService {
   private final ImageFileRepository imageFileRepository;
 
   public Slice<JobPostVO> getJobPosts(SearchJobPostDTO dto) {
-    return null;
-//    return jobPostRepository.findAllJobPost();
+    return jobPostRepository.findAllJobPost(dto);
   }
 
   public JobPostDetailVO getJobPostDetail(Long jobPostId) {

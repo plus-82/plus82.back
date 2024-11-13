@@ -17,8 +17,8 @@ public record JobPostVO(
     boolean forElementary,
     boolean forMiddleSchool,
     boolean forHighSchool,
-    boolean forAdult,
-    List<String> imageUrls
+    boolean forAdult
+//    List<String> imageUrls // todo
 ) {
 
   @QueryProjection
