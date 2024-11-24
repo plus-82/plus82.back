@@ -1,5 +1,6 @@
 package com.etplus.controller.dto;
 
+import com.etplus.controller.dto.code.OrderType;
 import com.etplus.repository.domain.code.LocationType;
 import java.util.List;
 import lombok.Getter;
@@ -16,5 +17,8 @@ public class SearchJobPostDTO extends PagingDTO{
   private Boolean forMiddleSchool;
   private Boolean forHighSchool;
   private Boolean forAdult;
+
+  private OrderType orderType = OrderType.ASC;
+  private String sortBy = "id";  // id, dueDate
 
 }

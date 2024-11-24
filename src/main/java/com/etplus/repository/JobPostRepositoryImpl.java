@@ -1,11 +1,15 @@
 package com.etplus.repository;
 
 import com.etplus.controller.dto.SearchJobPostDTO;
+import com.etplus.controller.dto.code.OrderType;
 import com.etplus.repository.domain.QAcademyEntity;
 import com.etplus.repository.domain.QJobPostEntity;
 import com.etplus.vo.JobPostVO;
 import com.etplus.vo.QJobPostVO;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -28,6 +32,7 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
   @Override
   public Slice<JobPostVO> findAllJobPost(SearchJobPostDTO dto) {
     BooleanBuilder whereCondition = getWhereCondition(dto);
+    OrderSpecifier<?> orderSpecifier = createOrderSpecifier(dto);
 
     JPAQuery<JobPostVO> jpaQuery = query.select(
         new QJobPostVO(
@@ -47,7 +52,7 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
         .from(jobPost)
         .innerJoin(jobPost.academy, academy)
         .where(whereCondition)
-        .orderBy(jobPost.dueDate.desc(), jobPost.id.desc());
+        .orderBy(orderSpecifier);
 
     List<JobPostVO> content = jpaQuery
         .offset(dto.getPageNumber() * dto.getRowCount())
@@ -91,5 +96,18 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
       whereCondition.and(academy.forAdult.eq(dto.getForAdult()));
     }
     return whereCondition;
+  }
+
+  private OrderSpecifier createOrderSpecifier(SearchJobPostDTO dto) {
+    Order order = Order.ASC ;
+    if (OrderType.DESC.equals(dto.getOrderType())) {
+      order = Order.DESC;
+    }
+
+    Path path = jobPost.id;
+    if ("dueDate".equals(dto.getSortBy())) {
+      path = jobPost.dueDate;
+    }
+    return new OrderSpecifier(order, path);
   }
 }
