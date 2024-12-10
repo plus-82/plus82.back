@@ -36,18 +36,18 @@ public class JobPostResumeRelationEntity {
   private LocalDate submittedDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
-  private UserEntity user;
+  @JoinColumn(name = "resume_id", referencedColumnName = "id", nullable = false, updatable = false)
+  private ResumeEntity resume;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "job_post_id", referencedColumnName = "id", nullable = false, updatable = false)
   private JobPostEntity jobPost;
 
   public JobPostResumeRelationEntity(Long id, JobPostResumeRelationStatus status,
-      LocalDate submittedDate, UserEntity user, JobPostEntity jobPost) {
+      LocalDate submittedDate, ResumeEntity resume, JobPostEntity jobPost) {
     this.id = id;
     this.status = status;
     this.submittedDate = submittedDate;
-    this.user = user;
+    this.resume = resume;
     this.jobPost = jobPost;
   }
 }
