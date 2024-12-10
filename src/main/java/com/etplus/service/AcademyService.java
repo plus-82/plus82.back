@@ -6,7 +6,7 @@ import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
-import com.etplus.provider.S3ImageUploader;
+import com.etplus.provider.S3Uploader;
 import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.FileRepository;
 import com.etplus.repository.UserRepository;
@@ -28,7 +28,7 @@ public class AcademyService {
 
   private final AcademyRepository academyRepository;
   private final UserRepository userRepository;
-  private final S3ImageUploader s3ImageUploader;
+  private final S3Uploader s3Uploader;
   private final FileRepository fileRepository;
 
   public AcademyDetailVO getAcademyDetail(Long academyId) {
@@ -112,7 +112,7 @@ public class AcademyService {
     // 이미지 업로드
     List<FileEntity> uploadedImageFiles = new ArrayList<>();
     for (MultipartFile image : dto.images()) {
-      uploadedImageFiles.add(s3ImageUploader.uploadAndSaveRepository(image, user));
+      uploadedImageFiles.add(s3Uploader.uploadImageAndSaveRepository(image, user));
     }
 
     List<Long> uploadedImageFileIds = uploadedImageFiles.stream()

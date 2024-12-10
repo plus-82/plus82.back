@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class S3ImageUploader {
+public class S3Uploader {
 
   private final AmazonS3Client client;
   private final FileRepository fileRepository;
@@ -30,9 +30,12 @@ public class S3ImageUploader {
   private String PATH_ROOT;
 
   @Transactional
-  public FileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
-    verifyFile(file.getContentType());
+  public FileEntity uploadImageAndSaveRepository(MultipartFile file, UserEntity owner) {
+    verifyImageFile(file.getContentType());
+    return uploadAndSaveRepository(file, owner);
+  }
 
+  private FileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
     String fileExtension = file.getContentType().substring(file.getContentType().lastIndexOf('/') + 1);
 
     String s3PathKey = PATH_ROOT + "/" + UuidProvider.generateUuid() + "." + fileExtension;
@@ -57,8 +60,7 @@ public class S3ImageUploader {
     ));
   }
 
-
-  private void verifyFile(String contentType) {
+  private void verifyImageFile(String contentType) {
     // 확장자가 jpeg, png인 파일들만 받아서 처리
     if (ObjectUtils.isEmpty(contentType) | (!contentType.contains("image/jpeg") & !contentType.contains("image/png")))
       throw new FileException(FileException.FileExceptionCode.INVALID_FILE_EXTENSION);
