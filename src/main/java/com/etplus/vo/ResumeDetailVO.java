@@ -23,7 +23,10 @@ public record ResumeDetailVO(
     Boolean forElementary,
     Boolean forMiddleSchool,
     Boolean forHighSchool,
-    Boolean forAdult
+    Boolean forAdult,
+
+    // file
+    String filePath
 ) {
 
   public static ResumeDetailVO valueOf(ResumeEntity resumeEntity) {
@@ -45,7 +48,8 @@ public record ResumeDetailVO(
         resumeEntity.getForElementary(),
         resumeEntity.getForMiddleSchool(),
         resumeEntity.getForHighSchool(),
-        resumeEntity.getForAdult()
+        resumeEntity.getForAdult(),
+        resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath()
     );
   }
 
