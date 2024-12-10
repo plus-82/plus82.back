@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name = "image_file")
-public class ImageFileEntity {
+@Table(name = "file")
+public class FileEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class ImageFileEntity {
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private UserEntity owner;
 
-    public ImageFileEntity(Long id, String fileName, String path, long fileSize, String fileContentType, UserEntity owner) {
+    public FileEntity(Long id, String fileName, String path, long fileSize, String fileContentType, UserEntity owner) {
         this.id = id;
         this.fileName = fileName;
         this.path = path;

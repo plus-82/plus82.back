@@ -4,8 +4,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.etplus.exception.FileException;
-import com.etplus.repository.ImageFileRepository;
-import com.etplus.repository.domain.ImageFileEntity;
+import com.etplus.repository.FileRepository;
+import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.util.UuidProvider;
 import jakarta.transaction.Transactional;
@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class S3ImageUploader {
 
   private final AmazonS3Client client;
-  private final ImageFileRepository imageFileRepository;
+  private final FileRepository fileRepository;
 
   @Value("${aws.s3.bucket}")
   private String BUCKET;
@@ -30,7 +30,7 @@ public class S3ImageUploader {
   private String PATH_ROOT;
 
   @Transactional
-  public ImageFileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
+  public FileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
     verifyFile(file.getContentType());
 
     String fileExtension = file.getContentType().substring(file.getContentType().lastIndexOf('/') + 1);
@@ -47,7 +47,7 @@ public class S3ImageUploader {
       throw new RuntimeException(e.getMessage());
     }
 
-    return imageFileRepository.save(new ImageFileEntity(
+    return fileRepository.save(new FileEntity(
             null,
             file.getOriginalFilename(),
             s3PathKey,
