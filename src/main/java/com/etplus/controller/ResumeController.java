@@ -1,0 +1,40 @@
+package com.etplus.controller;
+
+import com.etplus.common.AuthUser;
+import com.etplus.common.CommonResponse;
+import com.etplus.common.CommonResponseCode;
+import com.etplus.common.LoginUser;
+import com.etplus.repository.domain.code.RoleType;
+import com.etplus.service.ResumeService;
+import com.etplus.vo.ResumeDetailVO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/resumes")
+public class ResumeController {
+
+  private final ResumeService resumeService;
+
+//  @RequestMapping("/me")
+//  public CommonResponse<Slice<ResumeVO>> getMyResumes(
+//      @AuthUser({RoleType.TEACHER}) LoginUser loginUser) {
+////    Slice<ResumeVO> result = resumeService.getMyResumes(loginUser);
+////    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+//    return null;
+//  }
+
+  @GetMapping("/{resume-id}")
+  public CommonResponse<ResumeDetailVO> getResumeDetail(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("resume-id") Long resumeId) {
+    ResumeDetailVO vo = resumeService.getResumeDetail(loginUser.userId(), resumeId);
+    return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
+}
