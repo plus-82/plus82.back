@@ -1,5 +1,6 @@
 package com.etplus.service;
 
+import com.etplus.controller.dto.PagingDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -7,7 +8,9 @@ import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionC
 import com.etplus.repository.ResumeRepository;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.vo.ResumeDetailVO;
+import com.etplus.vo.ResumeVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -15,6 +18,10 @@ import org.springframework.stereotype.Service;
 public class ResumeService {
 
   private final ResumeRepository resumeRepository;
+
+  public Slice<ResumeVO> getMyResumes(long userId, PagingDTO dto) {
+    return resumeRepository.findAllByUserId(userId, dto);
+  }
 
   public ResumeDetailVO getResumeDetail(long userId, long resumeId) {
     ResumeEntity resume = resumeRepository.findById(resumeId)

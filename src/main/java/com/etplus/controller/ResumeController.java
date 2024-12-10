@@ -4,9 +4,12 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.PagingDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.ResumeService;
 import com.etplus.vo.ResumeDetailVO;
+import com.etplus.vo.ResumeVO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,13 +24,12 @@ public class ResumeController {
 
   private final ResumeService resumeService;
 
-//  @RequestMapping("/me")
-//  public CommonResponse<Slice<ResumeVO>> getMyResumes(
-//      @AuthUser({RoleType.TEACHER}) LoginUser loginUser) {
-////    Slice<ResumeVO> result = resumeService.getMyResumes(loginUser);
-////    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
-//    return null;
-//  }
+  @GetMapping("/me")
+  public CommonResponse<Slice<ResumeVO>> getMyResumes(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser, @Valid PagingDTO dto) {
+    Slice<ResumeVO> result = resumeService.getMyResumes(loginUser.userId(), dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
 
   @GetMapping("/{resume-id}")
   public CommonResponse<ResumeDetailVO> getResumeDetail(
