@@ -101,7 +101,7 @@ public class ResumeEntity {
     this.file = file;
   }
 
-  public ResumeEntity(UserEntity user, FileEntity file) {
+  public ResumeEntity(String title, UserEntity user, FileEntity file) {
     this.user = user;
     this.file = file;
   }

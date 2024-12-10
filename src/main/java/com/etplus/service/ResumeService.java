@@ -83,6 +83,7 @@ public class ResumeService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
     FileEntity file = s3Uploader.uploadResumeAndSaveRepository(dto.file(), user);
-    resumeRepository.save(new ResumeEntity(user, file));
+
+    resumeRepository.save(new ResumeEntity(file.getFileName(), user, file));
   }
 }
