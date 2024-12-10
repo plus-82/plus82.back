@@ -63,7 +63,7 @@ public class ResumeEntity {
   @JoinColumn(name = "residence_country_id", referencedColumnName = "id")
   private CountryEntity residenceCountry;
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UserEntity user;
 
   @OneToOne(fetch = FetchType.LAZY)
@@ -97,6 +97,11 @@ public class ResumeEntity {
     this.forAdult = forAdult;
     this.country = country;
     this.residenceCountry = residenceCountry;
+    this.user = user;
+    this.file = file;
+  }
+
+  public ResumeEntity(UserEntity user, FileEntity file) {
     this.user = user;
     this.file = file;
   }

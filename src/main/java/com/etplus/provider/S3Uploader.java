@@ -35,6 +35,12 @@ public class S3Uploader {
     return uploadAndSaveRepository(file, owner);
   }
 
+  @Transactional
+  public FileEntity uploadResumeAndSaveRepository(MultipartFile file, UserEntity owner) {
+    verifyResumeFile(file.getContentType());
+    return uploadAndSaveRepository(file, owner);
+  }
+
   private FileEntity uploadAndSaveRepository(MultipartFile file, UserEntity owner) {
     String fileExtension = file.getContentType().substring(file.getContentType().lastIndexOf('/') + 1);
 
@@ -63,6 +69,12 @@ public class S3Uploader {
   private void verifyImageFile(String contentType) {
     // 확장자가 jpeg, png인 파일들만 받아서 처리
     if (ObjectUtils.isEmpty(contentType) | (!contentType.contains("image/jpeg") & !contentType.contains("image/png")))
+      throw new FileException(FileException.FileExceptionCode.INVALID_FILE_EXTENSION);
+  }
+
+  private void verifyResumeFile(String contentType) {
+    // 확장자가 pdf인 파일들만 받아서 처리
+    if (ObjectUtils.isEmpty(contentType) | (!contentType.contains("application/pdf")))
       throw new FileException(FileException.FileExceptionCode.INVALID_FILE_EXTENSION);
   }
 

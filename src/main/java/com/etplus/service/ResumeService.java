@@ -1,6 +1,7 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.CreateResumeDTO;
+import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
@@ -8,10 +9,12 @@ import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.exception.ResumeException;
 import com.etplus.exception.ResumeException.ResumeExceptionCode;
+import com.etplus.provider.S3Uploader;
 import com.etplus.repository.CountryRepository;
 import com.etplus.repository.ResumeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.CountryEntity;
+import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.vo.ResumeDetailVO;
@@ -28,6 +31,7 @@ public class ResumeService {
   private final ResumeRepository resumeRepository;
   private final UserRepository userRepository;
   private final CountryRepository countryRepository;
+  private final S3Uploader s3Uploader;
 
   public Slice<ResumeVO> getMyResumes(long userId, PagingDTO dto) {
     return resumeRepository.findAllByUserId(userId, dto);
@@ -73,4 +77,12 @@ public class ResumeService {
             dto.forAdult(), country, residenceCountry, user, null));
   }
 
+  @Transactional
+  public void createResumeWithFile(long userId, CreateResumeWithFileDTO dto) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    FileEntity file = s3Uploader.uploadResumeAndSaveRepository(dto.file(), user);
+    resumeRepository.save(new ResumeEntity(user, file));
+  }
 }

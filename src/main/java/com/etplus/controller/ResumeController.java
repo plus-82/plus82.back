@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateResumeDTO;
+import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.ResumeService;
@@ -13,7 +14,9 @@ import com.etplus.vo.ResumeVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +50,14 @@ public class ResumeController {
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
       @RequestBody @Valid CreateResumeDTO dto) {
     resumeService.createResume(loginUser.userId(), dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public CommonResponse<Void> createResumeWithFile(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @ModelAttribute @Valid CreateResumeWithFileDTO dto) {
+    resumeService.createResumeWithFile(loginUser.userId(), dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
