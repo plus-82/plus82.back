@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ResumeRepository extends JpaRepository<ResumeEntity, Long>,
     ResumeRepositoryCustom {
 
+  boolean existsByUserIdAndIsRepresentativeIsTrue(long userId);
+
 }
