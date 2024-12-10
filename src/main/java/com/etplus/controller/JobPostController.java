@@ -49,4 +49,13 @@ public class JobPostController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/{job-post-id}/submit-resume/{resume-id}")
+  public CommonResponse<Void> submitResume(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId,
+      @PathVariable("resume-id") Long resumeId) {
+    jobPostService.submitResume(loginUser.userId(), jobPostId, resumeId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
 }
