@@ -16,6 +16,7 @@ public class ResourceNotFoundException extends CustomBadRequestException {
     ACADEMY_NOT_FOUND("RNF-004", "academy not found"),
     JOB_POST_NOT_FOUND("RNF-005", "job post not found"),
     RESUME_NOT_FOUND("RNF-006", "resume not found"),
+    JOB_POST_RESUME_RELATION_NOT_FOUND("RNF-007", "job post resume relation not found"),
     ;
 
     private String code;
