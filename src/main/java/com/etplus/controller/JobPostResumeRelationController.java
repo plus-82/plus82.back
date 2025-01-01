@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,7 @@ public class JobPostResumeRelationController {
   public CommonResponse<Void> updateJobPostResumeRelationStatus(
       @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
       @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId,
-      @Valid UpdateJobPostResumeRelationStatusDTO dto) {
+      @Valid @RequestBody UpdateJobPostResumeRelationStatusDTO dto) {
     jobPostResumeRelationService.updateJobPostResumeRelationStatus(
         jobPostResumeRelationId, dto.status(), loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
