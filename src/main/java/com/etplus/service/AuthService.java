@@ -149,7 +149,9 @@ public class AuthService {
 
     TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
-    redisStorage.save("RefreshToken::userId=" + user.getId(), tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    // TODO key 에 deviceId 추가?
+    redisStorage.save("RefreshToken::userId=" + user.getId(),
+        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
     return tokenVO;
   }
 
