@@ -38,6 +38,7 @@ public class JwtProvider {
         .compact();
 
     String refreshToken = Jwts.builder()
+        .claim("id", loginUser.userId())
         .setIssuedAt(now)
         .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
         .signWith(SignatureAlgorithm.HS512, JWT_SECRET_KEY)
@@ -46,10 +47,10 @@ public class JwtProvider {
     return new TokenVO(accessToken, ACCESS_TOKEN_VALID_TIME, refreshToken, REFRESH_TOKEN_VALID_TIME);
   }
 
-  public LoginUser decrypt(String jwtToken) throws AuthException {
+  public LoginUser decrypt(String accessToken) throws AuthException {
     try {
       Claims body = Jwts.parserBuilder().setSigningKey(JWT_SECRET_KEY).build()
-          .parseClaimsJws(jwtToken).getBody();
+          .parseClaimsJws(accessToken).getBody();
 
       return new LoginUser(
           body.get("id", Long.class),
@@ -63,6 +64,21 @@ public class JwtProvider {
     } catch (Exception e) {
       throw new AuthException(AuthExceptionCode.INVALID_TOKEN);
     }
+  }
+
+  public Long getId(String jwtToken) {
+    try {
+      Claims body = Jwts.parserBuilder().setSigningKey(JWT_SECRET_KEY).build()
+          .parseClaimsJws(jwtToken).getBody();
+      return body.get("id", Long.class);
+    } catch (ExpiredJwtException e) {
+      throw new AuthException(AuthExceptionCode.EXPIRED_TOKEN);
+    } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+      throw new AuthException(AuthExceptionCode.INVALID_TOKEN_TYPE);
+    } catch (Exception e) {
+      throw new AuthException(AuthExceptionCode.INVALID_TOKEN);
+    }
+
   }
 
 }
