@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "country")
-public class CountryEntity {
+public class CountryEntity extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

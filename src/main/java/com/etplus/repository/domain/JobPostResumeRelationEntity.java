@@ -23,7 +23,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "job_post_resume_relation")
-public class JobPostResumeRelationEntity {
+public class JobPostResumeRelationEntity extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

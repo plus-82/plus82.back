@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter @Setter
 @Entity
 @Table(name = "academy")
-public class AcademyEntity {
+public class AcademyEntity extends BaseEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
