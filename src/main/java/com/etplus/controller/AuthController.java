@@ -3,6 +3,7 @@ package com.etplus.controller;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
+import com.etplus.controller.dto.RequestReIssueTokenDTO;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
 import com.etplus.controller.dto.SignInDto;
@@ -42,6 +43,12 @@ public class AuthController {
   @PostMapping("/sign-in")
   public CommonResponse<TokenVO> signIn(@RequestBody @Valid SignInDto dto) {
     TokenVO token = authService.signIn(dto);
+    return new CommonResponse<>(token, CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/reissue")
+  public CommonResponse<TokenVO> reIssue(@RequestBody @Valid RequestReIssueTokenDTO refreshToken) {
+    TokenVO token = authService.reIssue(refreshToken);
     return new CommonResponse<>(token, CommonResponseCode.SUCCESS);
   }
 

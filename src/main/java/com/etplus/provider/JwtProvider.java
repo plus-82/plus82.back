@@ -4,6 +4,7 @@ import com.etplus.common.LoginUser;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.TokenVO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,27 +20,37 @@ public class JwtProvider {
 
   @Value("${jwt.key}")
   private String JWT_SECRET_KEY;
-  @Value("${jwt.expiration}")
-  private long TOKEN_VALID_TIME;
+  @Value("${jwt.expiration.access}")
+  private long ACCESS_TOKEN_VALID_TIME;
+  @Value("${jwt.expiration.refresh}")
+  private long REFRESH_TOKEN_VALID_TIME;
 
-  // TODO refreshToken 까지 포함한 DTO 반환
-  public String generateToken(LoginUser loginUser) {
+  public TokenVO generateToken(LoginUser loginUser) {
     Date now = new Date();
 
-    return Jwts.builder()
+    String accessToken = Jwts.builder()
         .claim("id", loginUser.userId())
         .claim("name", loginUser.email())
         .claim("role", loginUser.roleType())
         .setIssuedAt(now)
-        .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
+        .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
         .signWith(SignatureAlgorithm.HS512, JWT_SECRET_KEY)
         .compact();
+
+    String refreshToken = Jwts.builder()
+        .claim("id", loginUser.userId())
+        .setIssuedAt(now)
+        .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+        .signWith(SignatureAlgorithm.HS512, JWT_SECRET_KEY)
+        .compact();
+
+    return new TokenVO(accessToken, ACCESS_TOKEN_VALID_TIME, refreshToken, REFRESH_TOKEN_VALID_TIME);
   }
 
-  public LoginUser decrypt(String jwtToken) throws AuthException {
+  public LoginUser decrypt(String accessToken) throws AuthException {
     try {
       Claims body = Jwts.parserBuilder().setSigningKey(JWT_SECRET_KEY).build()
-          .parseClaimsJws(jwtToken).getBody();
+          .parseClaimsJws(accessToken).getBody();
 
       return new LoginUser(
           body.get("id", Long.class),
@@ -53,6 +64,21 @@ public class JwtProvider {
     } catch (Exception e) {
       throw new AuthException(AuthExceptionCode.INVALID_TOKEN);
     }
+  }
+
+  public Long getId(String jwtToken) {
+    try {
+      Claims body = Jwts.parserBuilder().setSigningKey(JWT_SECRET_KEY).build()
+          .parseClaimsJws(jwtToken).getBody();
+      return body.get("id", Long.class);
+    } catch (ExpiredJwtException e) {
+      throw new AuthException(AuthExceptionCode.EXPIRED_TOKEN);
+    } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+      throw new AuthException(AuthExceptionCode.INVALID_TOKEN_TYPE);
+    } catch (Exception e) {
+      throw new AuthException(AuthExceptionCode.INVALID_TOKEN);
+    }
+
   }
 
 }

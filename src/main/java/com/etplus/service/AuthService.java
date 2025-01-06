@@ -1,7 +1,9 @@
 package com.etplus.service;
 
+import com.etplus.cache.RedisStorage;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
+import com.etplus.controller.dto.RequestReIssueTokenDTO;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
 import com.etplus.controller.dto.SignInDto;
@@ -55,6 +57,7 @@ public class AuthService {
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
   private final JwtProvider jwtProvider;
+  private final RedisStorage redisStorage;
 
   @Transactional
   public void signUp(SignUpDto dto) {
@@ -145,9 +148,36 @@ public class AuthService {
       throw new AuthException(AuthExceptionCode.PW_NOT_CORRECT);
     }
 
-    String token = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
+    TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
-    return new TokenVO(token);
+    // TODO key 에 deviceId 추가?
+    redisStorage.save("RefreshToken::userId=" + user.getId(),
+        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    return tokenVO;
+  }
+
+  @Transactional
+  public TokenVO reIssue(RequestReIssueTokenDTO dto) {
+    // token 검증
+    Long userId = jwtProvider.getId(dto.refreshToken());
+
+    // redis 에 저장된 refreshToken 확인
+    String refreshToken = redisStorage.get("RefreshToken::userId=" + userId);
+    if (refreshToken == null) {
+      throw new AuthException(AuthExceptionCode.EXPIRED_TOKEN);
+    }
+
+    // user 조회
+    UserEntity user = userRepository.findById(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    // token 재발급
+    TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
+
+    // TODO key 에 deviceId 추가?
+    redisStorage.save("RefreshToken::userId=" + user.getId(),
+        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    return tokenVO;
   }
 
   @Transactional

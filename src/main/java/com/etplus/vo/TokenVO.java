@@ -1,9 +1,11 @@
 package com.etplus.vo;
 
 public record TokenVO (
-    String accessToken
+    String accessToken,
+    Long accessTokenExpireTime,
 
-// TODO refresh token, expire time?
+    String refreshToken,
+    Long refreshTokenExpireTime
 ) {
 
 }
