@@ -2,6 +2,7 @@ package com.etplus.vo;
 
 import com.etplus.repository.domain.code.VisaType;
 import com.querydsl.core.annotations.QueryProjection;
+import java.time.LocalDateTime;
 
 public record ResumeVO(
     Long id,
@@ -12,6 +13,8 @@ public record ResumeVO(
     boolean hasVisa,
     VisaType visaType,
     boolean isRepresentative,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
     boolean hasFile
 ) {
 

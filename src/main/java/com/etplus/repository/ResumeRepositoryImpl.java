@@ -32,6 +32,8 @@ public class ResumeRepositoryImpl implements ResumeRepositoryCustom {
             resume.hasVisa,
             resume.visaType,
             resume.isRepresentative,
+            resume.createdAt,
+            resume.updatedAt,
             resume.file.isNotNull()
         ))
         .where(resume.user.id.eq(userId))

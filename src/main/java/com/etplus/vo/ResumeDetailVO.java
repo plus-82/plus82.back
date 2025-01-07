@@ -4,6 +4,7 @@ import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.code.GenderType;
 import com.etplus.repository.domain.code.VisaType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record ResumeDetailVO(
     Long id,
@@ -24,6 +25,8 @@ public record ResumeDetailVO(
     Boolean forMiddleSchool,
     Boolean forHighSchool,
     Boolean forAdult,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
 
     // file
     String filePath
@@ -49,6 +52,8 @@ public record ResumeDetailVO(
         resumeEntity.getForMiddleSchool(),
         resumeEntity.getForHighSchool(),
         resumeEntity.getForAdult(),
+        resumeEntity.getCreatedAt(),
+        resumeEntity.getUpdatedAt(),
         resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath()
     );
   }
