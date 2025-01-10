@@ -13,10 +13,13 @@ import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.QJobPostResumeRelationVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 
 public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySupportCustom
@@ -97,67 +100,35 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
 
   @Override
   public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByTeacher(long teacherId) {
-    List<Tuple> results = query
-        .select(jobPostResumeRelation.status, jobPostResumeRelation.count())
-        .from(jobPostResumeRelation)
-        .where(resume.user.id.eq(teacherId))
-        .groupBy(jobPostResumeRelation.status)
-        .fetch();
-
-    int submitted = 0;
-    int reviewed = 0;
-    int accepted = 0;
-    int rejected = 0;
-    for (Tuple result : results) {
-      JobPostResumeRelationStatus status = result.get(jobPostResumeRelation.status);
-      Long count = result.get(jobPostResumeRelation.count());
-
-      if (JobPostResumeRelationStatus.ACCEPTED.equals(status)) {
-        accepted = count.intValue();
-      } else if (JobPostResumeRelationStatus.REJECTED.equals(status)) {
-        rejected = count.intValue();
-      } else if (JobPostResumeRelationStatus.REVIEWED.equals(status)) {
-        reviewed = count.intValue();
-      } else if (JobPostResumeRelationStatus.SUBMITTED.equals(status)) {
-        submitted = count.intValue();
-      }
-    }
-    int total = submitted + reviewed + accepted + rejected;
-
-    // Return the VO
-    return new JobPostResumeRelationSummaryVO(submitted, reviewed, accepted, rejected, total);
+    return getJobPostResumeRelationSummary(jobPostResumeRelation.resume.user.id.eq(teacherId));
   }
 
   @Override
   public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByAcademy(long academyId) {
+    return getJobPostResumeRelationSummary(jobPostResumeRelation.jobPost.academy.id.eq(academyId));
+  }
+
+  private JobPostResumeRelationSummaryVO getJobPostResumeRelationSummary(BooleanExpression condition) {
     List<Tuple> results = query
         .select(jobPostResumeRelation.status, jobPostResumeRelation.count())
         .from(jobPostResumeRelation)
-        .where(academy.id.eq(academyId))
+        .where(condition)
         .groupBy(jobPostResumeRelation.status)
         .fetch();
 
-    int submitted = 0;
-    int reviewed = 0;
-    int accepted = 0;
-    int rejected = 0;
-    for (Tuple result : results) {
-      JobPostResumeRelationStatus status = result.get(jobPostResumeRelation.status);
-      Long count = result.get(jobPostResumeRelation.count());
+    Map<JobPostResumeRelationStatus, Integer> statusCounts = results.stream()
+        .collect(Collectors.toMap(
+            result -> result.get(jobPostResumeRelation.status),
+            result -> result.get(jobPostResumeRelation.count()).intValue()
+        ));
 
-      if (JobPostResumeRelationStatus.ACCEPTED.equals(status)) {
-        accepted = count.intValue();
-      } else if (JobPostResumeRelationStatus.REJECTED.equals(status)) {
-        rejected = count.intValue();
-      } else if (JobPostResumeRelationStatus.REVIEWED.equals(status)) {
-        reviewed = count.intValue();
-      } else if (JobPostResumeRelationStatus.SUBMITTED.equals(status)) {
-        submitted = count.intValue();
-      }
-    }
+    int submitted = statusCounts.getOrDefault(JobPostResumeRelationStatus.SUBMITTED, 0);
+    int reviewed = statusCounts.getOrDefault(JobPostResumeRelationStatus.REVIEWED, 0);
+    int accepted = statusCounts.getOrDefault(JobPostResumeRelationStatus.ACCEPTED, 0);
+    int rejected = statusCounts.getOrDefault(JobPostResumeRelationStatus.REJECTED, 0);
+
     int total = submitted + reviewed + accepted + rejected;
 
-    // Return the VO
     return new JobPostResumeRelationSummaryVO(submitted, reviewed, accepted, rejected, total);
   }
 
