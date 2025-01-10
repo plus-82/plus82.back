@@ -6,12 +6,16 @@ import com.etplus.repository.domain.QAcademyEntity;
 import com.etplus.repository.domain.QJobPostEntity;
 import com.etplus.repository.domain.QJobPostResumeRelationEntity;
 import com.etplus.repository.domain.QResumeEntity;
+import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.util.QuerydslRepositorySupportCustom;
+import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.QJobPostResumeRelationVO;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
 
@@ -89,6 +93,72 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
         .orderBy(jobPostResumeRelation.id.desc());
 
     return applyPagination(jpaQuery, dto.toPageable());
+  }
+
+  @Override
+  public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByTeacher(long teacherId) {
+    List<Tuple> results = query
+        .select(jobPostResumeRelation.status, jobPostResumeRelation.count())
+        .from(jobPostResumeRelation)
+        .where(resume.user.id.eq(teacherId))
+        .groupBy(jobPostResumeRelation.status)
+        .fetch();
+
+    int submitted = 0;
+    int reviewed = 0;
+    int accepted = 0;
+    int rejected = 0;
+    for (Tuple result : results) {
+      JobPostResumeRelationStatus status = result.get(jobPostResumeRelation.status);
+      Long count = result.get(jobPostResumeRelation.count());
+
+      if (JobPostResumeRelationStatus.ACCEPTED.equals(status)) {
+        accepted = count.intValue();
+      } else if (JobPostResumeRelationStatus.REJECTED.equals(status)) {
+        rejected = count.intValue();
+      } else if (JobPostResumeRelationStatus.REVIEWED.equals(status)) {
+        reviewed = count.intValue();
+      } else if (JobPostResumeRelationStatus.SUBMITTED.equals(status)) {
+        submitted = count.intValue();
+      }
+    }
+    int total = submitted + reviewed + accepted + rejected;
+
+    // Return the VO
+    return new JobPostResumeRelationSummaryVO(submitted, reviewed, accepted, rejected, total);
+  }
+
+  @Override
+  public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByAcademy(long academyId) {
+    List<Tuple> results = query
+        .select(jobPostResumeRelation.status, jobPostResumeRelation.count())
+        .from(jobPostResumeRelation)
+        .where(academy.id.eq(academyId))
+        .groupBy(jobPostResumeRelation.status)
+        .fetch();
+
+    int submitted = 0;
+    int reviewed = 0;
+    int accepted = 0;
+    int rejected = 0;
+    for (Tuple result : results) {
+      JobPostResumeRelationStatus status = result.get(jobPostResumeRelation.status);
+      Long count = result.get(jobPostResumeRelation.count());
+
+      if (JobPostResumeRelationStatus.ACCEPTED.equals(status)) {
+        accepted = count.intValue();
+      } else if (JobPostResumeRelationStatus.REJECTED.equals(status)) {
+        rejected = count.intValue();
+      } else if (JobPostResumeRelationStatus.REVIEWED.equals(status)) {
+        reviewed = count.intValue();
+      } else if (JobPostResumeRelationStatus.SUBMITTED.equals(status)) {
+        submitted = count.intValue();
+      }
+    }
+    int total = submitted + reviewed + accepted + rejected;
+
+    // Return the VO
+    return new JobPostResumeRelationSummaryVO(submitted, reviewed, accepted, rejected, total);
   }
 
   private BooleanBuilder getWhereCondition(SearchJobPostResumeRelationDTO dto) {

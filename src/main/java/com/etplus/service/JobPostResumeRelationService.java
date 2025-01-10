@@ -12,6 +12,7 @@ import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -71,6 +72,24 @@ public class JobPostResumeRelationService {
 
     jobPostResumeRelation.setStatus(status);
     jobPostResumeRelationRepository.save(jobPostResumeRelation);
+  }
+
+  public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummary(RoleType roleType, long userId) {
+    if (RoleType.TEACHER.equals(roleType)) {
+      return jobPostResumeRelationRepository.getJobPostResumeRelationSummaryByTeacher(userId);
+    } else if (RoleType.ACADEMY.equals(roleType)) {
+      UserEntity user = userRepository.findById(userId)
+          .orElseThrow(() -> new ResourceNotFoundException(
+              ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+      AcademyEntity academy = user.getAcademy();
+
+      if (academy == null) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+      return jobPostResumeRelationRepository.getJobPostResumeRelationSummaryByAcademy(academy.getId());
+    } else {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
   }
 
 }
