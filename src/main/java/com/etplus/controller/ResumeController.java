@@ -39,9 +39,9 @@ public class ResumeController {
 
   @GetMapping("/{resume-id}")
   public CommonResponse<ResumeDetailVO> getResumeDetail(
-      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY}) LoginUser loginUser,
       @PathVariable("resume-id") Long resumeId) {
-    ResumeDetailVO vo = resumeService.getResumeDetail(loginUser.userId(), resumeId);
+    ResumeDetailVO vo = resumeService.getResumeDetail(loginUser.roleType(), loginUser.userId(), resumeId);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 

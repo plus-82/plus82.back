@@ -100,6 +100,15 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     return applyPagination(jpaQuery, dto.toPageable());
   }
 
+  private BooleanBuilder getWhereCondition(SearchJobPostResumeRelationDTO dto) {
+    BooleanBuilder whereCondition = new BooleanBuilder();
+
+    if (Objects.nonNull(dto.getStatus())) {
+      whereCondition.and(jobPostResumeRelation.status.eq(dto.getStatus()));
+    }
+    return whereCondition;
+  }
+
   @Override
   public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByTeacher(long teacherId) {
     return getJobPostResumeRelationSummary(jobPostResumeRelation.resume.user.id.eq(teacherId));
@@ -134,12 +143,14 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     return new JobPostResumeRelationSummaryVO(submitted, reviewed, accepted, rejected, total);
   }
 
-  private BooleanBuilder getWhereCondition(SearchJobPostResumeRelationDTO dto) {
-    BooleanBuilder whereCondition = new BooleanBuilder();
-
-    if (Objects.nonNull(dto.getStatus())) {
-      whereCondition.and(jobPostResumeRelation.status.eq(dto.getStatus()));
-    }
-    return whereCondition;
+  public boolean existsByResumeIdAndAcademyId(long resumeId, long academyId) {
+    return query
+        .selectOne()
+        .from(jobPostResumeRelation)
+        .join(jobPostResumeRelation.jobPost, jobPost)
+        .where(jobPostResumeRelation.resume.id.eq(resumeId)
+            .and(jobPost.academy.id.eq(academyId)))
+        .fetchFirst() != null;
   }
+
 }

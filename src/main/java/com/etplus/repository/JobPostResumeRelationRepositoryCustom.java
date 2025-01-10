@@ -15,4 +15,6 @@ interface JobPostResumeRelationRepositoryCustom {
   JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByTeacher(long teacherId);
   JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByAcademy(long academyId);
 
+  boolean existsByResumeIdAndAcademyId(long resumeId, long academyId);
+
 }
