@@ -29,6 +29,8 @@ public class JobPostResumeRelationEntity extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(columnDefinition = "TEXT")
+  private String coverLetter;         // 설명
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private JobPostResumeRelationStatus status;
@@ -42,9 +44,10 @@ public class JobPostResumeRelationEntity extends BaseEntity {
   @JoinColumn(name = "job_post_id", referencedColumnName = "id", nullable = false, updatable = false)
   private JobPostEntity jobPost;
 
-  public JobPostResumeRelationEntity(Long id, JobPostResumeRelationStatus status,
+  public JobPostResumeRelationEntity(Long id, String coverLetter, JobPostResumeRelationStatus status,
       LocalDate submittedDate, ResumeEntity resume, JobPostEntity jobPost) {
     this.id = id;
+    this.coverLetter = coverLetter;
     this.status = status;
     this.submittedDate = submittedDate;
     this.resume = resume;
