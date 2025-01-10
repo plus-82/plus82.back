@@ -2,6 +2,7 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.CreateJobPostDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
+import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.exception.JobPostException;
 import com.etplus.exception.JobPostException.JobPostExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -77,7 +78,7 @@ public class JobPostService {
   }
 
   @Transactional
-  public void submitResume(long userId, long jobPostId, long resumeId) {
+  public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
@@ -95,8 +96,8 @@ public class JobPostService {
     }
 
     jobPostResumeRelationRepository.save(
-        new JobPostResumeRelationEntity(null, JobPostResumeRelationStatus.SUBMITTED,
-            LocalDate.now(), resume, jobPost));
+        new JobPostResumeRelationEntity(null, dto.coverLetter(),
+            JobPostResumeRelationStatus.SUBMITTED, LocalDate.now(), resume, jobPost));
   }
 
 }

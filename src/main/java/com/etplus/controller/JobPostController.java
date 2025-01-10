@@ -5,8 +5,8 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateJobPostDTO;
-import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
+import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.JobPostService;
 import com.etplus.vo.JobPostDetailVO;
@@ -53,8 +53,9 @@ public class JobPostController {
   public CommonResponse<Void> submitResume(
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
       @PathVariable("job-post-id") Long jobPostId,
-      @PathVariable("resume-id") Long resumeId) {
-    jobPostService.submitResume(loginUser.userId(), jobPostId, resumeId);
+      @PathVariable("resume-id") Long resumeId,
+      @RequestBody SubmitResumeDTO dto) {
+    jobPostService.submitResume(loginUser.userId(), jobPostId, resumeId, dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
