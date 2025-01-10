@@ -11,6 +11,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -64,6 +65,14 @@ public class CustomExceptionHandler {
     // 없는 url로 요청이 들어왔을 때
     log.info("handleNoResourceFoundException : {}", e);
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    // json 형식이 잘못된 경우
+    log.info("handleHttpMessageNotReadableException : {}", e);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        new CommonResponse<>(InvalidInputValueExceptionCode.INVALID_INPUT_VALUE));
   }
 
   /**
