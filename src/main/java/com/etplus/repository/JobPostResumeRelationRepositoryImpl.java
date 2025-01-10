@@ -46,6 +46,7 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     JPAQuery<JobPostResumeRelationVO> jpaQuery = query.select(
             new QJobPostResumeRelationVO(
                 jobPostResumeRelation.id,
+                jobPostResumeRelation.coverLetter,
                 jobPostResumeRelation.status,
                 jobPostResumeRelation.submittedDate,
                 resume.id,
@@ -75,6 +76,7 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     JPAQuery<JobPostResumeRelationVO> jpaQuery = query.select(
             new QJobPostResumeRelationVO(
                 jobPostResumeRelation.id,
+                jobPostResumeRelation.coverLetter,
                 jobPostResumeRelation.status,
                 jobPostResumeRelation.submittedDate,
                 resume.id,

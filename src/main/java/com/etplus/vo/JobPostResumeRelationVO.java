@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public record JobPostResumeRelationVO(
     Long id,
+    String coverLetter,
     JobPostResumeRelationStatus status,
     LocalDate submittedDate,
 
