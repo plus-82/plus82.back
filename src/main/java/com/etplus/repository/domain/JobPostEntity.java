@@ -27,9 +27,16 @@ public class JobPostEntity extends BaseEntity {
   private Long id;
 
   @Column(nullable = false)
-  private String title;               // 제목
-  @Column(columnDefinition = "TEXT")
-  private String description;         // 설명
+  private String title;    // 제목
+
+  @Column(nullable = false, columnDefinition = "VARCHAR(500)")
+  private String jobDescription;  // 직무 설명
+  @Column(columnDefinition = "VARCHAR(500)")
+  private String requiredQualification;   // 자격 요건
+  @Column(columnDefinition = "VARCHAR(500)")
+  private String preferredQualification;  // 우대 사항
+  @Column(columnDefinition = "VARCHAR(500)")
+  private String benefits;  // 복지
 
   private Integer salary;             // 급여
   private boolean salaryNegotiable;   // 급여 협의 가능 여부
@@ -41,11 +48,15 @@ public class JobPostEntity extends BaseEntity {
   @JoinColumn(name = "academy_id", referencedColumnName = "id", nullable = false)
   private AcademyEntity academy;
 
-  public JobPostEntity(Long id, String title, String description, Integer salary,
-      boolean salaryNegotiable, LocalDate jobStartDate, LocalDate dueDate, AcademyEntity academy) {
+  public JobPostEntity(Long id, String title, String jobDescription, String requiredQualification,
+      String preferredQualification, String benefits, Integer salary, boolean salaryNegotiable,
+      LocalDate jobStartDate, LocalDate dueDate, AcademyEntity academy) {
     this.id = id;
     this.title = title;
-    this.description = description;
+    this.jobDescription = jobDescription;
+    this.requiredQualification = requiredQualification;
+    this.preferredQualification = preferredQualification;
+    this.benefits = benefits;
     this.salary = salary;
     this.salaryNegotiable = salaryNegotiable;
     this.jobStartDate = jobStartDate;
