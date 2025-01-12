@@ -73,7 +73,8 @@ public class JobPostService {
       throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND);
     }
 
-    jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.description(), dto.salary(),
+    jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
+        dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), academy));
   }
 

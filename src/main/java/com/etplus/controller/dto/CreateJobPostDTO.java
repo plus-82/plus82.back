@@ -7,7 +7,11 @@ import java.time.LocalDate;
 public record CreateJobPostDTO(
     @NotBlank
     String title,
-    String description,
+    @NotBlank
+    String jobDescription,
+    String requiredQualification,
+    String preferredQualification,
+    String benefits,
     Integer salary,
     @NotNull
     Boolean salaryNegotiable,
