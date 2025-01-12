@@ -9,7 +9,10 @@ public record JobPostDetailVO(
     // job post
     Long id,
     String title,
-    String description,
+    String jobDescription,
+    String requiredQualification,
+    String preferredQualification,
+    String benefits,
     Integer salary,
     boolean salaryNegotiable,
     LocalDate jobStartDate,
@@ -29,11 +32,15 @@ public record JobPostDetailVO(
     List<String> academyImageUrls
 ) {
 
-  public static JobPostDetailVO valueOf(JobPostEntity jobPostEntity, List<String> academyImageUrls) {
+  public static JobPostDetailVO valueOf(JobPostEntity jobPostEntity,
+      List<String> academyImageUrls) {
     return new JobPostDetailVO(
         jobPostEntity.getId(),
         jobPostEntity.getTitle(),
-        jobPostEntity.getDescription(),
+        jobPostEntity.getJobDescription(),
+        jobPostEntity.getRequiredQualification(),
+        jobPostEntity.getPreferredQualification(),
+        jobPostEntity.getBenefits(),
         jobPostEntity.getSalary(),
         jobPostEntity.isSalaryNegotiable(),
         jobPostEntity.getJobStartDate(),
