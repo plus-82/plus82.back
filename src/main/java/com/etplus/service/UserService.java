@@ -10,6 +10,7 @@ import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionC
 import com.etplus.provider.PasswordProvider;
 import com.etplus.provider.S3Uploader;
 import com.etplus.repository.CountryRepository;
+import com.etplus.repository.FileRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.FileEntity;
@@ -25,6 +26,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final CountryRepository countryRepository;
+  private final FileRepository fileRepository;
   private final PasswordProvider passwordProvider;
   private final S3Uploader s3Uploader;
 
@@ -33,6 +35,7 @@ public class UserService {
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     CountryEntity country = user.getCountry();
+    FileEntity profileImage = user.getProfileImage();
 
     return new UserVO(
         user.getId(),
@@ -41,7 +44,8 @@ public class UserService {
         user.getGenderType(),
         user.getBirthDate(),
         user.getEmail(),
-        country == null ? null : country.getCountryNameEn()
+        country == null ? null : country.getCountryNameEn(),
+        profileImage == null ? null : profileImage.getPath()
     );
   }
 

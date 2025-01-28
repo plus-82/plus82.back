@@ -10,7 +10,10 @@ public record UserVO(
     GenderType genderType,
     LocalDate birthDate,
     String email,
-    String countryNameEn
+    String countryNameEn,
+
+    // file
+    String profileImagePath
 ) {
 
 }
