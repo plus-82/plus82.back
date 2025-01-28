@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.UpdatePasswordDto;
+import com.etplus.controller.dto.UpdateProfileImageDTO;
 import com.etplus.controller.dto.UpdateUserDto;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.UserService;
@@ -37,6 +38,14 @@ public class UserController {
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
       @RequestBody @Valid UpdateUserDto dto) {
     userService.updateMe(loginUser.userId(), dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/me/profile-image")
+  public CommonResponse<Void> updateProfileImage(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @RequestBody @Valid UpdateProfileImageDTO dto) {
+    userService.updateProfileImage(loginUser.userId(), dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
