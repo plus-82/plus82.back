@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -59,9 +60,13 @@ public class UserEntity extends BaseEntity {
   @JoinColumn(name = "country_id", referencedColumnName = "id")
   private CountryEntity country;
 
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
+  private FileEntity profileImage;
+
   public UserEntity(Long id, String firstName, String lastName, GenderType genderType,
       LocalDate birthDate, String email, String password, RoleType roleType,
-      AcademyEntity academy, CountryEntity country) {
+      AcademyEntity academy, CountryEntity country, FileEntity profileImage) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -72,5 +77,6 @@ public class UserEntity extends BaseEntity {
     this.roleType = roleType;
     this.academy = academy;
     this.country = country;
+    this.profileImage = profileImage;
   }
 }
