@@ -12,8 +12,10 @@ import com.etplus.service.UserService;
 import com.etplus.vo.UserVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,10 +43,10 @@ public class UserController {
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
-  @PutMapping("/me/profile-image")
+  @PutMapping(value="/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> updateProfileImage(
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
-      @RequestBody @Valid UpdateProfileImageDTO dto) {
+      @ModelAttribute @Valid UpdateProfileImageDTO dto) {
     userService.updateProfileImage(loginUser.userId(), dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
