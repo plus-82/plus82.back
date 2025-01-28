@@ -87,7 +87,8 @@ public class AuthService {
         passwordProvider.encode(dto.password()),
         RoleType.TEACHER,
         null,
-        country
+        country,
+        null
     );
     userRepository.save(userEntity);
   }
@@ -131,6 +132,7 @@ public class AuthService {
         passwordProvider.encode(dto.password()),
         RoleType.ACADEMY,
         academy,
+        null,
         null
     );
     userRepository.save(userEntity);
