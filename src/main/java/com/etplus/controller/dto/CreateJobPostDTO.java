@@ -16,7 +16,14 @@ public record CreateJobPostDTO(
     @NotNull
     Boolean salaryNegotiable,
     LocalDate jobStartDate,
-    LocalDate dueDate
+    LocalDate dueDate,
+
+    // 대상
+    boolean forKindergarten,
+    boolean forElementary,
+    boolean forMiddleSchool,
+    boolean forHighSchool,
+    boolean forAdult
 ) {
 
 }
