@@ -44,7 +44,11 @@ public class UserService {
         user.getGenderType(),
         user.getBirthDate(),
         user.getEmail(),
+        country == null ? null : country.getId(),
         country == null ? null : country.getCountryNameEn(),
+        country == null ? null : country.getCountryCode(),
+        country == null ? null : country.getCountryCallingCode(),
+        country == null ? null : country.getFlag(),
         profileImage == null ? null : profileImage.getPath()
     );
   }

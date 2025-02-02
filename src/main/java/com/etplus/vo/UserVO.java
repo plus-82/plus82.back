@@ -10,7 +10,13 @@ public record UserVO(
     GenderType genderType,
     LocalDate birthDate,
     String email,
+
+    // country
+    Long countryId,
     String countryNameEn,
+    String countryCode,
+    String countryCallingCode,
+    String flag,
 
     // file
     String profileImagePath
