@@ -39,14 +39,14 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
             jobPost.id,
             jobPost.title,
             jobPost.dueDate,
+            jobPost.forKindergarten,
+            jobPost.forElementary,
+            jobPost.forMiddleSchool,
+            jobPost.forHighSchool,
+            jobPost.forAdult,
             academy.id,
             academy.name,
             academy.locationType,
-            academy.forKindergarten,
-            academy.forElementary,
-            academy.forMiddleSchool,
-            academy.forHighSchool,
-            academy.forAdult,
             academy.imageFileIdList
         ))
         .from(jobPost)
@@ -81,19 +81,19 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
       whereCondition.and(academy.locationType.in(dto.getLocationTypeList()));
     }
     if (Objects.nonNull(dto.getForKindergarten())) {
-      whereCondition.and(academy.forKindergarten.eq(dto.getForKindergarten()));
+      whereCondition.and(jobPost.forKindergarten.eq(dto.getForKindergarten()));
     }
     if (Objects.nonNull(dto.getForElementary())) {
-      whereCondition.and(academy.forElementary.eq(dto.getForElementary()));
+      whereCondition.and(jobPost.forElementary.eq(dto.getForElementary()));
     }
     if (Objects.nonNull(dto.getForMiddleSchool())) {
-      whereCondition.and(academy.forMiddleSchool.eq(dto.getForMiddleSchool()));
+      whereCondition.and(jobPost.forMiddleSchool.eq(dto.getForMiddleSchool()));
     }
     if (Objects.nonNull(dto.getForHighSchool())) {
-      whereCondition.and(academy.forHighSchool.eq(dto.getForHighSchool()));
+      whereCondition.and(jobPost.forHighSchool.eq(dto.getForHighSchool()));
     }
     if (Objects.nonNull(dto.getForAdult())) {
-      whereCondition.and(academy.forAdult.eq(dto.getForAdult()));
+      whereCondition.and(jobPost.forAdult.eq(dto.getForAdult()));
     }
     if (Objects.nonNull(dto.getFromDueDate())) {
       whereCondition.and(jobPost.dueDate.goe(dto.getFromDueDate()));

@@ -42,7 +42,14 @@ public class JobPostEntity extends BaseEntity {
   private boolean salaryNegotiable;   // 급여 협의 가능 여부
 
   private LocalDate jobStartDate;     // 근무 시작 가능 날짜
-  private LocalDate dueDate;          // 마감일
+  private LocalDate dueDate;          // 마감일 (null = 상시 채용)
+
+  // 대상
+  private boolean forKindergarten;
+  private boolean forElementary;
+  private boolean forMiddleSchool;
+  private boolean forHighSchool;
+  private boolean forAdult;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "academy_id", referencedColumnName = "id", nullable = false)
@@ -50,7 +57,8 @@ public class JobPostEntity extends BaseEntity {
 
   public JobPostEntity(Long id, String title, String jobDescription, String requiredQualification,
       String preferredQualification, String benefits, Integer salary, boolean salaryNegotiable,
-      LocalDate jobStartDate, LocalDate dueDate, AcademyEntity academy) {
+      LocalDate jobStartDate, LocalDate dueDate, boolean forKindergarten, boolean forElementary,
+      boolean forMiddleSchool, boolean forHighSchool, boolean forAdult, AcademyEntity academy) {
     this.id = id;
     this.title = title;
     this.jobDescription = jobDescription;
@@ -61,6 +69,11 @@ public class JobPostEntity extends BaseEntity {
     this.salaryNegotiable = salaryNegotiable;
     this.jobStartDate = jobStartDate;
     this.dueDate = dueDate;
+    this.forKindergarten = forKindergarten;
+    this.forElementary = forElementary;
+    this.forMiddleSchool = forMiddleSchool;
+    this.forHighSchool = forHighSchool;
+    this.forAdult = forAdult;
     this.academy = academy;
   }
 }
