@@ -15,35 +15,34 @@ public class JobPostVO {
   private Long id;
   private String title;
   private LocalDate dueDate;
-
-  private Long academyId;
-  private String academyName;
-  private LocationType locationType;
   private boolean forKindergarten;
   private boolean forElementary;
   private boolean forMiddleSchool;
   private boolean forHighSchool;
   private boolean forAdult;
+
+  private Long academyId;
+  private String academyName;
+  private LocationType locationType;
   @JsonIgnore
   private List<Long> imageFileIdList;
   private List<String> imageUrls;
 
   @QueryProjection
-  public JobPostVO(Long id, String title, LocalDate dueDate, Long academyId, String academyName,
-      LocationType locationType, boolean forKindergarten, boolean forElementary,
-      boolean forMiddleSchool, boolean forHighSchool, boolean forAdult,
-      List<Long> imageFileIdList) {
+  public JobPostVO(Long id, String title, LocalDate dueDate, boolean forKindergarten,
+      boolean forElementary, boolean forMiddleSchool, boolean forHighSchool, boolean forAdult,
+      Long academyId, String academyName, LocationType locationType, List<Long> imageFileIdList) {
     this.id = id;
     this.title = title;
     this.dueDate = dueDate;
-    this.academyId = academyId;
-    this.academyName = academyName;
-    this.locationType = locationType;
     this.forKindergarten = forKindergarten;
     this.forElementary = forElementary;
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
     this.forAdult = forAdult;
+    this.academyId = academyId;
+    this.academyName = academyName;
+    this.locationType = locationType;
     this.imageFileIdList = imageFileIdList;
   }
 }

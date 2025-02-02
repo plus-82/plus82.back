@@ -39,14 +39,14 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
             jobPost.id,
             jobPost.title,
             jobPost.dueDate,
+            jobPost.forKindergarten,
+            jobPost.forElementary,
+            jobPost.forMiddleSchool,
+            jobPost.forHighSchool,
+            jobPost.forAdult,
             academy.id,
             academy.name,
             academy.locationType,
-            academy.forKindergarten,
-            academy.forElementary,
-            academy.forMiddleSchool,
-            academy.forHighSchool,
-            academy.forAdult,
             academy.imageFileIdList
         ))
         .from(jobPost)

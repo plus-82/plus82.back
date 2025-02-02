@@ -17,6 +17,11 @@ public record JobPostDetailVO(
     boolean salaryNegotiable,
     LocalDate jobStartDate,
     LocalDate dueDate,
+    boolean forKindergarten,
+    boolean forElementary,
+    boolean forMiddleSchool,
+    boolean forHighSchool,
+    boolean forAdult,
 
     // academy
     Long academyId,
@@ -24,11 +29,6 @@ public record JobPostDetailVO(
     String academyDescription,
     LocationType academyLocationType,
     String academyDetailedAddress,
-    boolean forKindergarten,
-    boolean forElementary,
-    boolean forMiddleSchool,
-    boolean forHighSchool,
-    boolean forAdult,
     List<String> academyImageUrls
 ) {
 
@@ -45,16 +45,16 @@ public record JobPostDetailVO(
         jobPostEntity.isSalaryNegotiable(),
         jobPostEntity.getJobStartDate(),
         jobPostEntity.getDueDate(),
+        jobPostEntity.isForKindergarten(),
+        jobPostEntity.isForElementary(),
+        jobPostEntity.isForMiddleSchool(),
+        jobPostEntity.isForHighSchool(),
+        jobPostEntity.isForAdult(),
         jobPostEntity.getAcademy().getId(),
         jobPostEntity.getAcademy().getName(),
         jobPostEntity.getAcademy().getDescription(),
         jobPostEntity.getAcademy().getLocationType(),
         jobPostEntity.getAcademy().getDetailedAddress(),
-        jobPostEntity.getAcademy().isForKindergarten(),
-        jobPostEntity.getAcademy().isForElementary(),
-        jobPostEntity.getAcademy().isForMiddleSchool(),
-        jobPostEntity.getAcademy().isForHighSchool(),
-        jobPostEntity.getAcademy().isForAdult(),
         academyImageUrls
     );
   }
