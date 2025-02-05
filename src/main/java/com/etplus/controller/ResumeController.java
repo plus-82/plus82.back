@@ -45,10 +45,10 @@ public class ResumeController {
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> createResume(
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
-      @RequestBody @Valid CreateResumeDTO dto) {
+      @ModelAttribute @Valid CreateResumeDTO dto) {
     resumeService.createResume(loginUser.userId(), dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }

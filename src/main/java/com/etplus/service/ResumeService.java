@@ -87,12 +87,20 @@ public class ResumeService {
       }
     }
 
+    // 프로필 이미지
+    FileEntity fileEntity;
+    if (dto.profileImage() != null) {
+      fileEntity = s3Uploader.uploadImageAndSaveRepository(dto.profileImage(), user);
+    } else {
+      fileEntity = user.getProfileImage();
+    }
+
     resumeRepository.save(
         new ResumeEntity(null, dto.title(), dto.personalIntroduction(), dto.firstName(),
             dto.lastName(), dto.email(), dto.degree(), dto.major(), dto.genderType(),
             dto.birthDate(), dto.hasVisa(), dto.visaType(), dto.isRepresentative(),
             dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(),
-            dto.forAdult(), country, residenceCountry, user, null));
+            dto.forAdult(), country, residenceCountry, user, fileEntity, null));
   }
 
   @Transactional
