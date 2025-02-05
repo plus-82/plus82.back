@@ -65,6 +65,9 @@ public class ResumeEntity extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UserEntity user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
+  private FileEntity profileImage;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "file_id", referencedColumnName = "id")
@@ -76,7 +79,7 @@ public class ResumeEntity extends BaseEntity {
       Boolean forKindergarten, Boolean forElementary, Boolean forMiddleSchool,
       Boolean forHighSchool,
       Boolean forAdult, CountryEntity country, CountryEntity residenceCountry, UserEntity user,
-      FileEntity file) {
+      FileEntity profileImage, FileEntity file) {
     this.id = id;
     this.title = title;
     this.personalIntroduction = personalIntroduction;
@@ -98,6 +101,7 @@ public class ResumeEntity extends BaseEntity {
     this.country = country;
     this.residenceCountry = residenceCountry;
     this.user = user;
+    this.profileImage = profileImage;
     this.file = file;
   }
 

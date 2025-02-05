@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
+import org.springframework.web.multipart.MultipartFile;
 
 public record CreateResumeDTO(
 
@@ -36,6 +37,7 @@ public record CreateResumeDTO(
     Boolean forHighSchool,
     Boolean forAdult,
 
+    MultipartFile profileImage, // null 인 경우 user 의 profileImage 사용
     @NotNull
     Long countryId,
     @NotNull
