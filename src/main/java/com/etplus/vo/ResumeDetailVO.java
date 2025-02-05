@@ -27,6 +27,7 @@ public record ResumeDetailVO(
     Boolean forAdult,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
+    String profileImagePath,
 
     // file
     String filePath
@@ -54,6 +55,7 @@ public record ResumeDetailVO(
         resumeEntity.getForAdult(),
         resumeEntity.getCreatedAt(),
         resumeEntity.getUpdatedAt(),
+        resumeEntity.getProfileImage().getPath(),
         resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath()
     );
   }
