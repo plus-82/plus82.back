@@ -55,7 +55,7 @@ public record ResumeDetailVO(
         resumeEntity.getForAdult(),
         resumeEntity.getCreatedAt(),
         resumeEntity.getUpdatedAt(),
-        resumeEntity.getProfileImage().getPath(),
+        resumeEntity.getProfileImage() == null ? null : resumeEntity.getProfileImage().getPath(),
         resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath()
     );
   }
