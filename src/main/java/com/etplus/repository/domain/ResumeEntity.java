@@ -66,7 +66,7 @@ public class ResumeEntity extends BaseEntity {
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UserEntity user;
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "profile_image_id", referencedColumnName = "id", nullable = false)
+  @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
   private FileEntity profileImage;
 
   @OneToOne(fetch = FetchType.LAZY)
