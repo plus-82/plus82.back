@@ -12,6 +12,7 @@ import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.JobPostResumeRelationDetailVO;
 import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,31 @@ public class JobPostResumeRelationService {
     } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
+  }
+
+  public JobPostResumeRelationDetailVO getJobPostResumeRelation(RoleType roleType, long userId, long jobPostResumeRelationId) {
+    JobPostResumeRelationEntity jobPostResumeRelationEntity = jobPostResumeRelationRepository
+        .findById(jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
+
+    if (RoleType.TEACHER.equals(roleType)) {
+      if(jobPostResumeRelationEntity.getUser().getId() != userId) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+
+    } else if (RoleType.ACADEMY.equals(roleType)) {
+      UserEntity user = userRepository.findById(userId)
+          .orElseThrow(() -> new ResourceNotFoundException(
+              ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+      AcademyEntity academy = user.getAcademy();
+
+      if (jobPostResumeRelationEntity.getJobPost().getAcademy().getId() != academy.getId()) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+    } else {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+    return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity);
   }
 
   @Transactional
