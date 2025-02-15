@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface JobPostResumeRelationRepository extends
     JpaRepository<JobPostResumeRelationEntity, Long>, JobPostResumeRelationRepositoryCustom {
 
-  boolean existsByJobPostIdAndResumeId(Long jobPostId, Long resumeId);
+  boolean existsByJobPostIdAndUserId(Long jobPostId, Long userId);
 
 }

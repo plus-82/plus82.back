@@ -94,7 +94,7 @@ public class JobPostService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
 
-    if (jobPostResumeRelationRepository.existsByJobPostIdAndResumeId(jobPostId, resumeId)) {
+    if (jobPostResumeRelationRepository.existsByJobPostIdAndUserId(jobPostId, userId)) {
       throw new JobPostException(JobPostExceptionCode.RESUME_ALREADY_SUBMITTED);
     }
 
