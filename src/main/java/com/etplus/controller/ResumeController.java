@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,9 +38,9 @@ public class ResumeController {
 
   @GetMapping("/{resume-id}")
   public CommonResponse<ResumeDetailVO> getResumeDetail(
-      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY}) LoginUser loginUser,
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
       @PathVariable("resume-id") Long resumeId) {
-    ResumeDetailVO vo = resumeService.getResumeDetail(loginUser.roleType(), loginUser.userId(), resumeId);
+    ResumeDetailVO vo = resumeService.getResumeDetail(loginUser.userId(), resumeId);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 

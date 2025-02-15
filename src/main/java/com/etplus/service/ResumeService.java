@@ -11,15 +11,12 @@ import com.etplus.exception.ResumeException;
 import com.etplus.exception.ResumeException.ResumeExceptionCode;
 import com.etplus.provider.S3Uploader;
 import com.etplus.repository.CountryRepository;
-import com.etplus.repository.JobPostResumeRelationRepository;
 import com.etplus.repository.ResumeRepository;
 import com.etplus.repository.UserRepository;
-import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
-import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.ResumeDetailVO;
 import com.etplus.vo.ResumeVO;
 import jakarta.transaction.Transactional;
@@ -34,34 +31,19 @@ public class ResumeService {
   private final ResumeRepository resumeRepository;
   private final UserRepository userRepository;
   private final CountryRepository countryRepository;
-  private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
   private final S3Uploader s3Uploader;
 
   public Slice<ResumeVO> getMyResumes(long userId, PagingDTO dto) {
     return resumeRepository.findAllByUserId(userId, dto);
   }
 
-  public ResumeDetailVO getResumeDetail(RoleType roleType, long userId, long resumeId) {
+  public ResumeDetailVO getResumeDetail(long userId, long resumeId) {
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
 
-    if (RoleType.TEACHER.equals(roleType)) {
-      // 본인 이력서만 조회 가능
-      if (resume.getUser().getId() != userId) {
-        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
-      }
-    } else if (RoleType.ACADEMY.equals(roleType)) {
-      UserEntity user = userRepository.findById(userId)
-          .orElseThrow(() -> new ResourceNotFoundException(
-              ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-      AcademyEntity academy = user.getAcademy();
-
-      // 해당 학원에 지원한 이력서만 조회 가능
-      if (!jobPostResumeRelationRepository.existsByResumeIdAndAcademyId(resumeId, academy.getId())) {
-        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
-      }
-    } else {
+    // 본인 이력서만 조회 가능
+    if (resume.getUser().getId() != userId) {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
