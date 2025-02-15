@@ -30,7 +30,8 @@ public record ResumeDetailVO(
     String profileImagePath,
 
     // file
-    String filePath
+    String filePath,
+    String fileName
 ) {
 
   public static ResumeDetailVO valueOf(ResumeEntity resumeEntity) {
@@ -56,7 +57,8 @@ public record ResumeDetailVO(
         resumeEntity.getCreatedAt(),
         resumeEntity.getUpdatedAt(),
         resumeEntity.getProfileImage() == null ? null : resumeEntity.getProfileImage().getPath(),
-        resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath()
+        resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath(),
+        resumeEntity.getFile() == null ? null : resumeEntity.getFile().getFileName()
     );
   }
 
