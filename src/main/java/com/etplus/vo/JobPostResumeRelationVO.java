@@ -10,8 +10,7 @@ public record JobPostResumeRelationVO(
     JobPostResumeRelationStatus status,
     LocalDate submittedDate,
 
-    // Resume
-    Long resumeId,
+    // 지원 당시 resume 데이터
     String resumeTitle,
     String resumeFirstName,
     String resumeLastName,
