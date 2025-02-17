@@ -8,6 +8,7 @@ import com.etplus.controller.dto.SearchJobPostResumeRelationDTO;
 import com.etplus.controller.dto.UpdateJobPostResumeRelationStatusDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.JobPostResumeRelationService;
+import com.etplus.vo.JobPostResumeRelationDetailVO;
 import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import jakarta.validation.Valid;
@@ -33,6 +34,15 @@ public class JobPostResumeRelationController {
       @Valid SearchJobPostResumeRelationDTO dto) {
     Page<JobPostResumeRelationVO> result = jobPostResumeRelationService
         .getAllJobPostResumeRelations(loginUser.roleType(), loginUser.userId(), dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/{job-post-resume-relation-id}")
+  public CommonResponse<JobPostResumeRelationDetailVO> getJobPostResumeRelation(
+      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY}) LoginUser loginUser,
+      @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId) {
+    JobPostResumeRelationDetailVO result = jobPostResumeRelationService
+        .getJobPostResumeRelation(loginUser.roleType(), loginUser.userId(), jobPostResumeRelationId);
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 

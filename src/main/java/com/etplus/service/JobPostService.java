@@ -94,13 +94,21 @@ public class JobPostService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
 
-    if (jobPostResumeRelationRepository.existsByJobPostIdAndResumeId(jobPostId, resumeId)) {
+    if (jobPostResumeRelationRepository.existsByJobPostIdAndUserId(jobPostId, userId)) {
       throw new JobPostException(JobPostExceptionCode.RESUME_ALREADY_SUBMITTED);
     }
 
     jobPostResumeRelationRepository.save(
         new JobPostResumeRelationEntity(null, dto.coverLetter(),
-            JobPostResumeRelationStatus.SUBMITTED, LocalDate.now(), resume, jobPost));
+            JobPostResumeRelationStatus.SUBMITTED, LocalDate.now(), jobPost,
+            resume.getTitle(), resume.getPersonalIntroduction(), resume.getFirstName(),
+            resume.getLastName(), resume.getEmail(), resume.getDegree(), resume.getMajor(),
+            resume.getGenderType(), resume.getBirthDate(), resume.getHasVisa(),
+            resume.getVisaType(), resume.getForKindergarten(), resume.getForElementary(),
+            resume.getForMiddleSchool(), resume.getForHighSchool(), resume.getForAdult(),
+            resume.getCountry(), resume.getResidenceCountry(), resume.getUser(),
+            resume.getProfileImage(), resume.getFile()
+        ));
   }
 
 }

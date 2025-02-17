@@ -5,7 +5,6 @@ import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.QAcademyEntity;
 import com.etplus.repository.domain.QJobPostEntity;
 import com.etplus.repository.domain.QJobPostResumeRelationEntity;
-import com.etplus.repository.domain.QResumeEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.util.QuerydslRepositorySupportCustom;
 import com.etplus.vo.JobPostResumeRelationSummaryVO;
@@ -27,7 +26,6 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
 
   private final JPAQueryFactory query;
   private QJobPostResumeRelationEntity jobPostResumeRelation;
-  private QResumeEntity resume;
   private QJobPostEntity jobPost;
   private QAcademyEntity academy;
 
@@ -35,7 +33,6 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     super(JobPostResumeRelationEntity.class);
     this.query = query;
     jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
-    resume = new QResumeEntity("resume");
     jobPost = new QJobPostEntity("jobPost");
     academy = new QAcademyEntity("academy");
   }
@@ -49,17 +46,15 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
                 jobPostResumeRelation.coverLetter,
                 jobPostResumeRelation.status,
                 jobPostResumeRelation.submittedDate,
-                resume.id,
-                resume.title,
-                resume.firstName,
-                resume.lastName,
+                jobPostResumeRelation.resumeTitle,
+                jobPostResumeRelation.firstName,
+                jobPostResumeRelation.lastName,
                 jobPost.id,
                 jobPost.title,
                 academy.id,
                 academy.name
             ))
         .from(jobPostResumeRelation)
-        .innerJoin(jobPostResumeRelation.resume, resume)
         .innerJoin(jobPostResumeRelation.jobPost, jobPost)
         .innerJoin(jobPost.academy, academy)
         .where(academy.id.eq(academyId)
@@ -79,20 +74,18 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
                 jobPostResumeRelation.coverLetter,
                 jobPostResumeRelation.status,
                 jobPostResumeRelation.submittedDate,
-                resume.id,
-                resume.title,
-                resume.firstName,
-                resume.lastName,
+                jobPostResumeRelation.resumeTitle,
+                jobPostResumeRelation.firstName,
+                jobPostResumeRelation.lastName,
                 jobPost.id,
                 jobPost.title,
                 academy.id,
                 academy.name
             ))
         .from(jobPostResumeRelation)
-        .innerJoin(jobPostResumeRelation.resume, resume)
         .innerJoin(jobPostResumeRelation.jobPost, jobPost)
         .innerJoin(jobPost.academy, academy)
-        .where(resume.user.id.eq(teacherId)
+        .where(jobPostResumeRelation.user.id.eq(teacherId)
             .and(getWhereCondition(dto))
         )
         .orderBy(jobPostResumeRelation.id.desc());
@@ -111,7 +104,7 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
 
   @Override
   public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummaryByTeacher(long teacherId) {
-    return getJobPostResumeRelationSummary(jobPostResumeRelation.resume.user.id.eq(teacherId));
+    return getJobPostResumeRelationSummary(jobPostResumeRelation.user.id.eq(teacherId));
   }
 
   @Override
@@ -141,16 +134,6 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     int total = submitted + reviewed + accepted + rejected;
 
     return new JobPostResumeRelationSummaryVO(submitted, reviewed, accepted, rejected, total);
-  }
-
-  public boolean existsByResumeIdAndAcademyId(long resumeId, long academyId) {
-    return query
-        .selectOne()
-        .from(jobPostResumeRelation)
-        .join(jobPostResumeRelation.jobPost, jobPost)
-        .where(jobPostResumeRelation.resume.id.eq(resumeId)
-            .and(jobPost.academy.id.eq(academyId)))
-        .fetchFirst() != null;
   }
 
 }

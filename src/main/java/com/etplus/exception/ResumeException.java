@@ -11,6 +11,7 @@ public class ResumeException extends CustomBadRequestException {
   @Getter
   public enum ResumeExceptionCode implements ResponseCode {
     REPRESENTATIVE_RESUME_EXISTS("RSM-001", "representative resume already exists"),
+    FILE_RESUME_CANNOT_BE_MODIFIED("RSM-002", "file resume cannot be modified"),
     ;
 
     private String code;
