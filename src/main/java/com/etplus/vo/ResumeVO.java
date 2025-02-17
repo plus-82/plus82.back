@@ -15,7 +15,9 @@ public record ResumeVO(
     boolean isRepresentative,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
-    boolean hasFile
+
+    String filePath,
+    String fileName
 ) {
 
   @QueryProjection

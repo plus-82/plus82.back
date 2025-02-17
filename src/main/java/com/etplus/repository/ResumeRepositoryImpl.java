@@ -1,6 +1,7 @@
 package com.etplus.repository;
 
 import com.etplus.controller.dto.PagingDTO;
+import com.etplus.repository.domain.QFileEntity;
 import com.etplus.repository.domain.QResumeEntity;
 import com.etplus.vo.QResumeVO;
 import com.etplus.vo.ResumeVO;
@@ -14,10 +15,12 @@ public class ResumeRepositoryImpl implements ResumeRepositoryCustom {
 
   private final JPAQueryFactory query;
   private QResumeEntity resume;
+  private QFileEntity file;
 
   public ResumeRepositoryImpl(JPAQueryFactory query) {
     this.query = query;
     resume = new QResumeEntity("resume");
+    file = new QFileEntity("file");
   }
 
   @Override
@@ -34,10 +37,12 @@ public class ResumeRepositoryImpl implements ResumeRepositoryCustom {
             resume.isRepresentative,
             resume.createdAt,
             resume.updatedAt,
-            resume.file.isNotNull()
+            file.path,
+            file.fileName
         ))
         .where(resume.user.id.eq(userId))
         .from(resume)
+        .leftJoin(resume.file, file)
         .orderBy(resume.id.desc());
 
     List<ResumeVO> content = jpaQuery
