@@ -156,4 +156,18 @@ public class ResumeService {
 
     resumeRepository.save(resume);
   }
+
+  @Transactional
+  public void deleteResume(long userId, long resumeId) {
+    ResumeEntity resume = resumeRepository.findById(resumeId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
+
+    // 본인 이력서만 삭제 가능
+    if (resume.getUser().getId() != userId) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    resumeRepository.delete(resume);
+  }
 }

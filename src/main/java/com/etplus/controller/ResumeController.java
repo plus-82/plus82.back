@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +69,14 @@ public class ResumeController {
       @PathVariable("resume-id") Long resumeId,
       @ModelAttribute @Valid UpdateResumeDTO dto) {
     resumeService.updateResume(loginUser.userId(), resumeId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @DeleteMapping("/{resume-id}")
+  public CommonResponse<Void> deleteResume(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("resume-id") Long resumeId) {
+    resumeService.deleteResume(loginUser.userId(), resumeId);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
