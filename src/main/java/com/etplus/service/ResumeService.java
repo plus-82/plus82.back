@@ -3,6 +3,7 @@ package com.etplus.service;
 import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
+import com.etplus.controller.dto.UpdateResumeDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -93,5 +94,66 @@ public class ResumeService {
     FileEntity file = s3Uploader.uploadResumeAndSaveRepository(dto.file(), user);
 
     resumeRepository.save(new ResumeEntity(file.getFileName(), user, file));
+  }
+
+  @Transactional
+  public void updateResume(long userId, long resumeId, UpdateResumeDTO dto) {
+    ResumeEntity resume = resumeRepository.findById(resumeId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
+
+    // 본인 이력서만 수정 가능
+    if (resume.getUser().getId() != userId) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    // 파일 이력서는 수정 불가
+    if (resume.getFile() != null) {
+      throw new ResumeException(ResumeExceptionCode.FILE_RESUME_CANNOT_BE_MODIFIED);
+    }
+
+    // 대표 이력서 중복되는지 확인
+    if (dto.isRepresentative()) {
+      if (resumeRepository.existsByUserIdAndIsRepresentativeIsTrue(userId)) {
+        throw new ResumeException(ResumeExceptionCode.REPRESENTATIVE_RESUME_EXISTS);
+      }
+    }
+
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    CountryEntity country = countryRepository.findById(dto.countryId())
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
+    CountryEntity residenceCountry = countryRepository.findById(dto.residenceCountryId())
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
+
+    resume.setTitle(dto.title());
+    resume.setPersonalIntroduction(dto.personalIntroduction());
+    resume.setFirstName(dto.firstName());
+    resume.setLastName(dto.lastName());
+    resume.setEmail(dto.email());
+    resume.setDegree(dto.degree());
+    resume.setMajor(dto.major());
+    resume.setGenderType(dto.genderType());
+    resume.setBirthDate(dto.birthDate());
+    resume.setHasVisa(dto.hasVisa());
+    resume.setVisaType(dto.visaType());
+    resume.setIsRepresentative(dto.isRepresentative());
+    resume.setForKindergarten(dto.forKindergarten());
+    resume.setForElementary(dto.forElementary());
+    resume.setForMiddleSchool(dto.forMiddleSchool());
+    resume.setForHighSchool(dto.forHighSchool());
+    resume.setForAdult(dto.forAdult());
+
+    // 프로필 이미지
+    if (dto.profileImage() != null) {
+      resume.setProfileImage(s3Uploader.uploadImageAndSaveRepository(dto.profileImage(), user));
+    }
+    resume.setCountry(country);
+    resume.setResidenceCountry(residenceCountry);
+
+    resumeRepository.save(resume);
   }
 }

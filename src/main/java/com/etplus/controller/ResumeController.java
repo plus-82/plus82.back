@@ -7,6 +7,7 @@ import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
+import com.etplus.controller.dto.UpdateResumeDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.ResumeService;
 import com.etplus.vo.ResumeDetailVO;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,6 +59,15 @@ public class ResumeController {
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
       @ModelAttribute @Valid CreateResumeWithFileDTO dto) {
     resumeService.createResumeWithFile(loginUser.userId(), dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping(value = "/{resume-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public CommonResponse<Void> updateResume(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("resume-id") Long resumeId,
+      @ModelAttribute @Valid UpdateResumeDTO dto) {
+    resumeService.updateResume(loginUser.userId(), resumeId, dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
