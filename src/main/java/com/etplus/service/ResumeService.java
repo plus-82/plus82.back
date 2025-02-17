@@ -113,7 +113,7 @@ public class ResumeService {
     }
 
     // 대표 이력서 중복되는지 확인
-    if (dto.isRepresentative()) {
+    if (dto.isRepresentative() && !resume.getIsRepresentative()) {
       if (resumeRepository.existsByUserIdAndIsRepresentativeIsTrue(userId)) {
         throw new ResumeException(ResumeExceptionCode.REPRESENTATIVE_RESUME_EXISTS);
       }
