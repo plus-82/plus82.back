@@ -27,6 +27,17 @@ public record ResumeDetailVO(
     Boolean forAdult,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
+
+    // country
+    Long countryId,
+    String countryNameEn,
+
+    // residence country
+    Long residenceCountryId,
+    String residenceCountryNameEn,
+
+
+    // profile image
     String profileImagePath,
 
     // file
@@ -56,6 +67,11 @@ public record ResumeDetailVO(
         resumeEntity.getForAdult(),
         resumeEntity.getCreatedAt(),
         resumeEntity.getUpdatedAt(),
+
+        resumeEntity.getCountry() == null ? null : resumeEntity.getCountry().getId(),
+        resumeEntity.getCountry() == null ? null : resumeEntity.getCountry().getCountryNameEn(),
+        resumeEntity.getResidenceCountry() == null ? null : resumeEntity.getResidenceCountry().getId(),
+        resumeEntity.getResidenceCountry() == null ? null : resumeEntity.getResidenceCountry().getCountryNameEn(),
         resumeEntity.getProfileImage() == null ? null : resumeEntity.getProfileImage().getPath(),
         resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath(),
         resumeEntity.getFile() == null ? null : resumeEntity.getFile().getFileName()
