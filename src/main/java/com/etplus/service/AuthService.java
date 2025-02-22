@@ -26,18 +26,23 @@ import com.etplus.controller.dto.SignUpDto;
 import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.CountryRepository;
 import com.etplus.repository.EmailVerificationCodeRepository;
+import com.etplus.repository.MessageTemplateRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.EmailVerificationCodeEntity;
+import com.etplus.repository.domain.MessageTemplateEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.EmailVerificationCodeType;
+import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.util.UuidProvider;
 import com.etplus.vo.TokenVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +58,7 @@ public class AuthService {
   private final UserRepository userRepository;
   private final AcademyRepository academyRepository;
   private final CountryRepository countryRepository;
+  private final MessageTemplateRepository messageTemplateRepository;
   private final EmailVerificationCodeRepository emailVerificationCodeRepository;
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
@@ -196,6 +202,7 @@ public class AuthService {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
+    // verification code 생성 & 저장
     EmailVerificationCodeEntity emailVerificationCodeEntity = new EmailVerificationCodeEntity(
         null,
         dto.email(),
@@ -206,8 +213,15 @@ public class AuthService {
     );
     emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
-    emailProvider.send(dto.email(), "[Plus82] Verify your email",
-        "input this code: " + emailVerificationCodeEntity.getCode());
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "EMAIL_VERIFICATION_SIGN_UP", MessageTemplateType.EMAIL).orElse(null);
+
+    StringSubstitutor sub = new StringSubstitutor(Map.of("code", emailVerificationCodeEntity.getCode()));
+    String title = sub.replace(emailTemplate.getTitle());
+    String content = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(dto.email(), title, content);
   }
 
   @Transactional
@@ -243,6 +257,7 @@ public class AuthService {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
+    // verification code 생성 & 저장
     EmailVerificationCodeEntity emailVerificationCodeEntity = new EmailVerificationCodeEntity(
         null,
         dto.email(),
@@ -253,8 +268,14 @@ public class AuthService {
     );
     emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
-    emailProvider.send(dto.email(), "[Plus82] Reset your password",
-        "visit here: https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode());
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
+    StringSubstitutor sub = new StringSubstitutor(Map.of("link", "https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode()));
+    String title = sub.replace(emailTemplate.getTitle());
+    String content = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(dto.email(), title, content);
   }
 
   public void validateResetPasswordCode(String code) {
