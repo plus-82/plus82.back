@@ -253,6 +253,7 @@ public class AuthService {
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.TOO_MANY_REQUEST);
     }
 
+    // verification code 생성 & 저장
     EmailVerificationCodeEntity emailVerificationCodeEntity = new EmailVerificationCodeEntity(
         null,
         dto.email(),
@@ -263,8 +264,12 @@ public class AuthService {
     );
     emailVerificationCodeRepository.save(emailVerificationCodeEntity);
 
-    emailProvider.send(dto.email(), "[Plus82] Reset your password",
-        "visit here: https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode());
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
+    emailTemplate.setTemplateVariables(Map.of("link", "https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode()));
+
+    emailProvider.send(dto.email(), emailTemplate.getTitle(), emailTemplate.getContent());
   }
 
   public void validateResetPasswordCode(String code) {
