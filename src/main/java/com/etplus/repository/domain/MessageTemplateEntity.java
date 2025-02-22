@@ -10,12 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.text.StringSubstitutor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -42,12 +40,6 @@ public class MessageTemplateEntity {
   private String description;
   @Column(nullable = false, columnDefinition = "TEXT")
   private String content;
-
-  public void setTemplateVariables(Map<String, String> params) {
-    StringSubstitutor sub = new StringSubstitutor(params);
-    this.setTitle(sub.replace(this.getTitle()));
-    this.setContent(sub.replace(this.getContent()));
-  }
 
   public MessageTemplateEntity(Long id, String code, MessageTemplateType type, String title,
       String description, String content) {

@@ -42,6 +42,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -215,9 +216,12 @@ public class AuthService {
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
         "EMAIL_VERIFICATION_SIGN_UP", MessageTemplateType.EMAIL).orElse(null);
-    emailTemplate.setTemplateVariables(Map.of("code", emailVerificationCodeEntity.getCode()));
 
-    emailProvider.send(dto.email(), emailTemplate.getTitle(), emailTemplate.getContent());
+    StringSubstitutor sub = new StringSubstitutor(Map.of("code", emailVerificationCodeEntity.getCode()));
+    String title = sub.replace(emailTemplate.getTitle());
+    String content = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(dto.email(), title, content);
   }
 
   @Transactional
@@ -267,9 +271,11 @@ public class AuthService {
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
         "EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
-    emailTemplate.setTemplateVariables(Map.of("link", "https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode()));
+    StringSubstitutor sub = new StringSubstitutor(Map.of("link", "https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode()));
+    String title = sub.replace(emailTemplate.getTitle());
+    String content = sub.replace(emailTemplate.getContent());
 
-    emailProvider.send(dto.email(), emailTemplate.getTitle(), emailTemplate.getContent());
+    emailProvider.send(dto.email(), title, content);
   }
 
   public void validateResetPasswordCode(String code) {
