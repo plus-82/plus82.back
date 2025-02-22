@@ -87,6 +87,33 @@ public class ResumeService {
   }
 
   @Transactional
+  public void copyResume(long userId, long resumeId) {
+    ResumeEntity resume = resumeRepository.findById(resumeId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
+
+    // 본인 이력서만 수정 가능
+    if (resume.getUser().getId() != userId) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    // 파일 이력서는 수정 불가
+    if (resume.getFile() != null) {
+      throw new ResumeException(ResumeExceptionCode.FILE_RESUME_CANNOT_BE_MODIFIED);
+    }
+
+    resumeRepository.save(
+        new ResumeEntity(
+            null, resume.getTitle(), resume.getPersonalIntroduction(), resume.getFirstName(),
+            resume.getLastName(), resume.getEmail(), resume.getDegree(), resume.getMajor(),
+            resume.getGenderType(), resume.getBirthDate(), resume.getHasVisa(), resume.getVisaType(),
+            false, // 복사 시 대표 이력서 X
+            resume.getForKindergarten(), resume.getForElementary(), resume.getForMiddleSchool(),
+            resume.getForHighSchool(), resume.getForAdult(), resume.getCountry(),
+            resume.getResidenceCountry(), resume.getUser(), resume.getProfileImage(), null));
+  }
+
+  @Transactional
   public void createResumeWithFile(long userId, CreateResumeWithFileDTO dto) {
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
