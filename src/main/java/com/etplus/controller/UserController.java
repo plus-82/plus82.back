@@ -51,6 +51,13 @@ public class UserController {
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
+  @DeleteMapping(value = "/me/profile-image")
+  public CommonResponse<Void> deleteProfileImage(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
+    userService.deleteProfileImage(loginUser.userId());
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
   @DeleteMapping("/me")
   public CommonResponse<Void> deleteMe(
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {

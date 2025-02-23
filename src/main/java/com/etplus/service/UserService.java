@@ -83,6 +83,22 @@ public class UserService {
   }
 
   @Transactional
+  public void deleteProfileImage(long userId) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    user.setProfileImage(null);
+    userRepository.save(user);
+//    FileEntity profileImage = user.getProfileImage();
+//    if (profileImage != null) {
+//      s3Uploader.deleteImage(profileImage);
+//      fileRepository.delete(profileImage);
+//      user.setProfileImage(null);
+//      userRepository.save(user);
+//    }
+  }
+
+  @Transactional
   public void deleteUser(long userId) {
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
