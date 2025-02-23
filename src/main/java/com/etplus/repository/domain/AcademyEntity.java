@@ -37,6 +37,8 @@ public class AcademyEntity extends BaseEntity{
   @Enumerated(EnumType.STRING)
   private LocationType locationType;          // 위치 (시,도)
   private String detailedAddress;             // 상세 주소
+  private double lat;
+  private double lng;
 
   // 대상
   private boolean forKindergarten;
