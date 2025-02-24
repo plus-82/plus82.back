@@ -102,7 +102,13 @@ public class AcademyService {
     }
 
     academy.setName(dto.name());
+    academy.setNameEn(dto.nameEn());
+    academy.setRepresentativeName(dto.representativeName());
     academy.setDescription(dto.description());
+    academy.setLocationType(dto.locationType());
+    academy.setDetailedAddress(dto.detailedAddress());
+    academy.setLat(dto.lat());
+    academy.setLng(dto.lng());
     academy.setForKindergarten(dto.forKindergarten());
     academy.setForElementary(dto.forElementary());
     academy.setForMiddleSchool(dto.forMiddleSchool());
