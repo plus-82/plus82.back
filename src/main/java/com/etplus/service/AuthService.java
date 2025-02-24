@@ -87,6 +87,7 @@ public class AuthService {
         null,
         dto.firstName(),
         dto.lastName(),
+        null,
         dto.genderType(),
         dto.birthDate(),
         dto.email(),
@@ -130,8 +131,9 @@ public class AuthService {
     // 사용자 저장
     UserEntity userEntity = new UserEntity(
         null,
-        dto.firstName(),
-        dto.lastName(),
+        null,
+        null,
+        dto.fullName(),
         dto.genderType(),
         dto.birthDate(),
         dto.email(),

@@ -19,9 +19,7 @@ public record SignUpAcademyDto(
 
     // 사용자 정보
     @NotBlank
-    String firstName,
-    @NotBlank
-    String lastName,
+    String fullName,
     @NotNull
     GenderType genderType,  // 성별
     @NotNull
