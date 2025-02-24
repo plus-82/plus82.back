@@ -1,7 +1,9 @@
 package com.etplus.controller.dto;
 
 import com.etplus.repository.domain.code.GenderType;
+import com.etplus.repository.domain.code.LocationType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
@@ -28,6 +30,18 @@ public record SignUpAcademyDto(
     // 학원 정보
     @NotBlank
     String academyName,     // 학원 이름
+    @NotBlank
+    String academyNameEn,   // 학원 이름 (영어)
+    @NotBlank
+    String representativeName,          // 대표자명
+    @NotNull
+    LocationType locationType,          // 위치 (시,도)
+    @NotEmpty
+    String detailedAddress,             // 상세 주소
+    @NotNull
+    Double lat,
+    @NotNull
+    Double lng,
     @NotBlank
     @Pattern(regexp = "^[0-9]{10}$", message = "Invalid business registration number format")
     String businessRegistrationNumber   // 사업자 등록번호

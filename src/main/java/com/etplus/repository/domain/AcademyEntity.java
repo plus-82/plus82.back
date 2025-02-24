@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter @Setter
 @Entity
 @Table(name = "academy")
-public class AcademyEntity extends BaseEntity{
+public class AcademyEntity extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +29,8 @@ public class AcademyEntity extends BaseEntity{
 
   @Column(nullable = false)
   private String name;                        // 학원 이름
+  @Column(nullable = false)
+  private String representativeName;          // 대표자명
   @Column(length = 1000)
   private String description;                 // 학원 설명
   @Column(nullable = false, unique = true, length = 20)
@@ -51,18 +53,25 @@ public class AcademyEntity extends BaseEntity{
   @Convert(converter = LongListConverter.class)
   private List<Long> imageFileIdList;
 
-  public AcademyEntity(String name, String description, String businessRegistrationNumber,
-      LocationType locationType, String detailedAddress, boolean forKindergarten,
-      boolean forElementary, boolean forMiddleSchool, boolean forHighSchool, boolean forAdult) {
+  public AcademyEntity(Long id, String name, String representativeName, String description,
+      String businessRegistrationNumber, LocationType locationType, String detailedAddress,
+      double lat, double lng, boolean forKindergarten, boolean forElementary,
+      boolean forMiddleSchool,
+      boolean forHighSchool, boolean forAdult, List<Long> imageFileIdList) {
+    this.id = id;
     this.name = name;
+    this.representativeName = representativeName;
     this.description = description;
     this.businessRegistrationNumber = businessRegistrationNumber;
     this.locationType = locationType;
     this.detailedAddress = detailedAddress;
+    this.lat = lat;
+    this.lng = lng;
     this.forKindergarten = forKindergarten;
     this.forElementary = forElementary;
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
     this.forAdult = forAdult;
+    this.imageFileIdList = imageFileIdList;
   }
 }
