@@ -26,8 +26,13 @@ public record JobPostDetailVO(
     // academy
     Long academyId,
     String academyName,
+    String academyNameEn,
+    String academyRepresentativeName,
     String academyDescription,
     LocationType academyLocationType,
+    String detailedAddress,
+    double lat,
+    double lng,
     String academyDetailedAddress,
     List<String> academyImageUrls
 ) {
@@ -52,8 +57,13 @@ public record JobPostDetailVO(
         jobPostEntity.isForAdult(),
         jobPostEntity.getAcademy().getId(),
         jobPostEntity.getAcademy().getName(),
+        jobPostEntity.getAcademy().getNameEn(),
+        jobPostEntity.getAcademy().getRepresentativeName(),
         jobPostEntity.getAcademy().getDescription(),
         jobPostEntity.getAcademy().getLocationType(),
+        jobPostEntity.getAcademy().getDetailedAddress(),
+        jobPostEntity.getAcademy().getLat(),
+        jobPostEntity.getAcademy().getLng(),
         jobPostEntity.getAcademy().getDetailedAddress(),
         academyImageUrls
     );
