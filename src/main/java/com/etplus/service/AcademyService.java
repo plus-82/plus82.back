@@ -41,20 +41,7 @@ public class AcademyService {
 
     List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
 
-    return new AcademyDetailVO(
-        academy.getId(),
-        academy.getName(),
-        academy.getDescription(),
-        academy.getBusinessRegistrationNumber(),
-        academy.getLocationType(),
-        academy.getDetailedAddress(),
-        academy.isForKindergarten(),
-        academy.isForElementary(),
-        academy.isForMiddleSchool(),
-        academy.isForHighSchool(),
-        academy.isForAdult(),
-        imagePathList
-    );
+    return AcademyDetailVO.valueOf(academy, imagePathList);
   }
 
   public AcademyDetailVO getMyAcademy(LoginUser loginUser) {
@@ -73,20 +60,7 @@ public class AcademyService {
 
     List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
 
-    return new AcademyDetailVO(
-        academy.getId(),
-        academy.getName(),
-        academy.getDescription(),
-        academy.getBusinessRegistrationNumber(),
-        academy.getLocationType(),
-        academy.getDetailedAddress(),
-        academy.isForKindergarten(),
-        academy.isForElementary(),
-        academy.isForMiddleSchool(),
-        academy.isForHighSchool(),
-        academy.isForAdult(),
-        imagePathList
-    );
+    return AcademyDetailVO.valueOf(academy, imagePathList);
   }
 
   @Transactional
