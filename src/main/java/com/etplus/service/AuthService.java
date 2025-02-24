@@ -87,6 +87,7 @@ public class AuthService {
         null,
         dto.firstName(),
         dto.lastName(),
+        null,
         dto.genderType(),
         dto.birthDate(),
         dto.email(),
@@ -121,17 +122,25 @@ public class AuthService {
     // 학원 저장
     AcademyEntity academy = academyRepository.save(
         new AcademyEntity(
+            null,
             dto.academyName(),
+            dto.academyNameEn(),
+            dto.representativeName(),
             null,
             dto.businessRegistrationNumber(),
-            null, null, false, false, false, false, false
+            dto.locationType(),
+             dto.detailedAddress(),
+             dto.lat(),
+             dto.lng(),
+             false, false, false, false, false, null
         ));
 
     // 사용자 저장
     UserEntity userEntity = new UserEntity(
         null,
-        dto.firstName(),
-        dto.lastName(),
+        null,
+        null,
+        dto.fullName(),
         dto.genderType(),
         dto.birthDate(),
         dto.email(),

@@ -32,6 +32,7 @@ public class UserEntity extends BaseEntity {
 
   private String firstName;
   private String lastName;
+  private String fullName;
   private GenderType genderType;
   private LocalDate birthDate;
 
@@ -64,12 +65,13 @@ public class UserEntity extends BaseEntity {
   @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
   private FileEntity profileImage;
 
-  public UserEntity(Long id, String firstName, String lastName, GenderType genderType,
-      LocalDate birthDate, String email, String password, RoleType roleType,
-      AcademyEntity academy, CountryEntity country, FileEntity profileImage) {
+  public UserEntity(Long id, String firstName, String lastName, String fullName,
+      GenderType genderType, LocalDate birthDate, String email, String password,
+      RoleType roleType, AcademyEntity academy, CountryEntity country, FileEntity profileImage) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.fullName = fullName;
     this.genderType = genderType;
     this.birthDate = birthDate;
     this.email = email;
