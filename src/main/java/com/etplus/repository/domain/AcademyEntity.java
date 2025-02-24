@@ -30,6 +30,8 @@ public class AcademyEntity extends BaseEntity {
   @Column(nullable = false)
   private String name;                        // 학원 이름
   @Column(nullable = false)
+  private String nameEn;                      // 학원 영문 이름
+  @Column(nullable = false)
   private String representativeName;          // 대표자명
   @Column(length = 1000)
   private String description;                 // 학원 설명
@@ -53,13 +55,14 @@ public class AcademyEntity extends BaseEntity {
   @Convert(converter = LongListConverter.class)
   private List<Long> imageFileIdList;
 
-  public AcademyEntity(Long id, String name, String representativeName, String description,
+  public AcademyEntity(Long id, String name, String nameEn, String representativeName, String description,
       String businessRegistrationNumber, LocationType locationType, String detailedAddress,
       double lat, double lng, boolean forKindergarten, boolean forElementary,
       boolean forMiddleSchool,
       boolean forHighSchool, boolean forAdult, List<Long> imageFileIdList) {
     this.id = id;
     this.name = name;
+    this.nameEn = nameEn;
     this.representativeName = representativeName;
     this.description = description;
     this.businessRegistrationNumber = businessRegistrationNumber;

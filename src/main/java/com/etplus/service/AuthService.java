@@ -124,6 +124,7 @@ public class AuthService {
         new AcademyEntity(
             null,
             dto.academyName(),
+            dto.academyNameEn(),
             dto.representativeName(),
             null,
             dto.businessRegistrationNumber(),
