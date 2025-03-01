@@ -7,6 +7,8 @@ import com.etplus.common.LoginUser;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.NotificationService;
 import com.etplus.vo.NotificationSettingVO;
+import com.etplus.vo.NotificationVO;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationController {
 
   private final NotificationService notificationService;
+
+  @GetMapping
+  public CommonResponse<List<NotificationVO>> getNotifications(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
+    List<NotificationVO> vo = notificationService.getNotifications(loginUser.userId());
+    return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
 
   @GetMapping("/setting/me")
   public CommonResponse<NotificationSettingVO> getMyNotificationSetting(
