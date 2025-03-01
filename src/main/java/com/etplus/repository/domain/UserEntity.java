@@ -42,6 +42,8 @@ public class UserEntity extends BaseEntity {
   @Column(nullable = false)
   private String password;
 
+  private boolean allowEmail;
+
 //  @Enumerated(EnumType.STRING)
 //  private OauthProviderType providerType;
 //  private String providerId;
@@ -67,7 +69,7 @@ public class UserEntity extends BaseEntity {
   private FileEntity profileImage;
 
   public UserEntity(Long id, String firstName, String lastName, String fullName,
-      GenderType genderType, LocalDate birthDate, String email, String password,
+      GenderType genderType, LocalDate birthDate, String email, String password, boolean allowEmail,
       RoleType roleType, AcademyEntity academy, CountryEntity country, FileEntity profileImage) {
     this.id = id;
     this.firstName = firstName;
@@ -77,6 +79,7 @@ public class UserEntity extends BaseEntity {
     this.birthDate = birthDate;
     this.email = email;
     this.password = password;
+    this.allowEmail = allowEmail;
     this.roleType = roleType;
     this.academy = academy;
     this.country = country;
