@@ -5,19 +5,26 @@ import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
+import com.etplus.provider.EmailProvider;
 import com.etplus.repository.JobPostResumeRelationRepository;
+import com.etplus.repository.MessageTemplateRepository;
 import com.etplus.repository.NotificationRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.JobPostResumeRelationEntity;
+import com.etplus.repository.domain.MessageTemplateEntity;
 import com.etplus.repository.domain.NotificationEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
+import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.JobPostResumeRelationDetailVO;
 import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +36,8 @@ public class JobPostResumeRelationService {
   private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
   private final UserRepository userRepository;
   private final NotificationRepository notificationRepository;
+  private final MessageTemplateRepository messageTemplateRepository;
+  private final EmailProvider emailProvider;
 
   public Page<JobPostResumeRelationVO> getAllJobPostResumeRelations(RoleType roleType, long userId, SearchJobPostResumeRelationDTO dto) {
     if (RoleType.TEACHER.equals(roleType)) {
@@ -99,10 +108,25 @@ public class JobPostResumeRelationService {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
-    // TODO 선생님 이메일 알림
+    UserEntity teacher = jobPostResumeRelation.getUser();
+
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "JOB_POST_STATUS_" + status, MessageTemplateType.EMAIL).orElse(null);
+
+    Map params = new HashMap();
+    params.put("name", teacher.getFirstName() + " " + teacher.getLastName());
+    params.put("jobTitle", jobPostResumeRelation.getJobPost().getTitle());
+    params.put("academyName", academy.getName());
+    params.put("link", "https://plus82.co/my-page");
+
+    StringSubstitutor sub = new StringSubstitutor();
+    String emailTitle = sub.replace(emailTemplate.getTitle());
+    String emailContent = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(teacher.getEmail(), emailTitle, emailContent);
 
     // 선생님 알림 목록 추가
-    UserEntity teacher = jobPostResumeRelation.getUser();
     String title = "", titleEn = "", content = "", contentEn = "";
     switch (status) {
       case REVIEWED -> {
