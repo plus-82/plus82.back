@@ -33,6 +33,7 @@ public class UserEntity extends BaseEntity {
   private String firstName;
   private String lastName;
   private String fullName;
+  @Enumerated(EnumType.STRING)
   private GenderType genderType;
   private LocalDate birthDate;
 
