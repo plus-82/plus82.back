@@ -7,24 +7,33 @@ import com.etplus.exception.JobPostException;
 import com.etplus.exception.JobPostException.JobPostExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
+import com.etplus.provider.EmailProvider;
 import com.etplus.repository.FileRepository;
 import com.etplus.repository.JobPostRepository;
 import com.etplus.repository.JobPostResumeRelationRepository;
+import com.etplus.repository.MessageTemplateRepository;
+import com.etplus.repository.NotificationRepository;
 import com.etplus.repository.ResumeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.JobPostEntity;
 import com.etplus.repository.domain.JobPostResumeRelationEntity;
+import com.etplus.repository.domain.MessageTemplateEntity;
+import com.etplus.repository.domain.NotificationEntity;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
+import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +46,9 @@ public class JobPostService {
   private final FileRepository fileRepository;
   private final ResumeRepository resumeRepository;
   private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
+  private final MessageTemplateRepository messageTemplateRepository;
+  private final NotificationRepository notificationRepository;
+  private final EmailProvider emailProvider;
 
   public Slice<JobPostVO> getJobPosts(SearchJobPostDTO dto) {
     Slice<JobPostVO> allJobPost = jobPostRepository.findAllJobPost(dto);
@@ -82,6 +94,9 @@ public class JobPostService {
 
   @Transactional
   public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
@@ -97,6 +112,28 @@ public class JobPostService {
     if (jobPostResumeRelationRepository.existsByJobPostIdAndUserId(jobPostId, userId)) {
       throw new JobPostException(JobPostExceptionCode.RESUME_ALREADY_SUBMITTED);
     }
+
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "JOB_POST_STATUS_" + JobPostResumeRelationStatus.SUBMITTED, MessageTemplateType.EMAIL).orElse(null);
+
+    Map params = new HashMap();
+    params.put("name", user.getFirstName() + " " + user.getLastName());
+    params.put("jobTitle", jobPost.getTitle());
+    params.put("academyName", jobPost.getAcademy().getName());
+    params.put("link", "https://plus82.co/my-page");
+
+    StringSubstitutor sub = new StringSubstitutor();
+    String emailTitle = sub.replace(emailTemplate.getTitle());
+    String emailContent = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(user.getEmail(), emailTitle, emailContent);
+
+    // 선생님 알림 목록 추가
+    notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
+        String.format("%s에 이력서를 제출 완료했습니다", jobPost.getAcademy().getName()),
+        String.format("Resume submitted to %s", jobPost.getAcademy().getNameEn()),
+        user));
 
     jobPostResumeRelationRepository.save(
         new JobPostResumeRelationEntity(null, dto.coverLetter(),
