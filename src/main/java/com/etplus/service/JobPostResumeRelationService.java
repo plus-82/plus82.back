@@ -5,17 +5,26 @@ import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
+import com.etplus.provider.EmailProvider;
 import com.etplus.repository.JobPostResumeRelationRepository;
+import com.etplus.repository.MessageTemplateRepository;
+import com.etplus.repository.NotificationRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.JobPostResumeRelationEntity;
+import com.etplus.repository.domain.MessageTemplateEntity;
+import com.etplus.repository.domain.NotificationEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
+import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.JobPostResumeRelationDetailVO;
 import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +35,9 @@ public class JobPostResumeRelationService {
 
   private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
   private final UserRepository userRepository;
+  private final NotificationRepository notificationRepository;
+  private final MessageTemplateRepository messageTemplateRepository;
+  private final EmailProvider emailProvider;
 
   public Page<JobPostResumeRelationVO> getAllJobPostResumeRelations(RoleType roleType, long userId, SearchJobPostResumeRelationDTO dto) {
     if (RoleType.TEACHER.equals(roleType)) {
@@ -95,6 +107,52 @@ public class JobPostResumeRelationService {
         || currentStatus.equals(JobPostResumeRelationStatus.REJECTED)) {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
+
+    UserEntity teacher = jobPostResumeRelation.getUser();
+
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "JOB_POST_STATUS_" + status, MessageTemplateType.EMAIL).orElse(null);
+
+    Map params = new HashMap();
+    params.put("name", teacher.getFirstName() + " " + teacher.getLastName());
+    params.put("jobTitle", jobPostResumeRelation.getJobPost().getTitle());
+    params.put("academyName", academy.getName());
+    params.put("link", "https://plus82.co/my-page");
+
+    StringSubstitutor sub = new StringSubstitutor();
+    String emailTitle = sub.replace(emailTemplate.getTitle());
+    String emailContent = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(teacher.getEmail(), emailTitle, emailContent);
+
+    // 선생님 알림 목록 추가
+    String title = "", titleEn = "", content = "", contentEn = "";
+    switch (status) {
+      case REVIEWED -> {
+        title = "서류합격";
+        titleEn = "Reviewed";
+        content = String.format("%s에 제출한 이력서에 업데이트가 있습니다", academy.getName());
+        contentEn = String.format("Update on your resume at %s", academy.getNameEn());
+      }
+      case ACCEPTED -> {
+        title = "최종합격";
+        titleEn = "Accepted";
+        content = String.format("%s의 %s 포지션에 최종 합격했습니다",
+            academy.getName(), jobPostResumeRelation.getJobPost().getTitle());
+        contentEn = String.format("Final acceptance for %s at %s",
+            jobPostResumeRelation.getJobPost().getTitle(), academy.getNameEn());
+      }
+      case REJECTED -> {
+        title = "불합격";
+        titleEn = "Rejected";
+        content = String.format("%s의 %s 포지션에 안타깝게도 불합격했습니다",
+            academy.getName(), jobPostResumeRelation.getJobPost().getTitle());
+        contentEn = String.format("Unfortunately, rejected for %s at %s",
+            jobPostResumeRelation.getJobPost().getTitle(), academy.getNameEn());
+      }
+    }
+    notificationRepository.save(new NotificationEntity(null, title, titleEn, content, contentEn, teacher));
 
     jobPostResumeRelation.setStatus(status);
     jobPostResumeRelationRepository.save(jobPostResumeRelation);
