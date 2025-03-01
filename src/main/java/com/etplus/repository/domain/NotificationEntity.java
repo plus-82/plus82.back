@@ -27,17 +27,24 @@ public class NotificationEntity extends BaseEntity {
 
   @Column(length = 30)
   private String title;
+  @Column(length = 30)
+  private String titleEn;
   @Column(length = 100)
   private String content;
+  @Column(length = 100)
+  private String contentEn;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
   private UserEntity user;
 
-  public NotificationEntity(Long id, String title, String content, UserEntity user) {
+  public NotificationEntity(Long id, String title, String titleEn, String content, String contentEn,
+      UserEntity user) {
     this.id = id;
     this.title = title;
+    this.titleEn = titleEn;
     this.content = content;
+    this.contentEn = contentEn;
     this.user = user;
   }
 }
