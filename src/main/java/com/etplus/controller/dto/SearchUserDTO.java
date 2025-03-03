@@ -10,12 +10,8 @@ import lombok.Setter;
 public class SearchUserDTO extends PagingDTO {
 
   private String email;
-  private String firstName;
-  private String lastName;
+  private String name;
   private RoleType roleType;
-  private Long countryId;
-  private LocalDate fromDate;
-  private LocalDate toDate;
   private Boolean deleted;
 
 }

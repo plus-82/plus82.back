@@ -33,23 +33,14 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     if (StringUtils.hasText(dto.getEmail())) {
       builder.and(user.email.containsIgnoreCase(dto.getEmail()));
     }
-    if (StringUtils.hasText(dto.getFirstName())) {
-      builder.and(user.firstName.containsIgnoreCase(dto.getFirstName()));
-    }
-    if (StringUtils.hasText(dto.getLastName())) {
-      builder.and(user.lastName.containsIgnoreCase(dto.getLastName()));
+    if (StringUtils.hasText(dto.getName())) {
+      builder.and(user.firstName.containsIgnoreCase(dto.getName())
+          .or(user.lastName.containsIgnoreCase(dto.getName()))
+          .or(user.fullName.containsIgnoreCase(dto.getName()))
+      );
     }
     if (dto.getRoleType() != null) {
       builder.and(user.roleType.eq(dto.getRoleType()));
-    }
-    if (dto.getCountryId() != null) {
-      builder.and(user.country.id.eq(dto.getCountryId()));
-    }
-    if (dto.getFromDate() != null) {
-      builder.and(user.createdAt.goe(dto.getFromDate().atStartOfDay()));
-    }
-    if (dto.getToDate() != null) {
-      builder.and(user.createdAt.loe(dto.getToDate().plusDays(1).atStartOfDay()));
     }
     if (dto.getDeleted() != null) {
       builder.and(user.deleted.eq(dto.getDeleted()));
