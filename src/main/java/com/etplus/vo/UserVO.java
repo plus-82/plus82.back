@@ -1,6 +1,7 @@
 package com.etplus.vo;
 
 import com.etplus.repository.domain.code.GenderType;
+import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
 
 public record UserVO(
@@ -22,4 +23,7 @@ public record UserVO(
     String profileImagePath
 ) {
 
+  @QueryProjection
+  public UserVO {
+  }
 }

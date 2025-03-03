@@ -1,5 +1,6 @@
 package com.etplus.service;
 
+import com.etplus.controller.dto.SearchUserDTO;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateProfileImageDTO;
 import com.etplus.controller.dto.UpdateUserDto;
@@ -15,9 +16,12 @@ import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.repository.domain.code.GenderType;
+import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.UserVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -51,6 +55,30 @@ public class UserService {
         country == null ? null : country.getFlag(),
         profileImage == null ? null : profileImage.getPath()
     );
+  }
+
+  public Slice<UserVO> getAllUsers(SearchUserDTO dto) {
+    return userRepository.findAllUsers(dto);
+  }
+
+  @Transactional
+  public void createAdminUser(String email, String password) {
+    UserEntity userEntity = new UserEntity(
+        null,
+        null,
+        null,
+        null,
+        GenderType.MALE,
+        null,
+        email,
+        passwordProvider.encode(password),
+        true,
+        RoleType.ADMIN,
+        null,
+        null,
+        null
+    );
+    userRepository.save(userEntity);
   }
 
   @Transactional

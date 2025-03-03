@@ -4,6 +4,7 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.SearchUserDTO;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateProfileImageDTO;
 import com.etplus.controller.dto.UpdateUserDto;
@@ -12,13 +13,16 @@ import com.etplus.service.UserService;
 import com.etplus.vo.UserVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -33,6 +37,20 @@ public class UserController {
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
     UserVO vo = userService.getMe(loginUser.userId());
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping
+  public CommonResponse<Slice<UserVO>> getAllUsers(
+      @AuthUser(RoleType.ADMIN) LoginUser loginUser,
+      @Valid SearchUserDTO dto) {
+    Slice<UserVO> users = userService.getAllUsers(dto);
+    return new CommonResponse<>(users, CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/admin")
+  public CommonResponse<Void> createAdminUser(@RequestParam String email, @RequestParam String password) {
+    userService.createAdminUser(email, password);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
   @PutMapping("/me")
