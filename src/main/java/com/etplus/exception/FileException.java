@@ -10,7 +10,8 @@ public class FileException extends CustomBadRequestException {
     @AllArgsConstructor
     @Getter
     public enum FileExceptionCode implements ResponseCode {
-        INVALID_FILE_EXTENSION("FE-001", "invalid file extension"),
+        INVALID_FILE_EXTENSION("FE-001", "Invalid file extension. Allowed types: PDF, JPEG, JPG, PNG"),
+        FILE_SIZE_EXCEEDED("FE-002", "File size exceeds the maximum limit of 5MB"),
         ;
 
         private String code;
