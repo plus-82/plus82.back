@@ -90,6 +90,25 @@ public class JobPostService {
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
         dto.forHighSchool(), dto.forAdult(), academy));
+
+    // 이메일 템플릿 조회 & 파싱 & 발송
+    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+        "NEW_JOB_POST", MessageTemplateType.EMAIL).orElse(null);
+
+    Map params = new HashMap();
+    params.put("name", user.getFullName());
+    params.put("jobTitle", dto.title());
+    params.put("link", "https://plus82.co/job-postings");
+
+    StringSubstitutor sub = new StringSubstitutor(params);
+    String emailTitle = sub.replace(emailTemplate.getTitle());
+    String emailContent = sub.replace(emailTemplate.getContent());
+
+    emailProvider.send(user.getEmail(), emailTitle, emailContent);
+
+    // 선생님 알림 목록 추가
+    notificationRepository.save(new NotificationEntity(null, "등록", "Registered",
+        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", user));
   }
 
   @Transactional
