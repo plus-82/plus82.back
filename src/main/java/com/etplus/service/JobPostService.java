@@ -123,7 +123,7 @@ public class JobPostService {
     params.put("academyName", jobPost.getAcademy().getName());
     params.put("link", "https://plus82.co/my-page");
 
-    StringSubstitutor sub = new StringSubstitutor();
+    StringSubstitutor sub = new StringSubstitutor(params);
     String emailTitle = sub.replace(emailTemplate.getTitle());
     String emailContent = sub.replace(emailTemplate.getContent());
 
