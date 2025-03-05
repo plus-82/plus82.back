@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.CustomForbiddenException;
 import com.etplus.common.CustomUnauthorizedException;
+import com.etplus.exception.FileException.FileExceptionCode;
 import com.etplus.exception.InvalidInputValueException.InvalidInputValueExceptionCode;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
@@ -73,6 +75,14 @@ public class CustomExceptionHandler {
     log.info("handleHttpMessageNotReadableException : {}", e);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
         new CommonResponse<>(InvalidInputValueExceptionCode.INVALID_INPUT_VALUE));
+  }
+
+  @ExceptionHandler({MaxUploadSizeExceededException.class})
+  public ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+    // 파일 업로드 사이즈 초과
+    log.info("handleMaxUploadSizeExceededException : {}", e);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        new CommonResponse<>(FileExceptionCode.FILE_SIZE_EXCEEDED));
   }
 
   /**
