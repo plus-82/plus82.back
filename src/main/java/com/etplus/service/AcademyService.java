@@ -51,6 +51,9 @@ public class AcademyService {
 
     AcademyEntity academy = user.getAcademy();
 
+    // todo 공고 여러개 만들기.
+    // todo 공고 상세 조회 API에서 지원한 공고인지 나타내는 필드 추가
+
     if (!RoleType.ACADEMY.equals(user.getRoleType()) || academy == null) {
       throw new ResourceDeniedException(ResourceDeniedExceptionCode.INVALID_ROLE);
     }
