@@ -9,6 +9,7 @@ import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.JobPostService;
+import com.etplus.vo.JobPostDetailByTeacherVO;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostVO;
 import jakarta.validation.Valid;
@@ -38,6 +39,14 @@ public class JobPostController {
   public CommonResponse<JobPostDetailVO> getJobPostDetail(
       @PathVariable("job-post-id") Long jobPostId) {
     JobPostDetailVO vo = jobPostService.getJobPostDetail(jobPostId);
+    return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/{job-post-id}/by-teacher")
+  public CommonResponse<JobPostDetailByTeacherVO> getJobPostDetailByTeacher(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId) {
+    JobPostDetailByTeacherVO vo = jobPostService.getJobPostDetailByTeacher(loginUser.userId(), jobPostId);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
