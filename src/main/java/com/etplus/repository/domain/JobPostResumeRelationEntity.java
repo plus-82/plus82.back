@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,7 +26,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "job_post_resume_relation")
+@Table(name = "job_post_resume_relation",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"job_post_id", "user_id"}),
+    }
+)
 public class JobPostResumeRelationEntity extends BaseEntity {
 
   @Id
