@@ -55,10 +55,6 @@ public class UserEntity extends BaseEntity {
   @Column(nullable = false, updatable = false)
   private RoleType roleType;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "academy_id", referencedColumnName = "id", updatable = false)
-  private AcademyEntity academy;
-
   // academy 는 country null
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "country_id", referencedColumnName = "id")
@@ -70,7 +66,7 @@ public class UserEntity extends BaseEntity {
 
   public UserEntity(Long id, String firstName, String lastName, String fullName,
       GenderType genderType, LocalDate birthDate, String email, String password, boolean allowEmail,
-      RoleType roleType, AcademyEntity academy, CountryEntity country, FileEntity profileImage) {
+      RoleType roleType, CountryEntity country, FileEntity profileImage) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -81,7 +77,6 @@ public class UserEntity extends BaseEntity {
     this.password = password;
     this.allowEmail = allowEmail;
     this.roleType = roleType;
-    this.academy = academy;
     this.country = country;
     this.profileImage = profileImage;
   }
