@@ -45,13 +45,10 @@ public class AcademyService {
   }
 
   public AcademyDetailVO getMyAcademy(LoginUser loginUser) {
-    UserEntity user = userRepository.findById(loginUser.userId())
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(loginUser.userId())
+        .orElse(null);
 
-    AcademyEntity academy = user.getAcademy();
-
-    if (!RoleType.ACADEMY.equals(user.getRoleType()) || academy == null) {
+    if (!RoleType.ACADEMY.equals(loginUser.roleType()) || academy == null) {
       throw new ResourceDeniedException(ResourceDeniedExceptionCode.INVALID_ROLE);
     }
 
@@ -65,13 +62,10 @@ public class AcademyService {
 
   @Transactional
   public void updateMyAcademy(UpdateAcademyDto dto, LoginUser loginUser) {
-    UserEntity user = userRepository.findById(loginUser.userId())
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(loginUser.userId())
+        .orElse(null);
 
-    AcademyEntity academy = user.getAcademy();
-
-    if (!RoleType.ACADEMY.equals(user.getRoleType()) || academy == null) {
+    if (!RoleType.ACADEMY.equals(loginUser.roleType()) || academy == null) {
       throw new ResourceDeniedException(ResourceDeniedExceptionCode.INVALID_ROLE);
     }
 

@@ -8,6 +8,7 @@ import com.etplus.exception.JobPostException.JobPostExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.EmailProvider;
+import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.FileRepository;
 import com.etplus.repository.JobPostRepository;
 import com.etplus.repository.JobPostResumeRelationRepository;
@@ -45,6 +46,7 @@ public class JobPostService {
   private final JobPostRepository jobPostRepository;
   private final UserRepository userRepository;
   private final FileRepository fileRepository;
+  private final AcademyRepository academyRepository;
   private final ResumeRepository resumeRepository;
   private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
   private final MessageTemplateRepository messageTemplateRepository;
@@ -86,14 +88,9 @@ public class JobPostService {
 
   @Transactional
   public void createJobPost(long userId, CreateJobPostDTO dto) {
-    UserEntity user = userRepository.findById(userId)
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-    AcademyEntity academy = user.getAcademy();
-
-    if (academy == null) {
-      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND);
-    }
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
     jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
