@@ -75,7 +75,6 @@ public class UserService {
         true,
         RoleType.ADMIN,
         null,
-        null,
         null
     );
     userRepository.save(userEntity);

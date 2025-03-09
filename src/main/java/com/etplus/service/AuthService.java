@@ -94,7 +94,6 @@ public class AuthService {
         passwordProvider.encode(dto.password()),
         true,
         RoleType.TEACHER,
-        null,
         country,
         null
     );
@@ -135,6 +134,7 @@ public class AuthService {
              dto.lng(),
              false, false, false, false, false, null
         ));
+    //todo
 
     // 사용자 저장
     UserEntity userEntity = new UserEntity(
@@ -148,7 +148,6 @@ public class AuthService {
         passwordProvider.encode(dto.password()),
         true,
         RoleType.ACADEMY,
-        academy,
         null,
         null
     );
