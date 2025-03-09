@@ -1,5 +1,6 @@
 package com.etplus.vo;
 
+import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
@@ -26,5 +27,21 @@ public record JobPostResumeRelationVO(
 
   @QueryProjection
   public JobPostResumeRelationVO {
+  }
+
+  public static JobPostResumeRelationVO valueOf(JobPostResumeRelationEntity entity) {
+    return new JobPostResumeRelationVO(
+        entity.getId(),
+        entity.getCoverLetter(),
+        entity.getStatus(),
+        entity.getSubmittedDate(),
+        entity.getResumeTitle(),
+        entity.getFirstName(),
+        entity.getLastName(),
+        entity.getJobPost().getId(),
+        entity.getJobPost().getTitle(),
+        entity.getJobPost().getAcademy().getId(),
+        entity.getJobPost().getAcademy().getName()
+    );
   }
 }

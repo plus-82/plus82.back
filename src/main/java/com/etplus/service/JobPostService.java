@@ -26,6 +26,7 @@ import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.vo.JobPostDetailVO;
+import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -72,6 +73,15 @@ public class JobPostService {
     List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
 
     return JobPostDetailVO.valueOf(jobPost, imagePathList);
+  }
+
+  public JobPostResumeRelationVO getSubmittedJobPostResumeRelation(
+      long userId, long jobPostId) {
+    JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository
+        .findByUserIdAndJobPostId(userId, jobPostId).orElseThrow(() ->
+            new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
+
+    return JobPostResumeRelationVO.valueOf(jobPostResumeRelation);
   }
 
   @Transactional
