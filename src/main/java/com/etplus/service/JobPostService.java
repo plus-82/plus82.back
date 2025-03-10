@@ -91,6 +91,9 @@ public class JobPostService {
     AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
