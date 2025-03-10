@@ -1,6 +1,7 @@
 package com.etplus.service;
 
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.CreateAcademyDTO;
 import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
@@ -87,6 +88,46 @@ public class AcademyService {
     List<FileEntity> uploadedImageFiles = new ArrayList<>();
     for (MultipartFile image : dto.images()) {
       uploadedImageFiles.add(s3Uploader.uploadImageAndSaveRepository(image, academy.getRepresentativeUser()));
+    }
+
+    List<Long> uploadedImageFileIds = uploadedImageFiles.stream()
+        .map(FileEntity::getId)
+        .toList();
+
+    academy.setImageFileIdList(uploadedImageFileIds);
+    academyRepository.save(academy);
+  }
+
+  @Transactional
+  public void createAcademy(CreateAcademyDTO dto, long userId) {
+    UserEntity adminUser = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    AcademyEntity academy = academyRepository.save(
+        new AcademyEntity(
+            null,
+            dto.name(),
+            dto.nameEn(),
+            dto.representativeName(),
+            dto.representativeEmail(),
+            dto.description(),
+            null,
+            dto.locationType(),
+            dto.detailedAddress(),
+            dto.lat(),
+            dto.lng(),
+            false, false, false, false, false,
+            null,
+            true,
+            null,
+            adminUser
+        ));
+
+    // 이미지 업로드
+    List<FileEntity> uploadedImageFiles = new ArrayList<>();
+    for (MultipartFile image : dto.images()) {
+      uploadedImageFiles.add(s3Uploader.uploadImageAndSaveRepository(image, adminUser));
     }
 
     List<Long> uploadedImageFileIds = uploadedImageFiles.stream()

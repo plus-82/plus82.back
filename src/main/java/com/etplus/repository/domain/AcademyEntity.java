@@ -38,7 +38,7 @@ public class AcademyEntity extends BaseEntity {
   @Column(nullable = false)
   private String representativeName;          // 대표자명
   @Column(nullable = false)
-  private String representativeEmail;          // 대표자명
+  private String representativeEmail;          // 대표자 이메일
   @Column(length = 1000)
   private String description;                 // 학원 설명
   @Column(unique = true, length = 20)
