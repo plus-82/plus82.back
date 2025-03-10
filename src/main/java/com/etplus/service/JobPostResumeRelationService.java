@@ -6,10 +6,10 @@ import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.EmailProvider;
+import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.JobPostResumeRelationRepository;
 import com.etplus.repository.MessageTemplateRepository;
 import com.etplus.repository.NotificationRepository;
-import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.MessageTemplateEntity;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class JobPostResumeRelationService {
 
   private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
-  private final UserRepository userRepository;
+  private final AcademyRepository academyRepository;
   private final NotificationRepository notificationRepository;
   private final MessageTemplateRepository messageTemplateRepository;
   private final EmailProvider emailProvider;
@@ -43,14 +43,9 @@ public class JobPostResumeRelationService {
     if (RoleType.TEACHER.equals(roleType)) {
       return jobPostResumeRelationRepository.findAllJobPostResumeRelationsByTeacher(dto, userId);
     } else if (RoleType.ACADEMY.equals(roleType)) {
-      UserEntity user = userRepository.findById(userId)
+      AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
           .orElseThrow(() -> new ResourceNotFoundException(
-              ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-      AcademyEntity academy = user.getAcademy();
-
-      if (academy == null) {
-        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
-      }
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
       return jobPostResumeRelationRepository.findAllJobPostResumeRelationsByAcademy(dto, academy.getId());
     } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
@@ -68,10 +63,9 @@ public class JobPostResumeRelationService {
       }
 
     } else if (RoleType.ACADEMY.equals(roleType)) {
-      UserEntity user = userRepository.findById(userId)
+      AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
           .orElseThrow(() -> new ResourceNotFoundException(
-              ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-      AcademyEntity academy = user.getAcademy();
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
       if (jobPostResumeRelationEntity.getJobPost().getAcademy().getId() != academy.getId()) {
         throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
@@ -88,13 +82,9 @@ public class JobPostResumeRelationService {
         jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
         ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
 
-    UserEntity user = userRepository.findById(userId)
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-    AcademyEntity academy = user.getAcademy();
-    if (academy == null) {
-      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
-    }
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
     // 요청한 사용자 학원의 공고인지 확인
     if (jobPostResumeRelation.getJobPost().getAcademy().getId() != academy.getId()) {
@@ -162,14 +152,10 @@ public class JobPostResumeRelationService {
     if (RoleType.TEACHER.equals(roleType)) {
       return jobPostResumeRelationRepository.getJobPostResumeRelationSummaryByTeacher(userId);
     } else if (RoleType.ACADEMY.equals(roleType)) {
-      UserEntity user = userRepository.findById(userId)
+      AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
           .orElseThrow(() -> new ResourceNotFoundException(
-              ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-      AcademyEntity academy = user.getAcademy();
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
-      if (academy == null) {
-        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
-      }
       return jobPostResumeRelationRepository.getJobPostResumeRelationSummaryByAcademy(academy.getId());
     } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);

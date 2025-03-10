@@ -94,7 +94,6 @@ public class AuthService {
         passwordProvider.encode(dto.password()),
         true,
         RoleType.TEACHER,
-        null,
         country,
         null
     );
@@ -120,24 +119,8 @@ public class AuthService {
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
-    // 학원 저장
-    AcademyEntity academy = academyRepository.save(
-        new AcademyEntity(
-            null,
-            dto.academyName(),
-            dto.academyNameEn(),
-            dto.representativeName(),
-            null,
-            dto.businessRegistrationNumber(),
-            dto.locationType(),
-             dto.detailedAddress(),
-             dto.lat(),
-             dto.lng(),
-             false, false, false, false, false, null
-        ));
-
     // 사용자 저장
-    UserEntity userEntity = new UserEntity(
+    UserEntity userEntity = userRepository.save(new UserEntity(
         null,
         null,
         null,
@@ -148,11 +131,30 @@ public class AuthService {
         passwordProvider.encode(dto.password()),
         true,
         RoleType.ACADEMY,
-        academy,
         null,
         null
-    );
-    userRepository.save(userEntity);
+    ));
+
+    // 학원 저장
+    AcademyEntity academy = academyRepository.save(
+        new AcademyEntity(
+            null,
+            dto.academyName(),
+            dto.academyNameEn(),
+            dto.representativeName(),
+            dto.email(),
+            null,
+            dto.businessRegistrationNumber(),
+            dto.locationType(),
+            dto.detailedAddress(),
+            dto.lat(),
+            dto.lng(),
+            false, false, false, false, false,
+            null,
+            false,
+            userEntity,
+            null
+        ));
   }
 
   public TokenVO signIn(SignInDto dto) {
