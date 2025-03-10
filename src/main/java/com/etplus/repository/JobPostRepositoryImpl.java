@@ -4,14 +4,20 @@ import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.code.OrderType;
 import com.etplus.repository.domain.QAcademyEntity;
 import com.etplus.repository.domain.QJobPostEntity;
+import com.etplus.repository.domain.QJobPostResumeRelationEntity;
+import com.etplus.repository.domain.QUserEntity;
+import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
+import com.etplus.scheduler.vo.QJobPostDueDateNotiVO;
 import com.etplus.vo.JobPostVO;
 import com.etplus.vo.QJobPostVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Slice;
@@ -66,6 +72,35 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
     }
 
     return new SliceImpl<>(content, dto.toPageable(), hasNext);
+  }
+
+  @Override
+  public List<JobPostDueDateNotiVO> findDueDateNotificationTarget(LocalDate today) {
+    QUserEntity adminUser = new QUserEntity("adminUser");
+    QJobPostResumeRelationEntity jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
+
+    JPAQuery<JobPostDueDateNotiVO> jpaQuery = query.select(
+            new QJobPostDueDateNotiVO(
+                jobPost.id,
+                jobPost.title,
+                academy.id,
+                academy.name,
+                academy.representativeName,
+                academy.representativeEmail,
+                academy.byAdmin,
+                adminUser.id,
+                adminUser.email,
+                JPAExpressions
+                    .select(jobPostResumeRelation.count())
+                    .from(jobPostResumeRelation)
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id))
+            ))
+        .from(jobPost)
+        .innerJoin(jobPost.academy, academy)
+        .leftJoin(academy.adminUser, adminUser)
+        .where(jobPost.dueDate.eq(today));
+
+    return jpaQuery.fetch();
   }
 
   private BooleanBuilder getWhereCondition(SearchJobPostDTO dto) {
