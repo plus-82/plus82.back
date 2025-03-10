@@ -6,6 +6,7 @@ import com.etplus.repository.domain.QAcademyEntity;
 import com.etplus.repository.domain.QJobPostEntity;
 import com.etplus.repository.domain.QJobPostResumeRelationEntity;
 import com.etplus.repository.domain.QUserEntity;
+import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.QJobPostDueDateNotiVO;
 import com.etplus.vo.JobPostVO;
@@ -87,18 +88,28 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
                 academy.name,
                 academy.representativeName,
                 academy.representativeEmail,
-                academy.byAdmin,
                 adminUser.id,
                 adminUser.email,
                 JPAExpressions
                     .select(jobPostResumeRelation.count())
                     .from(jobPostResumeRelation)
-                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id))
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id)),
+                JPAExpressions
+                    .select(jobPostResumeRelation.count())
+                    .from(jobPostResumeRelation)
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id)
+                        .and(jobPostResumeRelation.status.eq(JobPostResumeRelationStatus.SUBMITTED))),
+                JPAExpressions
+                    .select(jobPostResumeRelation.count())
+                    .from(jobPostResumeRelation)
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id)
+                        .and(jobPostResumeRelation.status.eq(JobPostResumeRelationStatus.REVIEWED)))
             ))
         .from(jobPost)
         .innerJoin(jobPost.academy, academy)
         .leftJoin(academy.adminUser, adminUser)
-        .where(jobPost.dueDate.eq(today));
+        .where(jobPost.dueDate.eq(today)
+            .and(academy.byAdmin.isFalse()));
 
     return jpaQuery.fetch();
   }
