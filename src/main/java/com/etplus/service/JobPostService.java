@@ -158,10 +158,16 @@ public class JobPostService {
 
     emailProvider.send(user.getEmail(), emailTitle, emailContent);
 
-    // 선생님 알림 목록 추가
+    // 선생님 알림 추가
     notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
         String.format("%s에 이력서를 제출 완료했습니다", jobPost.getAcademy().getName()),
         String.format("Resume submitted to %s", jobPost.getAcademy().getNameEn()),
+        user));
+
+    // 학원 알림 추가
+    notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
+        String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
+        String.format("New application for {%s}", jobPost.getTitle()),
         user));
 
     jobPostResumeRelationRepository.save(
