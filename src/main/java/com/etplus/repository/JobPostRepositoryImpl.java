@@ -8,7 +8,9 @@ import com.etplus.repository.domain.QJobPostResumeRelationEntity;
 import com.etplus.repository.domain.QUserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
+import com.etplus.scheduler.vo.JobPostNewApplicantNotiVO;
 import com.etplus.scheduler.vo.QJobPostDueDateNotiVO;
+import com.etplus.scheduler.vo.QJobPostNewApplicantNotiVO;
 import com.etplus.vo.JobPostVO;
 import com.etplus.vo.QJobPostVO;
 import com.querydsl.core.BooleanBuilder;
@@ -110,6 +112,41 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
         .leftJoin(academy.adminUser, adminUser)
         .where(jobPost.dueDate.eq(today)
             .and(academy.byAdmin.isFalse()));
+
+    return jpaQuery.fetch();
+  }
+
+  @Override
+  public List<JobPostNewApplicantNotiVO> findNewApplicantNotificationTarget(LocalDate today) {
+    QUserEntity adminUser = new QUserEntity("adminUser");
+    QJobPostResumeRelationEntity jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
+
+    JPAQuery<JobPostNewApplicantNotiVO> jpaQuery = query.select(
+        new QJobPostNewApplicantNotiVO(
+            jobPost.id,
+            jobPost.title,
+            academy.id,
+            academy.name,
+            academy.representativeName,
+            academy.representativeEmail,
+            adminUser.id,
+            adminUser.email,
+            jobPostResumeRelation.count()
+        ))
+        .from(jobPost)
+        .innerJoin(jobPost.academy, academy)
+        .leftJoin(academy.adminUser, adminUser)
+        .leftJoin(jobPostResumeRelation)
+        .on(jobPost.id.eq(jobPostResumeRelation.jobPost.id)
+            .and(jobPostResumeRelation.createdAt.between(
+                today.minusDays(1).atStartOfDay(),
+                today.atStartOfDay())
+            )
+        )
+        .groupBy(jobPost.id, jobPost.title, academy.id, academy.name,
+            academy.representativeName, academy.representativeEmail,
+            adminUser.id, adminUser.email)
+        .having(jobPostResumeRelation.id.count().gt(0)); // 1개 이상인 경우만 가져오기
 
     return jpaQuery.fetch();
   }
