@@ -165,10 +165,13 @@ public class JobPostService {
         user));
 
     // 학원 알림 추가
-    notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
-        String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
-        String.format("New application for {%s}", jobPost.getTitle()),
-        user));
+    UserEntity representativeUser = jobPost.getAcademy().getRepresentativeUser();
+    if (representativeUser != null) {
+      notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
+          String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
+          String.format("New application for {%s}", jobPost.getTitle()),
+          representativeUser));
+    }
 
     jobPostResumeRelationRepository.save(
         new JobPostResumeRelationEntity(null, dto.coverLetter(),

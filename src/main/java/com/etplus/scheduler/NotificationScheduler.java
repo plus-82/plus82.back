@@ -7,6 +7,7 @@ import com.etplus.repository.NotificationRepository;
 import com.etplus.repository.domain.JobPostEntity;
 import com.etplus.repository.domain.MessageTemplateEntity;
 import com.etplus.repository.domain.NotificationEntity;
+import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.JobPostNewApplicantNotiVO;
@@ -51,10 +52,13 @@ public class NotificationScheduler {
 
     List<NotificationEntity> createdList = new ArrayList<>();
     for (JobPostEntity jobPost : jobPostList) {
-      createdList.add(new NotificationEntity(null, "마감", "Expired",
-          String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
-          String.format("job posting {%s} has closed", jobPost.getTitle()),
-          jobPost.getAcademy().getRepresentativeUser()));
+      UserEntity user = jobPost.getAcademy().getRepresentativeUser();
+      if (user != null) {
+        createdList.add(new NotificationEntity(null, "마감", "Expired",
+            String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
+            String.format("job posting {%s} has closed", jobPost.getTitle()),
+            user));
+      }
     }
 
     notificationRepository.saveAll(createdList);
