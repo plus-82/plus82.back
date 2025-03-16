@@ -9,7 +9,9 @@ import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.AcademyService;
 import com.etplus.vo.AcademyDetailVO;
+import com.etplus.vo.AcademyVO;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AcademyController {
 
   private final AcademyService academyService;
+
+  @GetMapping
+  public CommonResponse<List<AcademyVO>> getAllAcademies(@AuthUser(RoleType.ADMIN) LoginUser loginUser) {
+    List<AcademyVO> result = academyService.getAllAcademies();
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
 
   @GetMapping("/{academy-id}")
   public CommonResponse<AcademyDetailVO> getAcademyDetail(@PathVariable("academy-id") Long academyId) {

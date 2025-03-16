@@ -16,6 +16,7 @@ import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.AcademyDetailVO;
+import com.etplus.vo.AcademyVO;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,11 @@ public class AcademyService {
   private final UserRepository userRepository;
   private final S3Uploader s3Uploader;
   private final FileRepository fileRepository;
+
+  public List<AcademyVO> getAllAcademies() {
+    List<AcademyEntity> all = academyRepository.findAll();
+    return all.stream().map(AcademyVO::valueOf).toList();
+  }
 
   public AcademyDetailVO getAcademyDetail(Long academyId) {
     AcademyEntity academy = academyRepository.findById(academyId)
