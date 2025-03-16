@@ -3,12 +3,16 @@ package com.etplus.scheduler;
 import com.etplus.provider.EmailProvider;
 import com.etplus.repository.JobPostRepository;
 import com.etplus.repository.MessageTemplateRepository;
+import com.etplus.repository.NotificationRepository;
+import com.etplus.repository.domain.JobPostEntity;
 import com.etplus.repository.domain.MessageTemplateEntity;
+import com.etplus.repository.domain.NotificationEntity;
 import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.JobPostNewApplicantNotiVO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +30,35 @@ public class NotificationScheduler {
 
   private final JobPostRepository jobPostRepository;
   private final MessageTemplateRepository messageTemplateRepository;
+  private final NotificationRepository notificationRepository;
   private final EmailProvider emailProvider;
+
+  @Scheduled(cron = "0 1 0 * * ?")
+  @Transactional
+  public void createDueDateNotification() {
+    log.info("Starting creating notification for job post due date");
+
+    // 대상 목록 조회
+    LocalDate yesterday = LocalDate.now().minusDays(1);
+    List<JobPostEntity> jobPostList = jobPostRepository.findByDueDate(yesterday);
+
+    if (jobPostList.isEmpty()) {
+      log.info("No job posts due yesterday ({})", yesterday);
+      return;
+    }
+
+    log.info("Found job post id : {}", jobPostList.stream().map(JobPostEntity::getId).toList());
+
+    List<NotificationEntity> createdList = new ArrayList<>();
+    for (JobPostEntity jobPost : jobPostList) {
+      createdList.add(new NotificationEntity(null, "마감", "Expired",
+          String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
+          String.format("job posting {%s} has closed", jobPost.getTitle()),
+          jobPost.getAcademy().getRepresentativeUser()));
+    }
+
+    notificationRepository.saveAll(createdList);
+  }
 
   /***
    * 5시에 공고 마감 예정 알림.

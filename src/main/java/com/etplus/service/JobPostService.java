@@ -116,7 +116,7 @@ public class JobPostService {
 
     emailProvider.send(user.getEmail(), emailTitle, emailContent);
 
-    // 선생님 알림 목록 추가
+    // 학원 알림 목록 추가
     notificationRepository.save(new NotificationEntity(null, "등록", "Registered",
         "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", user));
   }
