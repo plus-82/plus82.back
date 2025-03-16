@@ -55,6 +55,15 @@ public class AcademyController {
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
+  @PutMapping(value = "/{academy-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public CommonResponse<Void> updateAcademyByAdmin(
+      @PathVariable("academy-id") Long academyId,
+      @ModelAttribute @Valid UpdateAcademyDto dto,
+      @AuthUser(RoleType.ADMIN) LoginUser loginUser) {
+    academyService.updateAcademyByAdmin(academyId, dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> createAcademy(@ModelAttribute @Valid CreateAcademyDTO dto,
       @AuthUser(RoleType.ADMIN) LoginUser loginUser) {

@@ -105,6 +105,41 @@ public class AcademyService {
   }
 
   @Transactional
+  public void updateAcademyByAdmin(long academyId, UpdateAcademyDto dto) {
+    AcademyEntity academy = academyRepository.findById(academyId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    academy.setName(dto.name());
+    academy.setNameEn(dto.nameEn());
+    academy.setRepresentativeName(dto.representativeName());
+    academy.setDescription(dto.description());
+    academy.setLocationType(dto.locationType());
+    academy.setDetailedAddress(dto.detailedAddress());
+    academy.setLat(dto.lat());
+    academy.setLng(dto.lng());
+    academy.setForKindergarten(dto.forKindergarten());
+    academy.setForElementary(dto.forElementary());
+    academy.setForMiddleSchool(dto.forMiddleSchool());
+    academy.setForHighSchool(dto.forHighSchool());
+    academy.setForAdult(dto.forAdult());
+
+    // 이미지 업로드
+    List<FileEntity> uploadedImageFiles = new ArrayList<>();
+    for (MultipartFile image : dto.images()) {
+      uploadedImageFiles.add(
+          s3Uploader.uploadImageAndSaveRepository(image, academy.getRepresentativeUser()));
+    }
+
+    List<Long> uploadedImageFileIds = uploadedImageFiles.stream()
+        .map(FileEntity::getId)
+        .toList();
+
+    academy.setImageFileIdList(uploadedImageFileIds);
+    academyRepository.save(academy);
+  }
+
+  @Transactional
   public void createAcademy(CreateAcademyDTO dto, long userId) {
     UserEntity adminUser = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
