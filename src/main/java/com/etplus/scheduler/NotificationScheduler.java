@@ -101,6 +101,7 @@ public class NotificationScheduler {
       params.put("name", vo.academyName());
       params.put("jobTitle", vo.title());
       params.put("date", today.minusDays(1l).format(formatter));
+      params.put("count", vo.yesterdayJobPostResumeTotalCount());
       params.put("link", "https://plus82.co/my-job-posts");
 
       StringSubstitutor sub = new StringSubstitutor(params);
