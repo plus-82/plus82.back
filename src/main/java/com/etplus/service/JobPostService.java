@@ -178,6 +178,34 @@ public class JobPostService {
       log.error("Failed to send email teacher for job post resume submission", e);
     }
 
+    // TODO
+//    // 이메일 템플릿 조회 & 파싱 & 발송
+//    if (jobPost.getAcademy().isByAdmin()) {
+//      try {
+          // TODO 어드민
+          // TODO 학원
+//        MessageTemplateEntity adminEmailTemplate = messageTemplateRepository.findByCodeAndType(
+//            "ADMIN_JOB_POST_SUBMITTED", MessageTemplateType.EMAIL).orElse(null);
+//
+//        String adminUserEmail = jobPost.getAcademy().getAdminUser().getEmail();
+//
+//        Map params = new HashMap();
+//        params.put("name", user.getFirstName() + " " + user.getLastName());
+//        params.put("jobTitle", jobPost.getTitle());
+//        params.put("academyName", jobPost.getAcademy().getNameEn());
+//        params.put("link", "https://plus82.co/my-page");
+//
+//        StringSubstitutor sub = new StringSubstitutor(params);
+//        String emailTitle = sub.replace(adminEmailTemplate.getTitle());
+//        String emailContent = sub.replace(adminEmailTemplate.getContent());
+//
+//        emailProvider.send(adminUserEmail, emailTitle, emailContent);
+//
+//      } catch(Exception e) {
+//        log.error("Failed to send email to admin for job post resume submission", e);
+//      }
+//    }
+
     // 선생님 알림 추가
     notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
         String.format("%s에 이력서를 제출 완료했습니다", jobPost.getAcademy().getName()),
