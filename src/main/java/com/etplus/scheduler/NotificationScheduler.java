@@ -102,7 +102,12 @@ public class NotificationScheduler {
       String title = sub.replace(emailTemplate.getTitle());
       String content = sub.replace(emailTemplate.getContent());
 
-      emailProvider.send(vo.representativeEmail(), title, content);
+      String receiverEmail = vo.representativeEmail();
+      if (vo.byAdmin()) {
+        receiverEmail = vo.adminUserEmail();
+      }
+
+      emailProvider.send(receiverEmail, title, content);
     }
     log.info("Completed job post due date notification process");
   }
@@ -144,7 +149,12 @@ public class NotificationScheduler {
       String title = sub.replace(emailTemplate.getTitle());
       String content = sub.replace(emailTemplate.getContent());
 
-      emailProvider.send(vo.representativeEmail(), title, content);
+      String receiverEmail = vo.representativeEmail();
+      if (vo.byAdmin()) {
+        receiverEmail = vo.adminUserEmail();
+      }
+
+      emailProvider.send(receiverEmail, title, content);
     }
     log.info("Completed new applicant notification process");
   }

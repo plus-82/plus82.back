@@ -90,6 +90,7 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
                 academy.name,
                 academy.representativeName,
                 academy.representativeEmail,
+                academy.byAdmin,
                 adminUser.id,
                 adminUser.email,
                 JPAExpressions
@@ -129,6 +130,7 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
             academy.name,
             academy.representativeName,
             academy.representativeEmail,
+            academy.byAdmin,
             adminUser.id,
             adminUser.email,
             jobPostResumeRelation.count()

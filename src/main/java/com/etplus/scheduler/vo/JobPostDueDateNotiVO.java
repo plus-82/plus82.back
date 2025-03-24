@@ -11,6 +11,7 @@ public record JobPostDueDateNotiVO (
     String academyName,
     String representativeName, // 대표자 이름
     String representativeEmail, // 대표자 메일
+    boolean byAdmin,
 
     // adminUser
     long adminUserId,
