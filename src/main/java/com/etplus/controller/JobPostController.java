@@ -59,6 +59,15 @@ public class JobPostController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/by-admin/academy/{academy-id}")
+  public CommonResponse<Void> createJobPostByAdmin(
+      @AuthUser({RoleType.ADMIN}) LoginUser loginUser,
+      @PathVariable("academy-id") Long academyId,
+      @RequestBody @Valid CreateJobPostDTO dto) {
+    jobPostService.createJobPostByAdmin(academyId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
   @PostMapping("/{job-post-id}/submit-resume/{resume-id}")
   public CommonResponse<Void> submitResume(
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,

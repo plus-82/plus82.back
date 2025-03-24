@@ -124,6 +124,19 @@ public class JobPostService {
   }
 
   @Transactional
+  public void createJobPostByAdmin(long academyId, CreateJobPostDTO dto) {
+    AcademyEntity academy = academyRepository.findById(academyId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
+        dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
+        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
+        dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
+        dto.forHighSchool(), dto.forAdult(), academy));
+  }
+
+  @Transactional
   public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
