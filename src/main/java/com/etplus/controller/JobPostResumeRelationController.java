@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -43,6 +44,14 @@ public class JobPostResumeRelationController {
       @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId) {
     JobPostResumeRelationDetailVO result = jobPostResumeRelationService
         .getJobPostResumeRelation(loginUser.roleType(), loginUser.userId(), jobPostResumeRelationId);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/by-code")
+  public CommonResponse<JobPostResumeRelationDetailVO> getJobPostResumeRelationByCode(
+      @RequestParam("code") String code) {
+    JobPostResumeRelationDetailVO result = jobPostResumeRelationService
+        .getJobPostResumeRelationByCode(code);
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 

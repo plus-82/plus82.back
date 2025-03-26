@@ -13,4 +13,6 @@ public interface JobPostResumeRelationRepository extends
 
   Optional<JobPostResumeRelationEntity> findByUserIdAndJobPostId(Long userId, Long jobPostId);
 
+  Optional<JobPostResumeRelationEntity> findByCode(String code);
+
 }

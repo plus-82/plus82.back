@@ -76,6 +76,13 @@ public class JobPostResumeRelationService {
     return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity);
   }
 
+  public JobPostResumeRelationDetailVO getJobPostResumeRelationByCode(String code) {
+    JobPostResumeRelationEntity jobPostResumeRelationEntity = jobPostResumeRelationRepository
+        .findByCode(code).orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
+    return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity);
+  }
+
   @Transactional
   public void updateJobPostResumeRelationStatus(long jobPostResumeRelationId, JobPostResumeRelationStatus status, long userId) {
     JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository.findById(
