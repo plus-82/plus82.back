@@ -20,6 +20,7 @@ public class JobPostVO {
   private boolean forMiddleSchool;
   private boolean forHighSchool;
   private boolean forAdult;
+  private boolean closed;
 
   private Long academyId;
   private String academyName;
@@ -31,7 +32,7 @@ public class JobPostVO {
   @QueryProjection
   public JobPostVO(Long id, String title, LocalDate dueDate, boolean forKindergarten,
       boolean forElementary, boolean forMiddleSchool, boolean forHighSchool, boolean forAdult,
-      Long academyId, String academyName, LocationType locationType, List<Long> imageFileIdList) {
+      boolean closed, Long academyId, String academyName, LocationType locationType, List<Long> imageFileIdList) {
     this.id = id;
     this.title = title;
     this.dueDate = dueDate;
@@ -40,6 +41,7 @@ public class JobPostVO {
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
     this.forAdult = forAdult;
+    this.closed = closed;
     this.academyId = academyId;
     this.academyName = academyName;
     this.locationType = locationType;

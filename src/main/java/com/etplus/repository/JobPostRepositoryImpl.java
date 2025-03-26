@@ -53,6 +53,7 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
             jobPost.forMiddleSchool,
             jobPost.forHighSchool,
             jobPost.forAdult,
+            jobPost.closed,
             academy.id,
             academy.name,
             academy.locationType,
@@ -112,7 +113,8 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
         .innerJoin(jobPost.academy, academy)
         .leftJoin(academy.adminUser, adminUser)
         .where(jobPost.dueDate.eq(today)
-            .and(academy.byAdmin.isFalse()));
+            .and(academy.byAdmin.isFalse())
+            .and(jobPost.closed.isFalse()));
 
     return jpaQuery.fetch();
   }
