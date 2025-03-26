@@ -146,7 +146,11 @@ public class JobPostService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
 
-    if (jobPost.getDueDate().isBefore(LocalDate.now())) {
+    if (jobPost.getDueDate() != null && jobPost.getDueDate().isBefore(LocalDate.now())) {
+      throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);
+    }
+
+    if (jobPost.isClosed()) {
       throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);
     }
 
