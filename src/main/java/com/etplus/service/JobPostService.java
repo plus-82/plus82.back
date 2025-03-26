@@ -102,7 +102,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), academy));
+        dto.forHighSchool(), dto.forAdult(), false, academy));
 
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
@@ -134,7 +134,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), academy));
+        dto.forHighSchool(), dto.forAdult(), false, academy));
   }
 
   @Transactional
