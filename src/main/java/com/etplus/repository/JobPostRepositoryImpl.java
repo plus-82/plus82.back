@@ -180,6 +180,9 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
     if (Objects.nonNull(dto.getForAdult())) {
       whereCondition.and(jobPost.forAdult.eq(dto.getForAdult()));
     }
+    if (Objects.nonNull(dto.getClosed())) {
+      whereCondition.and(jobPost.closed.eq(dto.getClosed()));
+    }
     if (Objects.nonNull(dto.getFromDueDate())) {
       whereCondition.and(jobPost.dueDate.goe(dto.getFromDueDate()));
     }

@@ -18,6 +18,7 @@ public class SearchJobPostDTO extends PagingDTO{
   private Boolean forMiddleSchool;
   private Boolean forHighSchool;
   private Boolean forAdult;
+  private Boolean closed;
 
   private LocalDate fromDueDate;
   private LocalDate toDueDate;
