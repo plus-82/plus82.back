@@ -50,18 +50,21 @@ public class NotificationScheduler {
 
     log.info("Found job post id : {}", jobPostList.stream().map(JobPostEntity::getId).toList());
 
-    List<NotificationEntity> createdList = new ArrayList<>();
+    List<NotificationEntity> createdNotificationList = new ArrayList<>();
+    List<JobPostEntity> closedJobPostList = new ArrayList<>();
     for (JobPostEntity jobPost : jobPostList) {
       UserEntity user = jobPost.getAcademy().getRepresentativeUser();
       if (user != null) {
-        createdList.add(new NotificationEntity(null, "마감", "Expired",
+        createdNotificationList.add(new NotificationEntity(null, "마감", "Expired",
             String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
             String.format("job posting {%s} has closed", jobPost.getTitle()),
             user));
       }
+      jobPost.setClosed(true);
+      closedJobPostList.add(jobPost);
     }
-
-    notificationRepository.saveAll(createdList);
+    jobPostRepository.saveAll(closedJobPostList);
+    notificationRepository.saveAll(createdNotificationList);
   }
 
   /***
