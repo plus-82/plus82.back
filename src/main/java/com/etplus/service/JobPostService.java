@@ -26,6 +26,7 @@ import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
+import com.etplus.util.UuidProvider;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
@@ -178,12 +179,14 @@ public class JobPostService {
       log.error("Failed to send email teacher for job post resume submission", e);
     }
 
+    // 접근 코드
+    String code = UuidProvider.generateCode();
     // TODO
 //    // 이메일 템플릿 조회 & 파싱 & 발송
 //    if (jobPost.getAcademy().isByAdmin()) {
 //      try {
-          // TODO 어드민
-          // TODO 학원
+    // TODO 어드민
+    // TODO 학원 - 코드 발송
 //        MessageTemplateEntity adminEmailTemplate = messageTemplateRepository.findByCodeAndType(
 //            "ADMIN_JOB_POST_SUBMITTED", MessageTemplateType.EMAIL).orElse(null);
 //
@@ -229,7 +232,7 @@ public class JobPostService {
             resume.getGenderType(), resume.getBirthDate(), resume.getHasVisa(),
             resume.getVisaType(), resume.getForKindergarten(), resume.getForElementary(),
             resume.getForMiddleSchool(), resume.getForHighSchool(), resume.getForAdult(),
-            resume.getCountry(), resume.getResidenceCountry(), resume.getUser(),
+            code, resume.getCountry(), resume.getResidenceCountry(), resume.getUser(),
             resume.getProfileImage(), resume.getFile()
         ));
   }

@@ -67,6 +67,9 @@ public class JobPostResumeRelationEntity extends BaseEntity {
   private Boolean forHighSchool;
   private Boolean forAdult;
 
+  // 접근 코드
+  private String code;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "country_id", referencedColumnName = "id")
   private CountryEntity country;
@@ -92,8 +95,8 @@ public class JobPostResumeRelationEntity extends BaseEntity {
       GenderType genderType, LocalDate birthDate, Boolean hasVisa, VisaType visaType,
       Boolean forKindergarten, Boolean forElementary, Boolean forMiddleSchool,
       Boolean forHighSchool,
-      Boolean forAdult, CountryEntity country, CountryEntity residenceCountry, UserEntity user,
-      FileEntity profileImage, FileEntity file) {
+      Boolean forAdult, String code, CountryEntity country, CountryEntity residenceCountry,
+      UserEntity user, FileEntity profileImage, FileEntity file) {
     this.id = id;
     this.coverLetter = coverLetter;
     this.status = status;
@@ -115,6 +118,7 @@ public class JobPostResumeRelationEntity extends BaseEntity {
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
     this.forAdult = forAdult;
+    this.code = code;
     this.country = country;
     this.residenceCountry = residenceCountry;
     this.user = user;
