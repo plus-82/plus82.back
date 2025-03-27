@@ -31,11 +31,11 @@ public class JobPostEntity extends BaseEntity {
 
   @Column(nullable = false, columnDefinition = "VARCHAR(500)")
   private String jobDescription;  // 직무 설명
-  @Column(columnDefinition = "VARCHAR(500)")
+  @Column(columnDefinition = "VARCHAR(1000)")
   private String requiredQualification;   // 자격 요건
-  @Column(columnDefinition = "VARCHAR(500)")
+  @Column(columnDefinition = "VARCHAR(1000)")
   private String preferredQualification;  // 우대 사항
-  @Column(columnDefinition = "VARCHAR(500)")
+  @Column(columnDefinition = "VARCHAR(1000)")
   private String benefits;  // 복지
 
   private Integer salary;             // 급여
