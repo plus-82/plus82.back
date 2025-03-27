@@ -184,34 +184,36 @@ public class JobPostService {
     }
 
     // 접근 코드
-    String code = UuidProvider.generateCode();
-    // TODO
-//    // 이메일 템플릿 조회 & 파싱 & 발송
-//    if (jobPost.getAcademy().isByAdmin()) {
-//      try {
-    // TODO 어드민
-    // TODO 학원 - 코드 발송
-//        MessageTemplateEntity adminEmailTemplate = messageTemplateRepository.findByCodeAndType(
-//            "ADMIN_JOB_POST_SUBMITTED", MessageTemplateType.EMAIL).orElse(null);
-//
-//        String adminUserEmail = jobPost.getAcademy().getAdminUser().getEmail();
-//
-//        Map params = new HashMap();
-//        params.put("name", user.getFirstName() + " " + user.getLastName());
-//        params.put("jobTitle", jobPost.getTitle());
-//        params.put("academyName", jobPost.getAcademy().getNameEn());
-//        params.put("link", "https://plus82.co/my-page");
-//
-//        StringSubstitutor sub = new StringSubstitutor(params);
-//        String emailTitle = sub.replace(adminEmailTemplate.getTitle());
-//        String emailContent = sub.replace(adminEmailTemplate.getContent());
-//
-//        emailProvider.send(adminUserEmail, emailTitle, emailContent);
-//
-//      } catch(Exception e) {
-//        log.error("Failed to send email to admin for job post resume submission", e);
-//      }
-//    }
+    String code = UuidProvider.generateUuid();
+
+    // 어드민이 올린 공고인 경우 학원에 이메일 전달
+    if (jobPost.getAcademy().isByAdmin()) {
+      try {
+        String adminUserEmail = jobPost.getAcademy().getAdminUser().getEmail();
+
+        MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+            "ADMIN_JOB_POST_SUBMITTED", MessageTemplateType.EMAIL).orElse(null);
+
+        Map params = new HashMap();
+        params.put("name", jobPost.getAcademy().getRepresentativeName());
+        params.put("jobTitle", jobPost.getTitle());
+        params.put("adminEmail", adminUserEmail);
+        params.put("link", "https://plus82.co/link/resume?code=" + code);
+
+        StringSubstitutor academySub = new StringSubstitutor(params);
+        String emailTitle = academySub.replace(emailTemplate.getTitle());
+        String emailContent = academySub.replace(emailTemplate.getContent());
+
+        // 학원 대표 이메일로 전송
+        String academyUserEmail = jobPost.getAcademy().getRepresentativeEmail();
+        emailProvider.send(academyUserEmail, emailTitle, emailContent);
+
+        // 어드민 이메일로 전송
+        emailProvider.send(adminUserEmail, emailTitle, emailContent);
+      } catch (Exception e) {
+        log.error("Failed to send email to academy for job post resume submission", e);
+      }
+    }
 
     // 선생님 알림 추가
     notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
