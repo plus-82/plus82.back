@@ -21,6 +21,7 @@ import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.JobPostResumeRelationDetailVO;
 import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +81,15 @@ public class JobPostResumeRelationService {
     JobPostResumeRelationEntity jobPostResumeRelationEntity = jobPostResumeRelationRepository
         .findByCode(code).orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
+
+    // 마감일 +2주 까지 조회 가능
+    LocalDate dueDate = jobPostResumeRelationEntity.getJobPost().getDueDate();
+    if (dueDate == null) {
+      if (LocalDate.now().isAfter(dueDate.plusWeeks(2))) {
+        throw new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND);
+      }
+    }
     return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity);
   }
 
