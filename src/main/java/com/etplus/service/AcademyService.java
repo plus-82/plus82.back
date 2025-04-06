@@ -158,7 +158,7 @@ public class AcademyService {
             dto.detailedAddress(),
             dto.lat(),
             dto.lng(),
-            false, false, false, false, false,
+            dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(), dto.forAdult(),
             null,
             true,
             null,

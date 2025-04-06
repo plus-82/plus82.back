@@ -22,19 +22,19 @@ public record CreateAcademyDTO(
     @NotEmpty
     String detailedAddress,             // 상세 주소
     @NotNull
-    Double lat,
+    double lat,
     @NotNull
-    Double lng,
+    double lng,
     @NotNull
-    Boolean forKindergarten,
+    boolean forKindergarten,
     @NotNull
-    Boolean forElementary,
+    boolean forElementary,
     @NotNull
-    Boolean forMiddleSchool,
+    boolean forMiddleSchool,
     @NotNull
-    Boolean forHighSchool,
+    boolean forHighSchool,
     @NotNull
-    Boolean forAdult,
+    boolean forAdult,
 
     // Images
     @NotNull
