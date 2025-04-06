@@ -15,6 +15,7 @@ import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.AcademyDetailByAdminVO;
 import com.etplus.vo.AcademyDetailVO;
 import com.etplus.vo.AcademyVO;
 import jakarta.transaction.Transactional;
@@ -51,7 +52,20 @@ public class AcademyService {
     return AcademyDetailVO.valueOf(academy, imagePathList);
   }
 
-  public AcademyDetailVO getMyAcademy(LoginUser loginUser) {
+  public AcademyDetailByAdminVO getAcademyDetailByAdmin(Long academyId) {
+    AcademyEntity academy = academyRepository.findById(academyId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    List<Long> imageFileIdList = academy.getImageFileIdList();
+    List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
+
+    List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
+
+    return AcademyDetailByAdminVO.valueOf(academy, imagePathList);
+  }
+
+  public AcademyDetailByAdminVO getMyAcademy(LoginUser loginUser) {
     AcademyEntity academy = academyRepository.findByRepresentativeUserId(loginUser.userId())
         .orElse(null);
 
@@ -64,7 +78,7 @@ public class AcademyService {
 
     List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
 
-    return AcademyDetailVO.valueOf(academy, imagePathList);
+    return AcademyDetailByAdminVO.valueOf(academy, imagePathList);
   }
 
   @Transactional

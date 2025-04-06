@@ -8,6 +8,7 @@ import com.etplus.controller.dto.CreateAcademyDTO;
 import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.AcademyService;
+import com.etplus.vo.AcademyDetailByAdminVO;
 import com.etplus.vo.AcademyDetailVO;
 import com.etplus.vo.AcademyVO;
 import jakarta.validation.Valid;
@@ -41,10 +42,18 @@ public class AcademyController {
     return new CommonResponse<>(academy, CommonResponseCode.SUCCESS);
   }
 
+  @GetMapping("/{academy-id}/by-admin")
+  public CommonResponse<AcademyDetailByAdminVO> getAcademyDetailByAdmin(
+      @AuthUser(RoleType.ADMIN) LoginUser loginUser,
+      @PathVariable("academy-id") Long academyId) {
+    AcademyDetailByAdminVO academy = academyService.getAcademyDetailByAdmin(academyId);
+    return new CommonResponse<>(academy, CommonResponseCode.SUCCESS);
+  }
+
   @GetMapping(value = "/me")
-  public CommonResponse<AcademyDetailVO> getMyAcademy(
+  public CommonResponse<AcademyDetailByAdminVO> getMyAcademy(
       @AuthUser(RoleType.ACADEMY) LoginUser loginUser) {
-    AcademyDetailVO vo = academyService.getMyAcademy(loginUser);
+    AcademyDetailByAdminVO vo = academyService.getMyAcademy(loginUser);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
