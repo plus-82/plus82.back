@@ -20,6 +20,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,9 @@ public class NotificationScheduler {
   private final MessageTemplateRepository messageTemplateRepository;
   private final NotificationRepository notificationRepository;
   private final EmailProvider emailProvider;
+
+  @Value("${url.front}")
+  private String FRONT_URL;
 
   @Scheduled(cron = "0 1 0 * * ?")
   @Transactional
@@ -99,7 +103,7 @@ public class NotificationScheduler {
       params.put("jobPostResumeTotalCount", vo.jobPostResumeTotalCount());
       params.put("jobPostResumeSubmittedCount", vo.jobPostResumeSubmittedCount());
       params.put("jobPostResumeReviewedCount", vo.jobPostResumeReviewedCount());
-      params.put("link", "https://plus82.co/my-job-posts");
+      params.put("link", FRONT_URL + "/my-job-posts");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String title = sub.replace(emailTemplate.getTitle());
@@ -146,7 +150,7 @@ public class NotificationScheduler {
       params.put("jobTitle", vo.title());
       params.put("date", today.minusDays(1l).format(formatter));
       params.put("count", vo.yesterdayJobPostResumeTotalCount());
-      params.put("link", "https://plus82.co/my-job-posts");
+      params.put("link", FRONT_URL + "my-job-posts");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String title = sub.replace(emailTemplate.getTitle());

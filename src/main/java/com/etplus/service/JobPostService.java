@@ -38,6 +38,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +56,9 @@ public class JobPostService {
   private final MessageTemplateRepository messageTemplateRepository;
   private final NotificationRepository notificationRepository;
   private final EmailProvider emailProvider;
+
+  @Value("${url.front}")
+  private String FRONT_URL;
 
   public Slice<JobPostVO> getJobPosts(SearchJobPostDTO dto) {
     Slice<JobPostVO> allJobPost = jobPostRepository.findAllJobPost(dto);
@@ -111,7 +115,7 @@ public class JobPostService {
     Map params = new HashMap();
     params.put("name", user.getFullName());
     params.put("jobTitle", dto.title());
-    params.put("link", "https://plus82.co/job-postings");
+    params.put("link", FRONT_URL + "/job-postings");
 
     StringSubstitutor sub = new StringSubstitutor(params);
     String emailTitle = sub.replace(emailTemplate.getTitle());
@@ -172,7 +176,7 @@ public class JobPostService {
       params.put("name", user.getFirstName() + " " + user.getLastName());
       params.put("jobTitle", jobPost.getTitle());
       params.put("academyName", jobPost.getAcademy().getNameEn());
-      params.put("link", "https://plus82.co/my-page");
+      params.put("link", FRONT_URL + "/setting/my-job-posting");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String emailTitle = sub.replace(emailTemplate.getTitle());
@@ -198,7 +202,7 @@ public class JobPostService {
         params.put("name", jobPost.getAcademy().getRepresentativeName());
         params.put("jobTitle", jobPost.getTitle());
         params.put("adminEmail", adminUserEmail);
-        params.put("link", "https://plus82.co/link/resume?code=" + code);
+        params.put("link", FRONT_URL + "/guest/resume?code=" + code);
 
         StringSubstitutor academySub = new StringSubstitutor(params);
         String emailTitle = academySub.replace(emailTemplate.getTitle());

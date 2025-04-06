@@ -54,6 +54,8 @@ public class AuthService {
   private Integer EMAIL_EXPIRATION_MINUTE;
   @Value("${email.max-try-count}")
   private Integer EMAIL_MAX_TRY_COUNT;
+  @Value("${url.front}")
+  private String FRONT_URL;
 
   private final UserRepository userRepository;
   private final AcademyRepository academyRepository;
@@ -284,7 +286,7 @@ public class AuthService {
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
         "EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
-    StringSubstitutor sub = new StringSubstitutor(Map.of("link", "https://plus82.co/password/reset?code=" + emailVerificationCodeEntity.getCode()));
+    StringSubstitutor sub = new StringSubstitutor(Map.of("link", FRONT_URL + "/password/reset?code=" + emailVerificationCodeEntity.getCode()));
     String title = sub.replace(emailTemplate.getTitle());
     String content = sub.replace(emailTemplate.getContent());
 

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringSubstitutor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class JobPostResumeRelationService {
+
+  @Value("${url.front}")
+  private String FRONT_URL;
 
   private final JobPostResumeRelationRepository jobPostResumeRelationRepository;
   private final AcademyRepository academyRepository;
@@ -125,7 +129,7 @@ public class JobPostResumeRelationService {
     params.put("name", teacher.getFirstName() + " " + teacher.getLastName());
     params.put("jobTitle", jobPostResumeRelation.getJobPost().getTitle());
     params.put("academyName", academy.getName());
-    params.put("link", "https://plus82.co/my-page");
+    params.put("link", FRONT_URL + "setting/my-job-posting");
 
     StringSubstitutor sub = new StringSubstitutor(params);
     String emailTitle = sub.replace(emailTemplate.getTitle());
