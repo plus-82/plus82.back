@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+  <!-- 뉴렐릭 -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- changed the encoder -->
+    <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>
+  </appender>
+  <appender name="ASYNC-NEWRELIC" class="com.newrelic.logging.logback.NewRelicAsyncAppender">
+    <appender-ref ref="STDOUT" />
+  </appender>
+
+
   <!-- default console appender -->
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
   <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
