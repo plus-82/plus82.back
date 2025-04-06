@@ -142,6 +142,34 @@ public class JobPostService {
   }
 
   @Transactional
+  public void updateJobPostByAdmin(long academyId, long jobPostId, CreateJobPostDTO dto) {
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    if (jobPost.getAcademy().getId() != academyId) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
+    }
+
+    jobPost.setTitle(dto.title());
+    jobPost.setJobDescription(dto.jobDescription());
+    jobPost.setRequiredQualification(dto.requiredQualification());
+    jobPost.setPreferredQualification(dto.preferredQualification());
+    jobPost.setBenefits(dto.benefits());
+    jobPost.setSalary(dto.salary());
+    jobPost.setSalaryNegotiable(dto.salaryNegotiable());
+    jobPost.setJobStartDate(dto.jobStartDate());
+    jobPost.setDueDate(dto.dueDate());
+    jobPost.setForKindergarten(dto.forKindergarten());
+    jobPost.setForElementary(dto.forElementary());
+    jobPost.setForMiddleSchool(dto.forMiddleSchool());
+    jobPost.setForHighSchool(dto.forHighSchool());
+    jobPost.setForAdult(dto.forAdult());
+
+    jobPostRepository.save(jobPost);
+  }
+
+  @Transactional
   public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(

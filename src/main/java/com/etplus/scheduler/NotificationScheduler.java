@@ -75,7 +75,6 @@ public class NotificationScheduler {
    * 5시에 공고 마감 예정 알림.
    */
   @Scheduled(cron = "0 0 17 * * ?")
-  @Transactional(readOnly = true)
   public void sendDueDateNotifications() {
     log.info("Starting job post due date notification process");
 
@@ -123,7 +122,6 @@ public class NotificationScheduler {
    * 9시에 새 지원자 알림.
    */
   @Scheduled(cron = "0 0 9 * * ?")
-  @Transactional(readOnly = true)
   public void sendNewApplicantNotifications() {
     log.info("Starting new applicant notification process");
 

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,6 +66,16 @@ public class JobPostController {
       @PathVariable("academy-id") Long academyId,
       @RequestBody @Valid CreateJobPostDTO dto) {
     jobPostService.createJobPostByAdmin(academyId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/{job-post-id}/by-admin/academy/{academy-id}")
+  public CommonResponse<Void> updateJobPostByAdmin(
+      @AuthUser({RoleType.ADMIN}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId,
+      @PathVariable("academy-id") Long academyId,
+      @RequestBody @Valid CreateJobPostDTO dto) {
+    jobPostService.updateJobPostByAdmin(academyId, jobPostId, dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
