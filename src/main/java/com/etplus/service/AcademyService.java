@@ -119,7 +119,7 @@ public class AcademyService {
   }
 
   @Transactional
-  public void updateAcademyByAdmin(long academyId, UpdateAcademyDto dto) {
+  public void updateAcademyByAdmin(long academyId, CreateAcademyDTO dto) {
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -127,6 +127,7 @@ public class AcademyService {
     academy.setName(dto.name());
     academy.setNameEn(dto.nameEn());
     academy.setRepresentativeName(dto.representativeName());
+    academy.setRepresentativeEmail(dto.representativeEmail());
     academy.setDescription(dto.description());
     academy.setLocationType(dto.locationType());
     academy.setDetailedAddress(dto.detailedAddress());
