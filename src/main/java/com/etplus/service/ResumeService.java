@@ -197,6 +197,7 @@ public class ResumeService {
     resume.setForMiddleSchool(dto.forMiddleSchool());
     resume.setForHighSchool(dto.forHighSchool());
     resume.setForAdult(dto.forAdult());
+    resume.setDraft(true);
 
     // 프로필 이미지
     if (dto.profileImage() != null) {
