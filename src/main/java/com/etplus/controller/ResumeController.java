@@ -87,6 +87,15 @@ public class ResumeController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PutMapping(value = "/{resume-id}/draft", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public CommonResponse<Void> updateDraftResume(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("resume-id") Long resumeId,
+      @ModelAttribute UpdateResumeDTO dto) {
+    resumeService.updateDraftResume(loginUser.userId(), resumeId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
   @DeleteMapping("/{resume-id}")
   public CommonResponse<Void> deleteResume(
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
