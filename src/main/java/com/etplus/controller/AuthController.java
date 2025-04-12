@@ -34,12 +34,6 @@ public class AuthController {
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 
-  @PostMapping("/sign-up/academy")
-  public CommonResponse<Void> signUpAcademy(@RequestBody @Valid SignUpAcademyDto dto) {
-    authService.signUpAcademy(dto);
-    return new CommonResponse(CommonResponseCode.SUCCESS);
-  }
-
   @PostMapping("/sign-in")
   public CommonResponse<TokenVO> signIn(@RequestBody @Valid SignInDto dto) {
     TokenVO token = authService.signIn(dto);

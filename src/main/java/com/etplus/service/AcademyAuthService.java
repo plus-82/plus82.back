@@ -3,11 +3,11 @@ package com.etplus.service;
 import com.etplus.cache.RedisStorage;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
-import com.etplus.controller.dto.RequestReIssueTokenDTO;
 import com.etplus.controller.dto.RequestResetPasswordDto;
-import com.etplus.controller.dto.ResetPasswordDto;
 import com.etplus.controller.dto.SignInDto;
-import com.etplus.controller.dto.VerifyEmailDto;
+import com.etplus.controller.dto.SignUpAcademyDto;
+import com.etplus.exception.AcademyException;
+import com.etplus.exception.AcademyException.AcademyExceptionCode;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.EmailVerificationCodeException;
@@ -19,12 +19,11 @@ import com.etplus.exception.UserException.UserExceptionCode;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.JwtProvider;
 import com.etplus.provider.PasswordProvider;
-import com.etplus.controller.dto.SignUpDto;
-import com.etplus.repository.CountryRepository;
+import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.EmailVerificationCodeRepository;
 import com.etplus.repository.MessageTemplateRepository;
 import com.etplus.repository.UserRepository;
-import com.etplus.repository.domain.CountryEntity;
+import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.EmailVerificationCodeEntity;
 import com.etplus.repository.domain.MessageTemplateEntity;
 import com.etplus.repository.domain.UserEntity;
@@ -43,7 +42,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class AuthService {
+public class AcademyAuthService {
 
   @Value("${email.expiration-minute}")
   private Integer EMAIL_EXPIRATION_MINUTE;
@@ -53,7 +52,7 @@ public class AuthService {
   private String FRONT_URL;
 
   private final UserRepository userRepository;
-  private final CountryRepository countryRepository;
+  private final AcademyRepository academyRepository;
   private final MessageTemplateRepository messageTemplateRepository;
   private final EmailVerificationCodeRepository emailVerificationCodeRepository;
   private final PasswordProvider passwordProvider;
@@ -62,10 +61,15 @@ public class AuthService {
   private final RedisStorage redisStorage;
 
   @Transactional
-  public void signUp(SignUpDto dto) {
+  public void signUpAcademy(SignUpAcademyDto dto) {
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
       throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
+    }
+
+    // 이미 등록된 사업자 등록번호인 경우 예외 처리
+    if (academyRepository.existsByBusinessRegistrationNumber(dto.businessRegistrationNumber())) {
+      throw new AcademyException(AcademyExceptionCode.ALREADY_USED_BUSINESS_REGISTRATION_NUMBER);
     }
 
     // 인증된 이메일이 있는지 확인 후 예외 처리
@@ -75,28 +79,45 @@ public class AuthService {
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
-    CountryEntity country = countryRepository.findById(dto.countryId()).orElseThrow(
-        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
-
     // 사용자 저장
-    UserEntity userEntity = new UserEntity(
+    UserEntity userEntity = userRepository.save(new UserEntity(
         null,
-        dto.firstName(),
-        dto.lastName(),
         null,
+        null,
+        dto.fullName(),
         dto.genderType(),
         dto.birthDate(),
         dto.email(),
         passwordProvider.encode(dto.password()),
         true,
-        RoleType.TEACHER,
-        country,
+        RoleType.ACADEMY,
+        null,
         null
-    );
-    userRepository.save(userEntity);
+    ));
+
+    // 학원 저장
+    academyRepository.save(
+        new AcademyEntity(
+            null,
+            dto.academyName(),
+            dto.academyNameEn(),
+            dto.representativeName(),
+            dto.email(),
+            null,
+            dto.businessRegistrationNumber(),
+            dto.locationType(),
+            dto.detailedAddress(),
+            dto.lat(),
+            dto.lng(),
+            false, false, false, false, false,
+            null,
+            false,
+            userEntity,
+            null
+        ));
   }
 
-  public TokenVO signIn(SignInDto dto) {
+  public TokenVO signInAcademy(SignInDto dto) {
     UserEntity user = userRepository.findByEmail(dto.email()).orElseThrow(
         () -> new AuthException(AuthExceptionCode.EMAIL_NOT_CORRECT));
 
@@ -108,35 +129,11 @@ public class AuthService {
       throw new AuthException(AuthExceptionCode.PW_NOT_CORRECT);
     }
 
-    // 선생님이 아닌 경우 예외 처리
-    if (!RoleType.TEACHER.equals(user.getRoleType())) {
+    // 학원 회원이 아닌 경우 예외 처리
+    if (!RoleType.ACADEMY.equals(user.getRoleType())) {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
-    TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
-
-    // TODO key 에 deviceId 추가?
-    redisStorage.save("RefreshToken::userId=" + user.getId(),
-        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
-    return tokenVO;
-  }
-
-  @Transactional
-  public TokenVO reIssue(RequestReIssueTokenDTO dto) {
-    // token 검증
-    Long userId = jwtProvider.getId(dto.refreshToken());
-
-    // redis 에 저장된 refreshToken 확인
-    String refreshToken = redisStorage.get("RefreshToken::userId=" + userId);
-    if (refreshToken == null) {
-      throw new AuthException(AuthExceptionCode.EXPIRED_TOKEN);
-    }
-
-    // user 조회
-    UserEntity user = userRepository.findById(userId).orElseThrow(
-        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-
-    // token 재발급
     TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
     // TODO key 에 deviceId 추가?
@@ -172,7 +169,7 @@ public class AuthService {
 
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
-        "EMAIL_VERIFICATION_SIGN_UP", MessageTemplateType.EMAIL).orElse(null);
+        "ACADEMY_EMAIL_VERIFICATION_SIGN_UP", MessageTemplateType.EMAIL).orElse(null);
 
     StringSubstitutor sub = new StringSubstitutor(Map.of("code", emailVerificationCodeEntity.getCode()));
     String title = sub.replace(emailTemplate.getTitle());
@@ -182,34 +179,13 @@ public class AuthService {
   }
 
   @Transactional
-  public void verifyCode(VerifyEmailDto dto) {
-    EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
-        .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
-            EmailVerificationCodeType.SIGN_UP, LocalDateTime.now())
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
-        );
-
-    if (emailVerificationCodeEntity.isVerified()) {
-      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
-    }
-
-    if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
-      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
-    }
-
-    emailVerificationCodeEntity.setVerified(true);
-    emailVerificationCodeRepository.save(emailVerificationCodeEntity);
-  }
-
-  @Transactional
   public void requestResetPassword(RequestResetPasswordDto dto) {
     UserEntity user = userRepository.findByEmailAndDeletedIsFalse(dto.email()).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     // 학원 회원이 아닌 경우 예외 처리
-    if (!RoleType.TEACHER.equals(user.getRoleType())) {
-      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND);
+    if (!RoleType.ACADEMY.equals(user.getRoleType())) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
     // 3회 이상 요청한 경우 예외 처리
@@ -232,7 +208,7 @@ public class AuthService {
 
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
-        "EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
+        "ACADEMY_EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
     StringSubstitutor sub = new StringSubstitutor(Map.of("link", FRONT_URL + "/password/reset?code=" + emailVerificationCodeEntity.getCode()));
     String title = sub.replace(emailTemplate.getTitle());
     String content = sub.replace(emailTemplate.getContent());
@@ -240,48 +216,4 @@ public class AuthService {
     emailProvider.send(dto.email(), title, content);
   }
 
-  public void validateResetPasswordCode(String code) {
-    EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
-        .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(code,
-            EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
-        );
-
-    if (emailVerificationCodeEntity.isVerified()) {
-      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
-    }
-
-    if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
-      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
-    }
-  }
-
-  @Transactional
-  public void resetPassword(ResetPasswordDto dto) {
-    EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
-        .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
-            EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
-        );
-
-    if (emailVerificationCodeEntity.isVerified()) {
-      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
-    }
-
-    if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
-      throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
-    }
-
-    emailVerificationCodeEntity.setVerified(true);
-    emailVerificationCodeRepository.save(emailVerificationCodeEntity);
-
-    // 비밀번호 변경
-    UserEntity userEntity = userRepository.findByEmailAndDeletedIsFalse(emailVerificationCodeEntity.getEmail()).orElseThrow(
-        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-
-    userEntity.setPassword(passwordProvider.encode(dto.password()));
-    userRepository.save(userEntity);
-  }
 }
