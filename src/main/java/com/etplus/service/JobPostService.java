@@ -9,6 +9,8 @@ import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
+import com.etplus.exception.ResumeException;
+import com.etplus.exception.ResumeException.ResumeExceptionCode;
 import com.etplus.provider.EmailProvider;
 import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.FileRepository;
@@ -199,6 +201,11 @@ public class JobPostService {
     ResumeEntity resume = resumeRepository.findByIdAndUserId(resumeId, userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
+
+    // 임시 이력서인 경우
+    if (resume.isDraft()) {
+      throw new ResumeException(ResumeExceptionCode.DRAFT_RESUME);
+    }
 
     if (jobPostResumeRelationRepository.existsByJobPostIdAndUserId(jobPostId, userId)) {
       throw new JobPostException(JobPostExceptionCode.RESUME_ALREADY_SUBMITTED);
