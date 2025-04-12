@@ -110,8 +110,10 @@ public class ResumeEntity extends BaseEntity {
     this.file = file;
   }
 
-  public ResumeEntity(String title, UserEntity user, FileEntity file) {
+  public ResumeEntity(String title, UserEntity user, FileEntity file, boolean isDraft) {
+    this.title = title;
     this.user = user;
     this.file = file;
+    this.isDraft = isDraft;
   }
 }

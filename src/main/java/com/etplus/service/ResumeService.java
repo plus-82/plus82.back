@@ -83,7 +83,7 @@ public class ResumeService {
             dto.lastName(), dto.email(), dto.degree(), dto.major(), dto.genderType(),
             dto.birthDate(), dto.hasVisa(), dto.visaType(), dto.isRepresentative(),
             dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(),
-            dto.forAdult(), true, country, residenceCountry, user, fileEntity, null));
+            dto.forAdult(), false, country, residenceCountry, user, fileEntity, null));
   }
 
   @Transactional
@@ -91,8 +91,11 @@ public class ResumeService {
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-    CountryEntity country = countryRepository.findById(dto.countryId()).orElse(null);
-    CountryEntity residenceCountry = countryRepository.findById(dto.residenceCountryId()).orElse(null);
+    CountryEntity country = dto.countryId() != null ? countryRepository.findById(dto.countryId())
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND)) : null;
+    CountryEntity residenceCountry =
+        dto.residenceCountryId() != null ? countryRepository.findById(dto.residenceCountryId())
+            .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND)) : null;
 
     // 프로필 이미지
     FileEntity fileEntity;
@@ -107,7 +110,7 @@ public class ResumeService {
             dto.lastName(), dto.email(), dto.degree(), dto.major(), dto.genderType(),
             dto.birthDate(), dto.hasVisa(), dto.visaType(), dto.isRepresentative(),
             dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(),
-            dto.forAdult(), false, country, residenceCountry, user, fileEntity, null));
+            dto.forAdult(), true, country, residenceCountry, user, fileEntity, null));
   }
 
   @Transactional
@@ -144,7 +147,7 @@ public class ResumeService {
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
     FileEntity file = s3Uploader.uploadResumeAndSaveRepository(dto.file(), user);
 
-    resumeRepository.save(new ResumeEntity(file.getFileName(), user, file));
+    resumeRepository.save(new ResumeEntity(file.getFileName(), user, file, false));
   }
 
   @Transactional
@@ -197,7 +200,7 @@ public class ResumeService {
     resume.setForMiddleSchool(dto.forMiddleSchool());
     resume.setForHighSchool(dto.forHighSchool());
     resume.setForAdult(dto.forAdult());
-    resume.setDraft(true);
+    resume.setDraft(false);
 
     // 프로필 이미지
     if (dto.profileImage() != null) {
@@ -227,8 +230,11 @@ public class ResumeService {
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
-    CountryEntity country = countryRepository.findById(dto.countryId()).orElse(null);
-    CountryEntity residenceCountry = countryRepository.findById(dto.residenceCountryId()).orElse(null);
+    CountryEntity country = dto.countryId() != null ? countryRepository.findById(dto.countryId())
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND)) : null;
+    CountryEntity residenceCountry =
+        dto.residenceCountryId() != null ? countryRepository.findById(dto.residenceCountryId())
+            .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND)) : null;
 
     resume.setTitle(dto.title());
     resume.setPersonalIntroduction(dto.personalIntroduction());
