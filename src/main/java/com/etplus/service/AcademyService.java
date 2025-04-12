@@ -34,8 +34,8 @@ public class AcademyService {
   private final S3Uploader s3Uploader;
   private final FileRepository fileRepository;
 
-  public List<AcademyVO> getAllAcademies() {
-    List<AcademyEntity> all = academyRepository.findAll();
+  public List<AcademyVO> getAcademiesByAdmin(long adminUserId) {
+    List<AcademyEntity> all = academyRepository.findByAdminUserId(adminUserId);
     return all.stream().map(AcademyVO::valueOf).toList();
   }
 
@@ -119,10 +119,14 @@ public class AcademyService {
   }
 
   @Transactional
-  public void updateAcademyByAdmin(long academyId, CreateAcademyDTO dto) {
+  public void updateAcademyByAdmin(long academyId, CreateAcademyDTO dto, long adminUserId) {
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    if (academy.getAdminUser().getId() != adminUserId) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    }
 
     academy.setName(dto.name());
     academy.setNameEn(dto.nameEn());
@@ -155,8 +159,8 @@ public class AcademyService {
   }
 
   @Transactional
-  public void createAcademy(CreateAcademyDTO dto, long userId) {
-    UserEntity adminUser = userRepository.findById(userId)
+  public void createAcademy(CreateAcademyDTO dto, long adminUserId) {
+    UserEntity adminUser = userRepository.findById(adminUserId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 

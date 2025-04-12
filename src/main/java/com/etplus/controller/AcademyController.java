@@ -31,8 +31,8 @@ public class AcademyController {
   private final AcademyService academyService;
 
   @GetMapping
-  public CommonResponse<List<AcademyVO>> getAllAcademies(@AuthUser(RoleType.ADMIN) LoginUser loginUser) {
-    List<AcademyVO> result = academyService.getAllAcademies();
+  public CommonResponse<List<AcademyVO>> getAcademiesByAdmin(@AuthUser(RoleType.ADMIN) LoginUser loginUser) {
+    List<AcademyVO> result = academyService.getAcademiesByAdmin(loginUser.userId());
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 
@@ -69,7 +69,7 @@ public class AcademyController {
       @PathVariable("academy-id") Long academyId,
       @ModelAttribute @Valid CreateAcademyDTO dto,
       @AuthUser(RoleType.ADMIN) LoginUser loginUser) {
-    academyService.updateAcademyByAdmin(academyId, dto);
+    academyService.updateAcademyByAdmin(academyId, dto, loginUser.userId());
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 

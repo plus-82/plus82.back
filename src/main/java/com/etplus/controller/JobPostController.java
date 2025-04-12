@@ -65,7 +65,7 @@ public class JobPostController {
       @AuthUser({RoleType.ADMIN}) LoginUser loginUser,
       @PathVariable("academy-id") Long academyId,
       @RequestBody @Valid CreateJobPostDTO dto) {
-    jobPostService.createJobPostByAdmin(academyId, dto);
+    jobPostService.createJobPostByAdmin(academyId, dto, loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
@@ -75,7 +75,7 @@ public class JobPostController {
       @PathVariable("job-post-id") Long jobPostId,
       @PathVariable("academy-id") Long academyId,
       @RequestBody @Valid CreateJobPostDTO dto) {
-    jobPostService.updateJobPostByAdmin(academyId, jobPostId, dto);
+    jobPostService.updateJobPostByAdmin(academyId, jobPostId, dto, loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 

@@ -5,6 +5,8 @@ import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.exception.JobPostException;
 import com.etplus.exception.JobPostException.JobPostExceptionCode;
+import com.etplus.exception.ResourceDeniedException;
+import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.EmailProvider;
@@ -129,10 +131,14 @@ public class JobPostService {
   }
 
   @Transactional
-  public void createJobPostByAdmin(long academyId, CreateJobPostDTO dto) {
+  public void createJobPostByAdmin(long academyId, CreateJobPostDTO dto, long adminUserId) {
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    if (academy.getAdminUser().getId() != adminUserId) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    }
 
     jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
@@ -142,10 +148,14 @@ public class JobPostService {
   }
 
   @Transactional
-  public void updateJobPostByAdmin(long academyId, long jobPostId, CreateJobPostDTO dto) {
+  public void updateJobPostByAdmin(long academyId, long jobPostId, CreateJobPostDTO dto, long adminUserId) {
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    if (jobPost.getAcademy().getAdminUser().getId() != adminUserId) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    }
 
     if (jobPost.getAcademy().getId() != academyId) {
       throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
