@@ -25,6 +25,7 @@ public record ResumeDetailVO(
     Boolean forMiddleSchool,
     Boolean forHighSchool,
     Boolean forAdult,
+    boolean isDraft,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
 
@@ -65,6 +66,7 @@ public record ResumeDetailVO(
         resumeEntity.getForMiddleSchool(),
         resumeEntity.getForHighSchool(),
         resumeEntity.getForAdult(),
+        resumeEntity.isDraft(),
         resumeEntity.getCreatedAt(),
         resumeEntity.getUpdatedAt(),
 

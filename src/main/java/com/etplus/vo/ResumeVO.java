@@ -13,6 +13,7 @@ public record ResumeVO(
     boolean hasVisa,
     VisaType visaType,
     boolean isRepresentative,
+    boolean isDraft,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
 

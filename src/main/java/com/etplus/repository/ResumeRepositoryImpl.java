@@ -35,6 +35,7 @@ public class ResumeRepositoryImpl implements ResumeRepositoryCustom {
             resume.hasVisa,
             resume.visaType,
             resume.isRepresentative,
+            resume.isDraft,
             resume.createdAt,
             resume.updatedAt,
             file.path,
