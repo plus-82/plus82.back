@@ -83,7 +83,31 @@ public class ResumeService {
             dto.lastName(), dto.email(), dto.degree(), dto.major(), dto.genderType(),
             dto.birthDate(), dto.hasVisa(), dto.visaType(), dto.isRepresentative(),
             dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(),
-            dto.forAdult(), country, residenceCountry, user, fileEntity, null));
+            dto.forAdult(), true, country, residenceCountry, user, fileEntity, null));
+  }
+
+  @Transactional
+  public void createDraftResume(long userId, CreateResumeDTO dto) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    CountryEntity country = countryRepository.findById(dto.countryId()).orElse(null);
+    CountryEntity residenceCountry = countryRepository.findById(dto.residenceCountryId()).orElse(null);
+
+    // 프로필 이미지
+    FileEntity fileEntity;
+    if (dto.profileImage() != null) {
+      fileEntity = s3Uploader.uploadImageAndSaveRepository(dto.profileImage(), user);
+    } else {
+      fileEntity = user.getProfileImage();
+    }
+
+    resumeRepository.save(
+        new ResumeEntity(null, dto.title(), dto.personalIntroduction(), dto.firstName(),
+            dto.lastName(), dto.email(), dto.degree(), dto.major(), dto.genderType(),
+            dto.birthDate(), dto.hasVisa(), dto.visaType(), dto.isRepresentative(),
+            dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(),
+            dto.forAdult(), false, country, residenceCountry, user, fileEntity, null));
   }
 
   @Transactional
@@ -109,7 +133,7 @@ public class ResumeService {
             resume.getGenderType(), resume.getBirthDate(), resume.getHasVisa(), resume.getVisaType(),
             false, // 복사 시 대표 이력서 X
             resume.getForKindergarten(), resume.getForElementary(), resume.getForMiddleSchool(),
-            resume.getForHighSchool(), resume.getForAdult(), resume.getCountry(),
+            resume.getForHighSchool(), resume.getForAdult(), resume.isDraft(), resume.getCountry(),
             resume.getResidenceCountry(), resume.getUser(), resume.getProfileImage(), null));
   }
 

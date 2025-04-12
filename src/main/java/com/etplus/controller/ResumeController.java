@@ -55,6 +55,14 @@ public class ResumeController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping(value = "/draft", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public CommonResponse<Void> createDraftResume(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @ModelAttribute CreateResumeDTO dto) {
+    resumeService.createDraftResume(loginUser.userId(), dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
   @PostMapping("/{resume-id}/copy")
   public CommonResponse<Void> copyResume(@AuthUser({RoleType.TEACHER}) LoginUser loginUser,
       @PathVariable("resume-id") Long resumeId) {
