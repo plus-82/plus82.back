@@ -56,6 +56,10 @@ public class ResumeEntity extends BaseEntity {
   private Boolean forHighSchool;
   private Boolean forAdult;
 
+  // 이력서 작성 상태
+  @Column(nullable = false)
+  private boolean isDraft;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "country_id", referencedColumnName = "id")
   private CountryEntity country;
@@ -78,7 +82,7 @@ public class ResumeEntity extends BaseEntity {
       LocalDate birthDate, Boolean hasVisa, VisaType visaType, Boolean isRepresentative,
       Boolean forKindergarten, Boolean forElementary, Boolean forMiddleSchool,
       Boolean forHighSchool,
-      Boolean forAdult, CountryEntity country, CountryEntity residenceCountry, UserEntity user,
+      Boolean forAdult, boolean isDraft, CountryEntity country, CountryEntity residenceCountry, UserEntity user,
       FileEntity profileImage, FileEntity file) {
     this.id = id;
     this.title = title;
@@ -98,6 +102,7 @@ public class ResumeEntity extends BaseEntity {
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
     this.forAdult = forAdult;
+    this.isDraft = isDraft;
     this.country = country;
     this.residenceCountry = residenceCountry;
     this.user = user;
