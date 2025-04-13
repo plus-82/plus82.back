@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.SearchJobPostResumeRelationDTO;
+import com.etplus.controller.dto.UpdateJobPostResumeRelationMemoDTO;
 import com.etplus.controller.dto.UpdateJobPostResumeRelationStatusDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.JobPostResumeRelationService;
@@ -62,6 +63,16 @@ public class JobPostResumeRelationController {
       @Valid @RequestBody UpdateJobPostResumeRelationStatusDTO dto) {
     jobPostResumeRelationService.updateJobPostResumeRelationStatus(
         jobPostResumeRelationId, dto.status(), loginUser.userId());
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/{job-post-resume-relation-id}/memo")
+  public CommonResponse<Void> updateJobPostResumeRelationMemo(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId,
+      @Valid @RequestBody UpdateJobPostResumeRelationMemoDTO dto) {
+    jobPostResumeRelationService.updateJobPostResumeRelationMemo(
+        jobPostResumeRelationId, dto.memo(), loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 

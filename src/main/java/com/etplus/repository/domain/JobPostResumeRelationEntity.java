@@ -43,6 +43,8 @@ public class JobPostResumeRelationEntity extends BaseEntity {
   private JobPostResumeRelationStatus status;
   @Column(nullable = false)
   private LocalDate submittedDate;
+  @Column(columnDefinition = "TEXT")
+  private String academyMemo;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "job_post_id", referencedColumnName = "id", nullable = false, updatable = false)
@@ -88,7 +90,7 @@ public class JobPostResumeRelationEntity extends BaseEntity {
 
   public JobPostResumeRelationEntity(Long id, String coverLetter,
       JobPostResumeRelationStatus status,
-      LocalDate submittedDate, JobPostEntity jobPost, String resumeTitle,
+      LocalDate submittedDate, String academyMemo, JobPostEntity jobPost, String resumeTitle,
       String personalIntroduction,
       String firstName, String lastName, String email, String degree, String major,
       GenderType genderType, LocalDate birthDate, Boolean hasVisa, VisaType visaType,
@@ -100,6 +102,7 @@ public class JobPostResumeRelationEntity extends BaseEntity {
     this.coverLetter = coverLetter;
     this.status = status;
     this.submittedDate = submittedDate;
+    this.academyMemo = academyMemo;
     this.jobPost = jobPost;
     this.resumeTitle = resumeTitle;
     this.personalIntroduction = personalIntroduction;

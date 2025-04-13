@@ -169,6 +169,25 @@ public class JobPostResumeRelationService {
     jobPostResumeRelationRepository.save(jobPostResumeRelation);
   }
 
+  @Transactional
+  public void updateJobPostResumeRelationMemo(long jobPostResumeRelationId, String memo, long userId) {
+    JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository.findById(
+        jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
+        ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
+
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    // 요청한 사용자 학원의 공고인지 확인
+    if (jobPostResumeRelation.getJobPost().getAcademy().getId() != academy.getId()) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    jobPostResumeRelation.setAcademyMemo(memo);
+    jobPostResumeRelationRepository.save(jobPostResumeRelation);
+  }
+
   public JobPostResumeRelationSummaryVO getJobPostResumeRelationSummary(RoleType roleType, long userId) {
     if (RoleType.TEACHER.equals(roleType)) {
       return jobPostResumeRelationRepository.getJobPostResumeRelationSummaryByTeacher(userId);

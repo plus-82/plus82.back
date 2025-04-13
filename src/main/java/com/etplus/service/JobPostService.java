@@ -281,7 +281,7 @@ public class JobPostService {
 
     jobPostResumeRelationRepository.save(
         new JobPostResumeRelationEntity(null, dto.coverLetter(),
-            JobPostResumeRelationStatus.SUBMITTED, LocalDate.now(), jobPost,
+            JobPostResumeRelationStatus.SUBMITTED, LocalDate.now(), null, jobPost,
             resume.getTitle(), resume.getPersonalIntroduction(), resume.getFirstName(),
             resume.getLastName(), resume.getEmail(), resume.getDegree(), resume.getMajor(),
             resume.getGenderType(), resume.getBirthDate(), resume.getHasVisa(),
