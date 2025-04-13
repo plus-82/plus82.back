@@ -1,6 +1,7 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.CreateJobPostDTO;
+import com.etplus.controller.dto.SearchJobPostByAcademyDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.exception.JobPostException;
@@ -31,6 +32,7 @@ import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.util.UuidProvider;
+import com.etplus.vo.JobPostByAcademyVO;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
@@ -43,6 +45,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +77,18 @@ public class JobPostService {
     }
 
     return allJobPost;
+  }
+
+  public Page<JobPostByAcademyVO> getJobPostsByAcademy(long userId, SearchJobPostByAcademyDTO dto) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(user.getId())
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    return jobPostRepository.findAllJobPostByAcademy(academy.getId(), dto);
   }
 
   public JobPostDetailVO getJobPostDetail(Long jobPostId) {

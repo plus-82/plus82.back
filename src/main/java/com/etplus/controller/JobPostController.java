@@ -5,15 +5,18 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateJobPostDTO;
+import com.etplus.controller.dto.SearchJobPostByAcademyDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.JobPostService;
+import com.etplus.vo.JobPostByAcademyVO;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +36,14 @@ public class JobPostController {
   @GetMapping
   public CommonResponse<Slice<JobPostVO>> getJobPosts(@Valid SearchJobPostDTO dto) {
     Slice<JobPostVO> result = jobPostService.getJobPosts(dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/by-academy")
+  public CommonResponse<Page<JobPostByAcademyVO>> getJobPostsByAcademy(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @Valid SearchJobPostByAcademyDTO dto) {
+    Page<JobPostByAcademyVO> result = jobPostService.getJobPostsByAcademy(loginUser.userId(), dto);
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 

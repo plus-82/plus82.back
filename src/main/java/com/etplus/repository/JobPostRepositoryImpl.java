@@ -1,7 +1,9 @@
 package com.etplus.repository;
 
+import com.etplus.controller.dto.SearchJobPostByAcademyDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.code.OrderType;
+import com.etplus.repository.domain.JobPostEntity;
 import com.etplus.repository.domain.QAcademyEntity;
 import com.etplus.repository.domain.QJobPostEntity;
 import com.etplus.repository.domain.QJobPostResumeRelationEntity;
@@ -11,7 +13,10 @@ import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.JobPostNewApplicantNotiVO;
 import com.etplus.scheduler.vo.QJobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.QJobPostNewApplicantNotiVO;
+import com.etplus.util.QuerydslRepositorySupportCustom;
+import com.etplus.vo.JobPostByAcademyVO;
 import com.etplus.vo.JobPostVO;
+import com.etplus.vo.QJobPostByAcademyVO;
 import com.etplus.vo.QJobPostVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -23,19 +28,23 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
+public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom implements JobPostRepositoryCustom {
 
   private final JPAQueryFactory query;
   private QJobPostEntity jobPost;
   private QAcademyEntity academy;
+  private QJobPostResumeRelationEntity jobPostResumeRelation;
 
   public JobPostRepositoryImpl(JPAQueryFactory query) {
+    super(JobPostEntity.class);
     this.query = query;
     jobPost = new QJobPostEntity("jobPost");
     academy = new QAcademyEntity("academy");
+    jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
   }
 
   @Override
@@ -76,6 +85,40 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
     }
 
     return new SliceImpl<>(content, dto.toPageable(), hasNext);
+  }
+
+  @Override
+  public Page<JobPostByAcademyVO> findAllJobPostByAcademy(long academyId,
+      SearchJobPostByAcademyDTO dto) {
+    BooleanBuilder whereCondition = new BooleanBuilder();
+    if (Objects.nonNull(dto.getClosed())) {
+      whereCondition.and(jobPost.closed.eq(dto.getClosed()));
+    }
+    if (Objects.nonNull(dto.getFromDueDate())) {
+      whereCondition.and(jobPost.dueDate.isNull().or(jobPost.dueDate.goe(dto.getFromDueDate())));
+    }
+    if (Objects.nonNull(dto.getToDueDate())) {
+      whereCondition.and(jobPost.dueDate.isNull().or(jobPost.dueDate.loe(dto.getToDueDate())));
+    }
+
+    JPAQuery<JobPostByAcademyVO> jpaQuery = query.select(
+        new QJobPostByAcademyVO(
+            jobPost.id,
+            jobPost.title,
+            jobPost.dueDate,
+            jobPost.createdAt,
+            jobPost.salary,
+            jobPostResumeRelation.count()
+        ))
+        .from(jobPost)
+        .leftJoin(jobPostResumeRelation).on(jobPost.id.eq(jobPostResumeRelation.jobPost.id))
+        .where(jobPost.academy.id.eq(academyId)
+            .and(whereCondition)
+        )
+        .groupBy(jobPost.id, jobPost.title, jobPost.dueDate, jobPost.createdAt, jobPost.salary)
+        .orderBy(jobPost.id.desc());
+
+    return applyPagination(jpaQuery, dto.toPageable());
   }
 
   @Override
