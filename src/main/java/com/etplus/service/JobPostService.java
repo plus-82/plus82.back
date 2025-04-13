@@ -148,6 +148,30 @@ public class JobPostService {
   }
 
   @Transactional
+  public void copyJobPost(long userId, long jobPostId) {
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    // 내 학원의 공고가 아닐 경우
+    if (jobPost.getAcademy().getId() != academy.getId()) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    }
+
+    jobPostRepository.save(new JobPostEntity(null, jobPost.getTitle(), jobPost.getJobDescription(),
+        jobPost.getRequiredQualification(), jobPost.getPreferredQualification(),
+        jobPost.getBenefits(), jobPost.getSalary(), jobPost.isSalaryNegotiable(),
+        jobPost.getJobStartDate(), jobPost.getDueDate(),
+        jobPost.isForKindergarten(), jobPost.isForElementary(),
+        jobPost.isForMiddleSchool(), jobPost.isForHighSchool(),
+        jobPost.isForAdult(), false, jobPost.getAcademy()));
+  }
+
+  @Transactional
   public void createJobPostByAdmin(long academyId, CreateJobPostDTO dto, long adminUserId) {
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(

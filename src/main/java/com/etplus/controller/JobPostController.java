@@ -71,6 +71,14 @@ public class JobPostController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/{job-post-id}/copy")
+  public CommonResponse<Void> copyJobPost(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId) {
+    jobPostService.copyJobPost(loginUser.userId(), jobPostId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
   @PostMapping("/by-admin/academy/{academy-id}")
   public CommonResponse<Void> createJobPostByAdmin(
       @AuthUser({RoleType.ADMIN}) LoginUser loginUser,
