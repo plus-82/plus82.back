@@ -62,12 +62,15 @@ public class JobPostResumeRelationService {
         .findById(jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
 
+    boolean isAcademyUser;
     if (RoleType.TEACHER.equals(roleType)) {
+      isAcademyUser = false;
       if(jobPostResumeRelationEntity.getUser().getId() != userId) {
         throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
       }
 
     } else if (RoleType.ACADEMY.equals(roleType)) {
+      isAcademyUser = true;
       AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
           .orElseThrow(() -> new ResourceNotFoundException(
               ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -78,7 +81,7 @@ public class JobPostResumeRelationService {
     } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
-    return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity);
+    return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity, isAcademyUser);
   }
 
   public JobPostResumeRelationDetailVO getJobPostResumeRelationByCode(String code) {
@@ -94,7 +97,7 @@ public class JobPostResumeRelationService {
             ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND);
       }
     }
-    return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity);
+    return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity, false);
   }
 
   @Transactional

@@ -11,6 +11,7 @@ public record JobPostResumeRelationDetailVO(
     String coverLetter,
     JobPostResumeRelationStatus status,
     LocalDate submittedDate,
+    String academyMemo,
 
     // 지원 당시 resume 데이터
     String resumeTitle,
@@ -59,12 +60,13 @@ public record JobPostResumeRelationDetailVO(
     String fileName
 ) {
 
-  public static JobPostResumeRelationDetailVO valueOf(JobPostResumeRelationEntity entity) {
+  public static JobPostResumeRelationDetailVO valueOf(JobPostResumeRelationEntity entity, boolean isAcademyUser) {
     return new JobPostResumeRelationDetailVO(
         entity.getId(),
         entity.getCoverLetter(),
         entity.getStatus(),
         entity.getSubmittedDate(),
+        isAcademyUser ? entity.getAcademyMemo() : null,
         entity.getResumeTitle(),
         entity.getPersonalIntroduction(),
         entity.getFirstName(),
