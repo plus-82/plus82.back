@@ -5,6 +5,7 @@ import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.JobPostNewApplicantNotiVO;
 import com.etplus.vo.JobPostByAcademyVO;
+import com.etplus.vo.JobPostByAdminVO;
 import com.etplus.vo.JobPostVO;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +16,7 @@ interface JobPostRepositoryCustom {
 
   Slice<JobPostVO> findAllJobPost(SearchJobPostDTO dto);
   Page<JobPostByAcademyVO> findAllJobPostByAcademy(long academyId, SearchJobPostByAcademyDTO dto);
+  Page<JobPostByAdminVO> findAllJobPostByAdmin(List<Long> academyIdList, SearchJobPostByAcademyDTO dto);
 
   List<JobPostDueDateNotiVO> findDueDateNotificationTarget(LocalDate today);
   List<JobPostNewApplicantNotiVO> findNewApplicantNotificationTarget(LocalDate today);

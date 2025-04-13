@@ -11,6 +11,7 @@ import com.etplus.controller.dto.SubmitResumeDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.JobPostService;
 import com.etplus.vo.JobPostByAcademyVO;
+import com.etplus.vo.JobPostByAdminVO;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
@@ -44,6 +45,14 @@ public class JobPostController {
       @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
       @Valid SearchJobPostByAcademyDTO dto) {
     Page<JobPostByAcademyVO> result = jobPostService.getJobPostsByAcademy(loginUser.userId(), dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/by-admin")
+  public CommonResponse<Page<JobPostByAdminVO>> getJobPostsByAdmin(
+      @AuthUser({RoleType.ADMIN}) LoginUser loginUser,
+      @Valid SearchJobPostByAcademyDTO dto) {
+    Page<JobPostByAdminVO> result = jobPostService.getJobPostsByAdmin(loginUser.userId(), dto);
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 

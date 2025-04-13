@@ -33,6 +33,7 @@ import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.util.UuidProvider;
 import com.etplus.vo.JobPostByAcademyVO;
+import com.etplus.vo.JobPostByAdminVO;
 import com.etplus.vo.JobPostDetailVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
@@ -89,6 +90,20 @@ public class JobPostService {
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
     return jobPostRepository.findAllJobPostByAcademy(academy.getId(), dto);
+  }
+
+  public Page<JobPostByAdminVO> getJobPostsByAdmin(long userId, SearchJobPostByAcademyDTO dto) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    List<AcademyEntity> academyList = academyRepository.findByAdminUserId(user.getId());
+    if (academyList.isEmpty()) {
+      return Page.empty();
+    }
+
+    List<Long> academyIdList = academyList.stream().map(AcademyEntity::getId).toList();
+    return jobPostRepository.findAllJobPostByAdmin(academyIdList, dto);
   }
 
   public JobPostDetailVO getJobPostDetail(Long jobPostId) {

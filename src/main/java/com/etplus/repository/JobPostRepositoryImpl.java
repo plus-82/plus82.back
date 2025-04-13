@@ -15,8 +15,10 @@ import com.etplus.scheduler.vo.QJobPostDueDateNotiVO;
 import com.etplus.scheduler.vo.QJobPostNewApplicantNotiVO;
 import com.etplus.util.QuerydslRepositorySupportCustom;
 import com.etplus.vo.JobPostByAcademyVO;
+import com.etplus.vo.JobPostByAdminVO;
 import com.etplus.vo.JobPostVO;
 import com.etplus.vo.QJobPostByAcademyVO;
+import com.etplus.vo.QJobPostByAdminVO;
 import com.etplus.vo.QJobPostVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -116,6 +118,43 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
             .and(whereCondition)
         )
         .groupBy(jobPost.id, jobPost.title, jobPost.dueDate, jobPost.createdAt, jobPost.salary)
+        .orderBy(jobPost.id.desc());
+
+    return applyPagination(jpaQuery, dto.toPageable());
+  }
+
+  @Override
+  public Page<JobPostByAdminVO> findAllJobPostByAdmin(List<Long> academyIdList,
+      SearchJobPostByAcademyDTO dto) {
+    BooleanBuilder whereCondition = new BooleanBuilder();
+    if (Objects.nonNull(dto.getClosed())) {
+      whereCondition.and(jobPost.closed.eq(dto.getClosed()));
+    }
+    if (Objects.nonNull(dto.getFromDueDate())) {
+      whereCondition.and(jobPost.dueDate.isNull().or(jobPost.dueDate.goe(dto.getFromDueDate())));
+    }
+    if (Objects.nonNull(dto.getToDueDate())) {
+      whereCondition.and(jobPost.dueDate.isNull().or(jobPost.dueDate.loe(dto.getToDueDate())));
+    }
+
+    JPAQuery<JobPostByAdminVO> jpaQuery = query.select(
+            new QJobPostByAdminVO(
+                jobPost.id,
+                jobPost.title,
+                jobPost.dueDate,
+                jobPost.createdAt,
+                jobPost.salary,
+                academy.id,
+                academy.name,
+                jobPostResumeRelation.count()
+            ))
+        .from(jobPost)
+        .innerJoin(jobPost.academy, academy)
+        .leftJoin(jobPostResumeRelation).on(jobPost.id.eq(jobPostResumeRelation.jobPost.id))
+        .where(jobPost.academy.id.in(academyIdList)
+            .and(whereCondition)
+        )
+        .groupBy(jobPost.id, jobPost.title, jobPost.dueDate, jobPost.createdAt, jobPost.salary, academy.id, academy.name)
         .orderBy(jobPost.id.desc());
 
     return applyPagination(jpaQuery, dto.toPageable());
