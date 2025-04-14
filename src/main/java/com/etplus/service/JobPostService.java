@@ -140,7 +140,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, academy));
+        dto.forHighSchool(), dto.forAdult(), false, false, academy));
 
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
@@ -183,7 +183,7 @@ public class JobPostService {
         jobPost.getJobStartDate(), jobPost.getDueDate(),
         jobPost.isForKindergarten(), jobPost.isForElementary(),
         jobPost.isForMiddleSchool(), jobPost.isForHighSchool(),
-        jobPost.isForAdult(), false, jobPost.getAcademy()));
+        jobPost.isForAdult(), false, jobPost.isDraft(), jobPost.getAcademy()));
   }
 
   @Transactional
@@ -200,7 +200,20 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, academy));
+        dto.forHighSchool(), dto.forAdult(), false, false, academy));
+  }
+
+  @Transactional
+  public void createDraftJobPost(long userId, CreateJobPostDTO dto) {
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
+        dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
+        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
+        dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
+        dto.forHighSchool(), dto.forAdult(), false, true, academy));
   }
 
   @Transactional
@@ -231,6 +244,77 @@ public class JobPostService {
     jobPost.setForMiddleSchool(dto.forMiddleSchool());
     jobPost.setForHighSchool(dto.forHighSchool());
     jobPost.setForAdult(dto.forAdult());
+    // 수정 시
+    jobPost.setDraft(false);
+
+    jobPostRepository.save(jobPost);
+  }
+
+  @Transactional
+  public void updateJobPost(long userId, long jobPostId,CreateJobPostDTO dto) {
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    // 내 학원의 공고가 아닐 경우
+    if (jobPost.getAcademy().getId() != academy.getId()) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    }
+
+    jobPost.setTitle(dto.title());
+    jobPost.setJobDescription(dto.jobDescription());
+    jobPost.setRequiredQualification(dto.requiredQualification());
+    jobPost.setPreferredQualification(dto.preferredQualification());
+    jobPost.setBenefits(dto.benefits());
+    jobPost.setSalary(dto.salary());
+    jobPost.setSalaryNegotiable(dto.salaryNegotiable());
+    jobPost.setJobStartDate(dto.jobStartDate());
+    jobPost.setDueDate(dto.dueDate());
+    jobPost.setForKindergarten(dto.forKindergarten());
+    jobPost.setForElementary(dto.forElementary());
+    jobPost.setForMiddleSchool(dto.forMiddleSchool());
+    jobPost.setForHighSchool(dto.forHighSchool());
+    jobPost.setForAdult(dto.forAdult());
+
+    // 수정 시
+    jobPost.setDraft(true);
+
+    jobPostRepository.save(jobPost);
+  }
+
+  @Transactional
+  public void updateDraftJobPost(long userId, long jobPostId, CreateJobPostDTO dto) {
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    // 내 학원 공고, 임시저장 아닌 경우
+    if (jobPost.getAcademy().getId() != academy.getId() || (!jobPost.isDraft())) {
+      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    }
+
+    jobPost.setTitle(dto.title());
+    jobPost.setJobDescription(dto.jobDescription());
+    jobPost.setRequiredQualification(dto.requiredQualification());
+    jobPost.setPreferredQualification(dto.preferredQualification());
+    jobPost.setBenefits(dto.benefits());
+    jobPost.setSalary(dto.salary());
+    jobPost.setSalaryNegotiable(dto.salaryNegotiable());
+    jobPost.setJobStartDate(dto.jobStartDate());
+    jobPost.setDueDate(dto.dueDate());
+    jobPost.setForKindergarten(dto.forKindergarten());
+    jobPost.setForElementary(dto.forElementary());
+    jobPost.setForMiddleSchool(dto.forMiddleSchool());
+    jobPost.setForHighSchool(dto.forHighSchool());
+    jobPost.setForAdult(dto.forAdult());
 
     jobPostRepository.save(jobPost);
   }
@@ -243,6 +327,10 @@ public class JobPostService {
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    if (jobPost.isDraft()) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
+    }
 
     if (jobPost.getDueDate() != null && jobPost.getDueDate().isBefore(LocalDate.now())) {
       throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);

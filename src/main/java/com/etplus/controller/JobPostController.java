@@ -97,6 +97,14 @@ public class JobPostController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/draft")
+  public CommonResponse<Void> createDraftJobPost(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @RequestBody CreateJobPostDTO dto) {
+    jobPostService.createDraftJobPost(loginUser.userId(), dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
   @PutMapping("/{job-post-id}/by-admin/academy/{academy-id}")
   public CommonResponse<Void> updateJobPostByAdmin(
       @AuthUser({RoleType.ADMIN}) LoginUser loginUser,
@@ -104,6 +112,24 @@ public class JobPostController {
       @PathVariable("academy-id") Long academyId,
       @RequestBody @Valid CreateJobPostDTO dto) {
     jobPostService.updateJobPostByAdmin(academyId, jobPostId, dto, loginUser.userId());
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/{job-post-id}")
+  public CommonResponse<Void> updateJobPost(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId,
+      @RequestBody @Valid CreateJobPostDTO dto) {
+    jobPostService.updateJobPost(loginUser.userId(), jobPostId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/{job-post-id}/draft")
+  public CommonResponse<Void> updateDraftJobPost(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId,
+      @RequestBody CreateJobPostDTO dto) {
+    jobPostService.updateDraftJobPost(loginUser.userId(), jobPostId, dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
