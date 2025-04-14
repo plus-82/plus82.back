@@ -10,6 +10,7 @@ public record JobPostResumeRelationVO(
     String coverLetter,
     JobPostResumeRelationStatus status,
     LocalDate submittedDate,
+    String academyMemo,
 
     // 지원 당시 resume 데이터
     String resumeTitle,
@@ -35,6 +36,7 @@ public record JobPostResumeRelationVO(
         entity.getCoverLetter(),
         entity.getStatus(),
         entity.getSubmittedDate(),
+        null,
         entity.getResumeTitle(),
         entity.getFirstName(),
         entity.getLastName(),
