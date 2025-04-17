@@ -12,6 +12,7 @@ public class JobPostException extends CustomBadRequestException {
   public enum JobPostExceptionCode implements ResponseCode {
     JOB_POST_CLOSED("JP-001", "job post closed"),
     RESUME_ALREADY_SUBMITTED("JP-002", "resume already submitted"),
+    CHECK_TITLE("JP-003", "check title"),
     ;
 
     private String code;

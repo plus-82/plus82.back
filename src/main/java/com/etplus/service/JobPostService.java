@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -205,6 +206,9 @@ public class JobPostService {
 
   @Transactional
   public void createDraftJobPost(long userId, CreateJobPostDTO dto) {
+    if (!StringUtils.hasText(dto.title())) {
+      throw new JobPostException(JobPostExceptionCode.CHECK_TITLE);
+    }
     AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -281,13 +285,17 @@ public class JobPostService {
     jobPost.setForAdult(dto.forAdult());
 
     // 수정 시
-    jobPost.setDraft(true);
+    jobPost.setDraft(false);
 
     jobPostRepository.save(jobPost);
   }
 
   @Transactional
   public void updateDraftJobPost(long userId, long jobPostId, CreateJobPostDTO dto) {
+    if (!StringUtils.hasText(dto.title())) {
+      throw new JobPostException(JobPostExceptionCode.CHECK_TITLE);
+    }
+
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
