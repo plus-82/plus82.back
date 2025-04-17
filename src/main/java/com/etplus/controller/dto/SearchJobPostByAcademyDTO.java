@@ -11,5 +11,6 @@ public class SearchJobPostByAcademyDTO extends PagingDTO {
   private Boolean closed;
   private LocalDate fromDueDate;
   private LocalDate toDueDate;
+  private Boolean isDraft;
 
 }

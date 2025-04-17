@@ -102,6 +102,9 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
     if (Objects.nonNull(dto.getToDueDate())) {
       whereCondition.and(jobPost.dueDate.isNull().or(jobPost.dueDate.loe(dto.getToDueDate())));
     }
+    if (Objects.nonNull(dto.getIsDraft())) {
+      whereCondition.and(jobPost.isDraft.eq(dto.getIsDraft()));
+    }
 
     JPAQuery<JobPostByAcademyVO> jpaQuery = query.select(
         new QJobPostByAcademyVO(
