@@ -183,7 +183,7 @@ public class JobPostService {
         jobPost.getJobStartDate(), jobPost.getDueDate(),
         jobPost.isForKindergarten(), jobPost.isForElementary(),
         jobPost.isForMiddleSchool(), jobPost.isForHighSchool(),
-        jobPost.isForAdult(), false, jobPost.isDraft(), jobPost.getAcademy()));
+        jobPost.isForAdult(), false, true, jobPost.getAcademy()));
   }
 
   @Transactional
