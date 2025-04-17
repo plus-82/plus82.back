@@ -101,6 +101,9 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     if (Objects.nonNull(dto.getStatus())) {
       whereCondition.and(jobPostResumeRelation.status.eq(dto.getStatus()));
     }
+    if (Objects.nonNull(dto.getJobPostId())) {
+      whereCondition.and(jobPost.id.eq(dto.getJobPostId()));
+    }
     return whereCondition;
   }
 

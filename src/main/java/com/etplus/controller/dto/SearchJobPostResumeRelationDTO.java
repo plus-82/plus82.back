@@ -9,5 +9,6 @@ import lombok.Setter;
 public class SearchJobPostResumeRelationDTO extends PagingDTO {
 
   private JobPostResumeRelationStatus status;
+  private Long jobPostId;
 
 }
