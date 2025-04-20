@@ -67,6 +67,35 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
   }
 
   @Override
+  public Page<JobPostResumeRelationVO> findAllJobPostResumeRelationsByAcademy(
+      SearchJobPostResumeRelationDTO dto, List<Long> academyIds) {
+    JPAQuery<JobPostResumeRelationVO> jpaQuery = query.select(
+            new QJobPostResumeRelationVO(
+                jobPostResumeRelation.id,
+                jobPostResumeRelation.coverLetter,
+                jobPostResumeRelation.status,
+                jobPostResumeRelation.submittedDate,
+                jobPostResumeRelation.academyMemo,
+                jobPostResumeRelation.resumeTitle,
+                jobPostResumeRelation.firstName,
+                jobPostResumeRelation.lastName,
+                jobPost.id,
+                jobPost.title,
+                academy.id,
+                academy.name
+            ))
+        .from(jobPostResumeRelation)
+        .innerJoin(jobPostResumeRelation.jobPost, jobPost)
+        .innerJoin(jobPost.academy, academy)
+        .where(academy.id.in(academyIds)
+            .and(getWhereCondition(dto))
+        )
+        .orderBy(jobPostResumeRelation.id.desc());
+
+    return applyPagination(jpaQuery, dto.toPageable());
+  }
+
+  @Override
   public Page<JobPostResumeRelationVO> findAllJobPostResumeRelationsByTeacher(
       SearchJobPostResumeRelationDTO dto, long teacherId) {
     JPAQuery<JobPostResumeRelationVO> jpaQuery = query.select(

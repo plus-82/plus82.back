@@ -32,7 +32,7 @@ public class JobPostResumeRelationController {
 
   @GetMapping
   public CommonResponse<Page<JobPostResumeRelationVO>> getJobPostResumeRelations(
-      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY}) LoginUser loginUser,
+      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY, RoleType.ADMIN}) LoginUser loginUser,
       @Valid SearchJobPostResumeRelationDTO dto) {
     Page<JobPostResumeRelationVO> result = jobPostResumeRelationService
         .getAllJobPostResumeRelations(loginUser.roleType(), loginUser.userId(), dto);

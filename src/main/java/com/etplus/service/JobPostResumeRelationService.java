@@ -23,6 +23,7 @@ import com.etplus.vo.JobPostResumeRelationSummaryVO;
 import com.etplus.vo.JobPostResumeRelationVO;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringSubstitutor;
@@ -52,6 +53,11 @@ public class JobPostResumeRelationService {
           .orElseThrow(() -> new ResourceNotFoundException(
               ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
       return jobPostResumeRelationRepository.findAllJobPostResumeRelationsByAcademy(dto, academy.getId());
+    } else if (RoleType.ADMIN.equals(roleType)) {
+      List<AcademyEntity> academyList = academyRepository.findByAdminUserId(userId);
+      List<Long> academyIds = academyList.stream().map(AcademyEntity::getId).toList();
+
+      return jobPostResumeRelationRepository.findAllJobPostResumeRelationsByAcademy(dto, academyIds);
     } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
