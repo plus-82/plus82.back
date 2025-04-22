@@ -2,6 +2,7 @@ package com.etplus.vo;
 
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.code.LocationType;
+import java.time.LocalDateTime;
 
 public record AcademyVO(
     Long id,
@@ -12,6 +13,7 @@ public record AcademyVO(
     String businessRegistrationNumber,
     LocationType locationType,
     String detailedAddress,
+    LocalDateTime updatedAt,
     boolean byAdmin
 ) {
 
@@ -25,6 +27,7 @@ public record AcademyVO(
         entity.getBusinessRegistrationNumber(),
         entity.getLocationType(),
         entity.getDetailedAddress(),
+        entity.getUpdatedAt(),
         entity.isByAdmin()
     );
   }
