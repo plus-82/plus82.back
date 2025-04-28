@@ -8,6 +8,7 @@ public record JobPostByAdminVO(
     Long id,
     String title,
     LocalDate dueDate,
+    LocalDate openDate,
     LocalDateTime createdAt,
     Integer salary,
 

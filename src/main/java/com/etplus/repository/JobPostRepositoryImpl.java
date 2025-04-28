@@ -111,6 +111,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
             jobPost.id,
             jobPost.title,
             jobPost.dueDate,
+            jobPost.openDate,
             jobPost.createdAt,
             jobPost.salary,
             jobPostResumeRelation.count()
@@ -145,6 +146,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
                 jobPost.id,
                 jobPost.title,
                 jobPost.dueDate,
+                jobPost.openDate,
                 jobPost.createdAt,
                 jobPost.salary,
                 academy.id,
