@@ -178,7 +178,7 @@ public class JobPostService {
       throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
     }
 
-    jobPostRepository.save(new JobPostEntity(null, jobPost.getTitle(), jobPost.getJobDescription(),
+    jobPostRepository.save(new JobPostEntity(null, "(복사)" + jobPost.getTitle(), jobPost.getJobDescription(),
         jobPost.getRequiredQualification(), jobPost.getPreferredQualification(),
         jobPost.getBenefits(), jobPost.getSalary(), jobPost.isSalaryNegotiable(),
         jobPost.getJobStartDate(), jobPost.getDueDate(),

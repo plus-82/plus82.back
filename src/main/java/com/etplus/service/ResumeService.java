@@ -131,7 +131,7 @@ public class ResumeService {
 
     resumeRepository.save(
         new ResumeEntity(
-            null, resume.getTitle() + " copy", resume.getPersonalIntroduction(), resume.getFirstName(),
+            null, "(copy)" + resume.getTitle(), resume.getPersonalIntroduction(), resume.getFirstName(),
             resume.getLastName(), resume.getEmail(), resume.getDegree(), resume.getMajor(),
             resume.getGenderType(), resume.getBirthDate(), resume.getHasVisa(), resume.getVisaType(),
             false, // 복사 시 대표 이력서 X
