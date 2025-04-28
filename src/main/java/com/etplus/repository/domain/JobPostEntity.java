@@ -43,6 +43,7 @@ public class JobPostEntity extends BaseEntity {
 
   private LocalDate jobStartDate;     // 근무 시작 가능 날짜
   private LocalDate dueDate;          // 마감일 (null = 상시 채용)
+  private LocalDate openDate;         // 공개일
 
   // 대상
   private boolean forKindergarten;
@@ -61,7 +62,7 @@ public class JobPostEntity extends BaseEntity {
 
   public JobPostEntity(Long id, String title, String jobDescription, String requiredQualification,
       String preferredQualification, String benefits, Integer salary, boolean salaryNegotiable,
-      LocalDate jobStartDate, LocalDate dueDate, boolean forKindergarten, boolean forElementary,
+      LocalDate jobStartDate, LocalDate dueDate, LocalDate openDate, boolean forKindergarten, boolean forElementary,
       boolean forMiddleSchool, boolean forHighSchool, boolean forAdult, boolean closed, boolean isDraft, AcademyEntity academy) {
     this.id = id;
     this.title = title;
@@ -73,6 +74,7 @@ public class JobPostEntity extends BaseEntity {
     this.salaryNegotiable = salaryNegotiable;
     this.jobStartDate = jobStartDate;
     this.dueDate = dueDate;
+    this.openDate = openDate;
     this.forKindergarten = forKindergarten;
     this.forElementary = forElementary;
     this.forMiddleSchool = forMiddleSchool;

@@ -139,7 +139,7 @@ public class JobPostService {
 
     jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
-        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
+        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), LocalDate.now(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
         dto.forHighSchool(), dto.forAdult(), false, false, academy));
 
@@ -181,7 +181,7 @@ public class JobPostService {
     jobPostRepository.save(new JobPostEntity(null, "(복사)" + jobPost.getTitle(), jobPost.getJobDescription(),
         jobPost.getRequiredQualification(), jobPost.getPreferredQualification(),
         jobPost.getBenefits(), jobPost.getSalary(), jobPost.isSalaryNegotiable(),
-        jobPost.getJobStartDate(), jobPost.getDueDate(),
+        jobPost.getJobStartDate(), jobPost.getDueDate(), null,
         jobPost.isForKindergarten(), jobPost.isForElementary(),
         jobPost.isForMiddleSchool(), jobPost.isForHighSchool(),
         jobPost.isForAdult(), false, true, jobPost.getAcademy()));
@@ -199,7 +199,7 @@ public class JobPostService {
 
     jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
-        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
+        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), LocalDate.now(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
         dto.forHighSchool(), dto.forAdult(), false, false, academy));
   }
@@ -215,7 +215,7 @@ public class JobPostService {
 
     jobPostRepository.save(new JobPostEntity(null, dto.title(), dto.jobDescription(),
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
-        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(),
+        dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), null,
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
         dto.forHighSchool(), dto.forAdult(), false, true, academy));
   }
@@ -248,8 +248,12 @@ public class JobPostService {
     jobPost.setForMiddleSchool(dto.forMiddleSchool());
     jobPost.setForHighSchool(dto.forHighSchool());
     jobPost.setForAdult(dto.forAdult());
+
     // 수정 시
-    jobPost.setDraft(false);
+    if (jobPost.isDraft()) {
+      jobPost.setDraft(false);
+      jobPost.setOpenDate(LocalDate.now());
+    }
 
     jobPostRepository.save(jobPost);
   }
@@ -285,7 +289,10 @@ public class JobPostService {
     jobPost.setForAdult(dto.forAdult());
 
     // 수정 시
-    jobPost.setDraft(false);
+    if (jobPost.isDraft()) {
+      jobPost.setDraft(false);
+      jobPost.setOpenDate(LocalDate.now());
+    }
 
     jobPostRepository.save(jobPost);
   }
