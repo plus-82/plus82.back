@@ -31,6 +31,7 @@ import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
+import com.etplus.repository.domain.code.RoleType;
 import com.etplus.util.UuidProvider;
 import com.etplus.vo.JobPostByAcademyVO;
 import com.etplus.vo.JobPostByAdminVO;
@@ -141,7 +142,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), LocalDate.now(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, false, academy));
+        dto.forHighSchool(), dto.forAdult(), null, false, false, academy));
 
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
@@ -184,7 +185,7 @@ public class JobPostService {
         jobPost.getJobStartDate(), jobPost.getDueDate(), null,
         jobPost.isForKindergarten(), jobPost.isForElementary(),
         jobPost.isForMiddleSchool(), jobPost.isForHighSchool(),
-        jobPost.isForAdult(), false, true, jobPost.getAcademy()));
+        jobPost.isForAdult(), jobPost.getCloseReason(), false, true, jobPost.getAcademy()));
   }
 
   @Transactional
@@ -201,7 +202,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), LocalDate.now(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, false, academy));
+        dto.forHighSchool(), dto.forAdult(), null, false, false, academy));
   }
 
   @Transactional
@@ -217,7 +218,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), null,
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, true, academy));
+        dto.forHighSchool(), dto.forAdult(), null, false, true, academy));
   }
 
   @Transactional
