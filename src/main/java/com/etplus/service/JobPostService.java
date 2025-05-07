@@ -336,6 +336,68 @@ public class JobPostService {
   }
 
   @Transactional
+  public void closeJobPost(long userId, long jobPostId, String closeReason) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    if (RoleType.ACADEMY.equals(user.getRoleType())) {
+      AcademyEntity academy = academyRepository.findByRepresentativeUserId(user.getId())
+          .orElseThrow(() -> new ResourceNotFoundException(
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+      // 내 학원의 공고가 아닐 경우
+      if (jobPost.getAcademy().getId() != academy.getId()) {
+        throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+      }
+    }
+
+    // 이미 마감된 공고인 경우
+    if (jobPost.isClosed()) {
+      throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);
+    }
+    // 임시저장 공고인 경우
+    if (jobPost.isDraft()) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
+    }
+
+    jobPost.setClosed(true);
+    jobPost.setDueDate(LocalDate.now());
+    jobPost.setCloseReason(closeReason);
+    jobPostRepository.save(jobPost);
+
+    // 이메일 발송
+    String receiverEmail;
+    if (jobPost.getAcademy().isByAdmin()) {
+      receiverEmail = jobPost.getAcademy().getAdminUser().getEmail();
+    } else {
+      receiverEmail = jobPost.getAcademy().getRepresentativeEmail();
+    }
+    try {
+      MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+              "JOB_POST_CLOSE_MANUALLY", MessageTemplateType.EMAIL).orElse(null);
+
+      // TODO NotificationScheduler.sendDueDateNotifications 참고
+      Map params = new HashMap();
+//      params.put("name", user.getFirstName() + " " + user.getLastName());
+//      params.put("jobTitle", jobPost.getTitle());
+//      params.put("academyName", jobPost.getAcademy().getNameEn());
+//      params.put("link", FRONT_URL + "/setting/my-job-posting");
+//
+      StringSubstitutor sub = new StringSubstitutor(params);
+      String emailTitle = sub.replace(emailTemplate.getTitle());
+      String emailContent = sub.replace(emailTemplate.getContent());
+
+      emailProvider.send(receiverEmail, emailTitle, emailContent);
+    } catch (Exception e) {
+      log.error("Failed to send email for job post close", e);
+    }
+  }
+
+  @Transactional
   public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
