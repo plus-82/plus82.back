@@ -41,7 +41,7 @@ public class JobPostResumeRelationController {
 
   @GetMapping("/{job-post-resume-relation-id}")
   public CommonResponse<JobPostResumeRelationDetailVO> getJobPostResumeRelation(
-      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY}) LoginUser loginUser,
+      @AuthUser({RoleType.TEACHER, RoleType.ACADEMY, RoleType.ADMIN}) LoginUser loginUser,
       @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId) {
     JobPostResumeRelationDetailVO result = jobPostResumeRelationService
         .getJobPostResumeRelation(loginUser.roleType(), loginUser.userId(), jobPostResumeRelationId);
@@ -58,21 +58,21 @@ public class JobPostResumeRelationController {
 
   @PutMapping("/{job-post-resume-relation-id}/status")
   public CommonResponse<Void> updateJobPostResumeRelationStatus(
-      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @AuthUser({RoleType.ACADEMY, RoleType.ADMIN}) LoginUser loginUser,
       @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId,
       @Valid @RequestBody UpdateJobPostResumeRelationStatusDTO dto) {
     jobPostResumeRelationService.updateJobPostResumeRelationStatus(
-        jobPostResumeRelationId, dto.status(), loginUser.userId());
+        loginUser.roleType(), jobPostResumeRelationId, dto.status(), loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
   @PutMapping("/{job-post-resume-relation-id}/memo")
   public CommonResponse<Void> updateJobPostResumeRelationMemo(
-      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @AuthUser({RoleType.ACADEMY, RoleType.ADMIN}) LoginUser loginUser,
       @PathVariable("job-post-resume-relation-id") Long jobPostResumeRelationId,
       @Valid @RequestBody UpdateJobPostResumeRelationMemoDTO dto) {
     jobPostResumeRelationService.updateJobPostResumeRelationMemo(
-        jobPostResumeRelationId, dto.memo(), loginUser.userId());
+        loginUser.roleType(), jobPostResumeRelationId, dto.memo(), loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 

@@ -10,4 +10,5 @@ public interface AcademyRepository extends JpaRepository<AcademyEntity, Long> {
   boolean existsByBusinessRegistrationNumber(String businessRegistrationNumber);
   Optional<AcademyEntity> findByRepresentativeUserId(Long representativeUserId);
   List<AcademyEntity> findByAdminUserId(long adminUserId);
+  boolean existsByAdminUserIdAndId(long adminUserId, long academyId);
 }

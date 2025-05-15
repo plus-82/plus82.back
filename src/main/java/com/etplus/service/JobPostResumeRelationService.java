@@ -68,7 +68,7 @@ public class JobPostResumeRelationService {
         .findById(jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
 
-    boolean isAcademyUser;
+    boolean isAcademyUser = false;
     if (RoleType.TEACHER.equals(roleType)) {
       isAcademyUser = false;
       if(jobPostResumeRelationEntity.getUser().getId() != userId) {
@@ -84,8 +84,13 @@ public class JobPostResumeRelationService {
       if (jobPostResumeRelationEntity.getJobPost().getAcademy().getId() != academy.getId()) {
         throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
       }
-    } else {
-      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    } else if (RoleType.ADMIN.equals(roleType)) {
+      isAcademyUser = true;
+      AcademyEntity academy = jobPostResumeRelationEntity.getJobPost().getAcademy();
+
+      if (!academyRepository.existsByAdminUserIdAndId(userId, academy.getId())) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
     }
     return JobPostResumeRelationDetailVO.valueOf(jobPostResumeRelationEntity, isAcademyUser);
   }
@@ -107,17 +112,28 @@ public class JobPostResumeRelationService {
   }
 
   @Transactional
-  public void updateJobPostResumeRelationStatus(long jobPostResumeRelationId, JobPostResumeRelationStatus status, long userId) {
+  public void updateJobPostResumeRelationStatus(RoleType roleType, long jobPostResumeRelationId, JobPostResumeRelationStatus status, long userId) {
     JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository.findById(
         jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
         ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
 
-    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+    AcademyEntity academy;
+    if (RoleType.ACADEMY.equals(roleType)) {
+      academy = academyRepository.findByRepresentativeUserId(userId)
+          .orElseThrow(() -> new ResourceNotFoundException(
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
-    // 요청한 사용자 학원의 공고인지 확인
-    if (jobPostResumeRelation.getJobPost().getAcademy().getId() != academy.getId()) {
+      // 요청한 사용자 학원의 공고인지 확인
+      if (jobPostResumeRelation.getJobPost().getAcademy().getId() != academy.getId()) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+    } else if (RoleType.ADMIN.equals(roleType)) {
+      academy = jobPostResumeRelation.getJobPost().getAcademy();
+
+      if (!academyRepository.existsByAdminUserIdAndId(userId, academy.getId())) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+    } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
@@ -179,17 +195,28 @@ public class JobPostResumeRelationService {
   }
 
   @Transactional
-  public void updateJobPostResumeRelationMemo(long jobPostResumeRelationId, String memo, long userId) {
+  public void updateJobPostResumeRelationMemo(RoleType roleType, long jobPostResumeRelationId, String memo, long userId) {
     JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository.findById(
         jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
         ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
 
-    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
-        .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+    AcademyEntity academy;
+    if (RoleType.ACADEMY.equals(roleType)) {
+      academy = academyRepository.findByRepresentativeUserId(userId)
+          .orElseThrow(() -> new ResourceNotFoundException(
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
-    // 요청한 사용자 학원의 공고인지 확인
-    if (jobPostResumeRelation.getJobPost().getAcademy().getId() != academy.getId()) {
+      // 요청한 사용자 학원의 공고인지 확인
+      if (jobPostResumeRelation.getJobPost().getAcademy().getId() != academy.getId()) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+    } else if (RoleType.ADMIN.equals(roleType)) {
+      academy = jobPostResumeRelation.getJobPost().getAcademy();
+
+      if (!academyRepository.existsByAdminUserIdAndId(userId, academy.getId())) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+    } else {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
