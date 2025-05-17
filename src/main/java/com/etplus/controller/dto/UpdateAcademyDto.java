@@ -19,6 +19,7 @@ public record UpdateAcademyDto(
     @NotNull
     LocationType locationType,          // 위치 (시,도)
     @NotEmpty
+    String address,
     String detailedAddress,             // 상세 주소
     @NotNull
     Double lat,

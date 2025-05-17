@@ -102,6 +102,7 @@ public class AcademyService {
     academy.setRepresentativeName(dto.representativeName());
     academy.setDescription(dto.description());
     academy.setLocationType(dto.locationType());
+    academy.setAddress(dto.address());
     academy.setDetailedAddress(dto.detailedAddress());
     academy.setLat(dto.lat());
     academy.setLng(dto.lng());
