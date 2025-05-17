@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.SearchUserDTO;
+import com.etplus.controller.dto.UpdateAcademyUserDto;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateProfileImageDTO;
 import com.etplus.controller.dto.UpdateUserDto;
@@ -55,9 +56,17 @@ public class UserController {
 
   @PutMapping("/me")
   public CommonResponse<Void> updateMe(
-      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
       @RequestBody @Valid UpdateUserDto dto) {
     userService.updateMe(loginUser.userId(), dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/me/by-academy")
+  public CommonResponse<Void> updateMeByAcademy(
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @RequestBody @Valid UpdateAcademyUserDto dto) {
+    userService.updateMeByAcademy(loginUser.userId(), dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 

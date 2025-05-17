@@ -1,6 +1,7 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.SearchUserDTO;
+import com.etplus.controller.dto.UpdateAcademyUserDto;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateProfileImageDTO;
 import com.etplus.controller.dto.UpdateUserDto;
@@ -95,6 +96,17 @@ public class UserService {
           () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.COUNTRY_NOT_FOUND));
       user.setCountry(country);
     }
+    userRepository.save(user);
+  }
+
+  @Transactional
+  public void updateMeByAcademy(long userId, UpdateAcademyUserDto dto) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    user.setFullName(dto.fullName());
+    user.setGenderType(dto.genderType());
+    user.setBirthDate(dto.birthDate());
     userRepository.save(user);
   }
 
