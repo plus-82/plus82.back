@@ -31,6 +31,8 @@ import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
+import com.etplus.repository.domain.code.RoleType;
+import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.util.UuidProvider;
 import com.etplus.vo.JobPostByAcademyVO;
 import com.etplus.vo.JobPostByAdminVO;
@@ -39,6 +41,7 @@ import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +144,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), LocalDate.now(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, false, academy));
+        dto.forHighSchool(), dto.forAdult(), null, false, false, academy));
 
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
@@ -184,7 +187,7 @@ public class JobPostService {
         jobPost.getJobStartDate(), jobPost.getDueDate(), null,
         jobPost.isForKindergarten(), jobPost.isForElementary(),
         jobPost.isForMiddleSchool(), jobPost.isForHighSchool(),
-        jobPost.isForAdult(), false, true, jobPost.getAcademy()));
+        jobPost.isForAdult(), jobPost.getCloseReason(), false, true, jobPost.getAcademy()));
   }
 
   @Transactional
@@ -201,7 +204,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), LocalDate.now(),
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, false, academy));
+        dto.forHighSchool(), dto.forAdult(), null, false, false, academy));
   }
 
   @Transactional
@@ -217,7 +220,7 @@ public class JobPostService {
         dto.requiredQualification(), dto.preferredQualification(), dto.benefits(), dto.salary(),
         dto.salaryNegotiable(), dto.jobStartDate(), dto.dueDate(), null,
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
-        dto.forHighSchool(), dto.forAdult(), false, true, academy));
+        dto.forHighSchool(), dto.forAdult(), null, false, true, academy));
   }
 
   @Transactional
@@ -332,6 +335,73 @@ public class JobPostService {
     jobPost.setForAdult(dto.forAdult());
 
     jobPostRepository.save(jobPost);
+  }
+
+  @Transactional
+  public void closeJobPost(long userId, long jobPostId, String closeReason) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    if (RoleType.ACADEMY.equals(user.getRoleType())) {
+      AcademyEntity academy = academyRepository.findByRepresentativeUserId(user.getId())
+          .orElseThrow(() -> new ResourceNotFoundException(
+              ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+      // 내 학원의 공고가 아닐 경우
+      if (jobPost.getAcademy().getId() != academy.getId()) {
+        throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+      }
+    }
+
+    // 이미 마감된 공고인 경우
+    if (jobPost.isClosed()) {
+      throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);
+    }
+    // 임시저장 공고인 경우
+    if (jobPost.isDraft()) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
+    }
+
+    jobPost.setClosed(true);
+    jobPost.setDueDate(LocalDate.now());
+    jobPost.setCloseReason(closeReason);
+    jobPostRepository.save(jobPost);
+
+    // 이메일 발송
+    try {
+      MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+              "JOB_POST_CLOSE_MANUALLY", MessageTemplateType.EMAIL).orElse(null);
+
+      JobPostDueDateNotiVO notificationTarget = jobPostRepository
+          .findDueDateNotificationTargetByJobPostId(jobPostId).orElse(null);
+
+      Map params = new HashMap();
+      params.put("name", notificationTarget.academyName());
+      params.put("jobTitle", notificationTarget.title());
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+      params.put("todayStr", LocalDate.now().format(formatter));
+      params.put("jobPostResumeTotalCount", notificationTarget.jobPostResumeTotalCount());
+      params.put("jobPostResumeSubmittedCount", notificationTarget.jobPostResumeSubmittedCount());
+      params.put("jobPostResumeReviewedCount", notificationTarget.jobPostResumeReviewedCount());
+      params.put("link", FRONT_URL + "/my-job-posts");
+
+      StringSubstitutor sub = new StringSubstitutor(params);
+      String emailTitle = sub.replace(emailTemplate.getTitle());
+      String emailContent = sub.replace(emailTemplate.getContent());
+
+      String receiverEmail = notificationTarget.representativeEmail();
+      if (notificationTarget.byAdmin()) {
+        receiverEmail = notificationTarget.adminUserEmail();
+      }
+
+      emailProvider.send(receiverEmail, emailTitle, emailContent);
+    } catch (Exception e) {
+      log.error("Failed to send email for job post close", e);
+    }
   }
 
   @Transactional

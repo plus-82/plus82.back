@@ -52,9 +52,9 @@ public class JobPostEntity extends BaseEntity {
   private boolean forHighSchool;
   private boolean forAdult;
 
-  // 마감 여부
-  private boolean closed;
-  private boolean isDraft;
+  private String closeReason;   // 마감 사유
+  private boolean closed;       // 마감 여부
+  private boolean isDraft;      // 임시 저장 여부
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "academy_id", referencedColumnName = "id", nullable = false)
@@ -63,7 +63,8 @@ public class JobPostEntity extends BaseEntity {
   public JobPostEntity(Long id, String title, String jobDescription, String requiredQualification,
       String preferredQualification, String benefits, Integer salary, boolean salaryNegotiable,
       LocalDate jobStartDate, LocalDate dueDate, LocalDate openDate, boolean forKindergarten, boolean forElementary,
-      boolean forMiddleSchool, boolean forHighSchool, boolean forAdult, boolean closed, boolean isDraft, AcademyEntity academy) {
+      boolean forMiddleSchool, boolean forHighSchool, boolean forAdult, String closeReason,
+      boolean closed, boolean isDraft, AcademyEntity academy) {
     this.id = id;
     this.title = title;
     this.jobDescription = jobDescription;
@@ -80,6 +81,7 @@ public class JobPostEntity extends BaseEntity {
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
     this.forAdult = forAdult;
+    this.closeReason = closeReason;
     this.closed = closed;
     this.isDraft = isDraft;
     this.academy = academy;

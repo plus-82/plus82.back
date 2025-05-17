@@ -4,6 +4,7 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.CloseJobPostDTO;
 import com.etplus.controller.dto.CreateJobPostDTO;
 import com.etplus.controller.dto.SearchJobPostByAcademyDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
@@ -130,6 +131,15 @@ public class JobPostController {
       @PathVariable("job-post-id") Long jobPostId,
       @RequestBody CreateJobPostDTO dto) {
     jobPostService.updateDraftJobPost(loginUser.userId(), jobPostId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/{job-post-id}/close")
+  public CommonResponse<Void> closeJobPost(
+      @AuthUser({RoleType.ACADEMY, RoleType.ADMIN}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId,
+      @RequestBody @Valid CloseJobPostDTO dto) {
+    jobPostService.closeJobPost(loginUser.userId(), jobPostId, dto.closeReason());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 

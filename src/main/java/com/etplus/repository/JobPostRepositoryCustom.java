@@ -9,6 +9,7 @@ import com.etplus.vo.JobPostByAdminVO;
 import com.etplus.vo.JobPostVO;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 
@@ -19,6 +20,7 @@ interface JobPostRepositoryCustom {
   Page<JobPostByAdminVO> findAllJobPostByAdmin(List<Long> academyIdList, SearchJobPostByAcademyDTO dto);
 
   List<JobPostDueDateNotiVO> findDueDateNotificationTarget(LocalDate today);
+  Optional<JobPostDueDateNotiVO> findDueDateNotificationTargetByJobPostId(long jobPostId);
   List<JobPostNewApplicantNotiVO> findNewApplicantNotificationTarget(LocalDate today);
 
 }
