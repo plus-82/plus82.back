@@ -4,6 +4,8 @@ import com.etplus.controller.dto.CreateJobPostDTO;
 import com.etplus.controller.dto.SearchJobPostByAcademyDTO;
 import com.etplus.controller.dto.SearchJobPostDTO;
 import com.etplus.controller.dto.SubmitResumeDTO;
+import com.etplus.exception.AuthException;
+import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.JobPostException;
 import com.etplus.exception.JobPostException.JobPostExceptionCode;
 import com.etplus.exception.ResourceDeniedException;
@@ -354,6 +356,12 @@ public class JobPostService {
       // 내 학원의 공고가 아닐 경우
       if (jobPost.getAcademy().getId() != academy.getId()) {
         throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+      }
+    } else if (RoleType.ADMIN.equals(user.getRoleType())) {
+      AcademyEntity academy = jobPost.getAcademy();
+
+      if (!academyRepository.existsByAdminUserIdAndId(userId, academy.getId())) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
       }
     }
 
