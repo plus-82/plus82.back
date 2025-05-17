@@ -8,6 +8,7 @@ public record UserVO(
     Long id,
     String firstName,
     String lastName,
+    String fullName,
     GenderType genderType,
     LocalDate birthDate,
     String email,

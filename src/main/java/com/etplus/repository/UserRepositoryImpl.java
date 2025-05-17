@@ -53,6 +53,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 user.id,
                 user.firstName,
                 user.lastName,
+                user.fullName,
                 user.genderType,
                 user.birthDate,
                 user.email,
