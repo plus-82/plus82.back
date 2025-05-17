@@ -30,6 +30,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -204,6 +205,46 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
             .and(jobPost.closed.isFalse()));
 
     return jpaQuery.fetch();
+  }
+
+  @Override
+  public Optional<JobPostDueDateNotiVO> findDueDateNotificationTargetByJobPostId(long jobPostId) {
+    QUserEntity adminUser = new QUserEntity("adminUser");
+    QJobPostResumeRelationEntity jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
+
+    JobPostDueDateNotiVO result = query.select(
+            new QJobPostDueDateNotiVO(
+                jobPost.id,
+                jobPost.title,
+                academy.id,
+                academy.name,
+                academy.representativeName,
+                academy.representativeEmail,
+                academy.byAdmin,
+                adminUser.id,
+                adminUser.email,
+                JPAExpressions
+                    .select(jobPostResumeRelation.count())
+                    .from(jobPostResumeRelation)
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id)),
+                JPAExpressions
+                    .select(jobPostResumeRelation.count())
+                    .from(jobPostResumeRelation)
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id)
+                        .and(jobPostResumeRelation.status.eq(JobPostResumeRelationStatus.SUBMITTED))),
+                JPAExpressions
+                    .select(jobPostResumeRelation.count())
+                    .from(jobPostResumeRelation)
+                    .where(jobPostResumeRelation.jobPost.id.eq(jobPost.id)
+                        .and(jobPostResumeRelation.status.eq(JobPostResumeRelationStatus.REVIEWED)))
+            ))
+        .from(jobPost)
+        .innerJoin(jobPost.academy, academy)
+        .leftJoin(academy.adminUser, adminUser)
+        .where(jobPost.id.eq(jobPostId))
+        .fetchOne();
+
+    return Optional.ofNullable(result);
   }
 
   @Override

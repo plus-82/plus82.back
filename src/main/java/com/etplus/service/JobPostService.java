@@ -32,6 +32,7 @@ import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
 import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.scheduler.vo.JobPostDueDateNotiVO;
 import com.etplus.util.UuidProvider;
 import com.etplus.vo.JobPostByAcademyVO;
 import com.etplus.vo.JobPostByAdminVO;
@@ -40,6 +41,7 @@ import com.etplus.vo.JobPostResumeRelationVO;
 import com.etplus.vo.JobPostVO;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -370,26 +372,31 @@ public class JobPostService {
     jobPostRepository.save(jobPost);
 
     // 이메일 발송
-    String receiverEmail;
-    if (jobPost.getAcademy().isByAdmin()) {
-      receiverEmail = jobPost.getAcademy().getAdminUser().getEmail();
-    } else {
-      receiverEmail = jobPost.getAcademy().getRepresentativeEmail();
-    }
     try {
       MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
               "JOB_POST_CLOSE_MANUALLY", MessageTemplateType.EMAIL).orElse(null);
 
-      // TODO NotificationScheduler.sendDueDateNotifications 참고
+      JobPostDueDateNotiVO notificationTarget = jobPostRepository
+          .findDueDateNotificationTargetByJobPostId(jobPostId).orElse(null);
+
       Map params = new HashMap();
-//      params.put("name", user.getFirstName() + " " + user.getLastName());
-//      params.put("jobTitle", jobPost.getTitle());
-//      params.put("academyName", jobPost.getAcademy().getNameEn());
-//      params.put("link", FRONT_URL + "/setting/my-job-posting");
-//
+      params.put("name", notificationTarget.academyName());
+      params.put("jobTitle", notificationTarget.title());
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+      params.put("todayStr", LocalDate.now().format(formatter));
+      params.put("jobPostResumeTotalCount", notificationTarget.jobPostResumeTotalCount());
+      params.put("jobPostResumeSubmittedCount", notificationTarget.jobPostResumeSubmittedCount());
+      params.put("jobPostResumeReviewedCount", notificationTarget.jobPostResumeReviewedCount());
+      params.put("link", FRONT_URL + "/my-job-posts");
+
       StringSubstitutor sub = new StringSubstitutor(params);
       String emailTitle = sub.replace(emailTemplate.getTitle());
       String emailContent = sub.replace(emailTemplate.getContent());
+
+      String receiverEmail = notificationTarget.representativeEmail();
+      if (notificationTarget.byAdmin()) {
+        receiverEmail = notificationTarget.adminUserEmail();
+      }
 
       emailProvider.send(receiverEmail, emailTitle, emailContent);
     } catch (Exception e) {
