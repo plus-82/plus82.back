@@ -38,7 +38,7 @@ public class AcademyEntity extends BaseEntity {
   @Column(nullable = false)
   private String representativeName;          // 대표자명
   @Column(nullable = false)
-  private String representativeEmail;          // 대표자 이메일
+  private String representativeEmail;         // 대표자 이메일
   @Column(columnDefinition = "TEXT")
   private String description;                 // 학원 설명
   @Column(unique = true, length = 20)
@@ -46,6 +46,7 @@ public class AcademyEntity extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   private LocationType locationType;          // 위치 (시,도)
+  private String address;                     // 주소
   private String detailedAddress;             // 상세 주소
   private double lat;
   private double lng;
@@ -72,7 +73,7 @@ public class AcademyEntity extends BaseEntity {
 
   public AcademyEntity(Long id, String name, String nameEn, String representativeName,
       String representativeEmail, String description, String businessRegistrationNumber,
-      LocationType locationType, String detailedAddress, double lat, double lng,
+      LocationType locationType, String address, String detailedAddress, double lat, double lng,
       boolean forKindergarten, boolean forElementary, boolean forMiddleSchool,
       boolean forHighSchool,
       boolean forAdult, List<Long> imageFileIdList, boolean byAdmin, UserEntity representativeUser,
@@ -85,6 +86,7 @@ public class AcademyEntity extends BaseEntity {
     this.description = description;
     this.businessRegistrationNumber = businessRegistrationNumber;
     this.locationType = locationType;
+    this.address = address;
     this.detailedAddress = detailedAddress;
     this.lat = lat;
     this.lng = lng;

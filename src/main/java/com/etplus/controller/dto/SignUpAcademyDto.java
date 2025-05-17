@@ -37,6 +37,7 @@ public record SignUpAcademyDto(
     @NotNull
     LocationType locationType,          // 위치 (시,도)
     @NotEmpty
+    String address,                     // 주소
     String detailedAddress,             // 상세 주소
     @NotNull
     Double lat,

@@ -174,6 +174,7 @@ public class AcademyService {
             dto.description(),
             null,
             dto.locationType(),
+            dto.address(),
             dto.detailedAddress(),
             dto.lat(),
             dto.lng(),
