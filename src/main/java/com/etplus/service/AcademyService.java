@@ -18,6 +18,7 @@ import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.AcademyDetailByAdminVO;
 import com.etplus.vo.AcademyDetailVO;
 import com.etplus.vo.AcademyVO;
+import com.etplus.vo.common.ImageVO;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +48,11 @@ public class AcademyService {
     List<Long> imageFileIdList = academy.getImageFileIdList();
     List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
 
-    List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
+    List<ImageVO> imageVOList = imageFileList.stream()
+        .map(fileEntity -> new ImageVO(fileEntity.getId(), fileEntity.getPath()))
+        .toList();
 
-    return AcademyDetailVO.valueOf(academy, imagePathList);
+    return AcademyDetailVO.valueOf(academy, imageVOList);
   }
 
   public AcademyDetailByAdminVO getAcademyDetailByAdmin(Long academyId) {
@@ -60,9 +63,11 @@ public class AcademyService {
     List<Long> imageFileIdList = academy.getImageFileIdList();
     List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
 
-    List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
+    List<ImageVO> imageVOList = imageFileList.stream()
+        .map(fileEntity -> new ImageVO(fileEntity.getId(), fileEntity.getPath()))
+        .toList();
 
-    return AcademyDetailByAdminVO.valueOf(academy, imagePathList);
+    return AcademyDetailByAdminVO.valueOf(academy, imageVOList);
   }
 
   public AcademyDetailByAdminVO getMyAcademy(LoginUser loginUser) {
@@ -76,9 +81,11 @@ public class AcademyService {
     List<Long> imageFileIdList = academy.getImageFileIdList();
     List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
 
-    List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
+    List<ImageVO> imageList = imageFileList.stream()
+        .map(fileEntity -> new ImageVO(fileEntity.getId(), fileEntity.getPath()))
+        .toList();
 
-    return AcademyDetailByAdminVO.valueOf(academy, imagePathList);
+    return AcademyDetailByAdminVO.valueOf(academy, imageList);
   }
 
   @Transactional

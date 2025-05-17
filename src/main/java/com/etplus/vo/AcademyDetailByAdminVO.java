@@ -2,6 +2,7 @@ package com.etplus.vo;
 
 import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.code.LocationType;
+import com.etplus.vo.common.ImageVO;
 import java.util.List;
 
 public record AcademyDetailByAdminVO(
@@ -21,10 +22,10 @@ public record AcademyDetailByAdminVO(
     boolean forMiddleSchool,
     boolean forHighSchool,
     boolean forAdult,
-    List<String> imageUrls
+    List<ImageVO> imageList
 ) {
 
-  public static AcademyDetailByAdminVO valueOf(AcademyEntity academy, List<String> imageUrls) {
+  public static AcademyDetailByAdminVO valueOf(AcademyEntity academy, List<ImageVO> imageList) {
     return new AcademyDetailByAdminVO(
         academy.getId(),
         academy.getName(),
@@ -42,7 +43,7 @@ public record AcademyDetailByAdminVO(
         academy.isForMiddleSchool(),
         academy.isForHighSchool(),
         academy.isForAdult(),
-        imageUrls
+        imageList
     );
   }
 
