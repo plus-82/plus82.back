@@ -106,7 +106,7 @@ public class AcademyAuthService {
             null,
             dto.businessRegistrationNumber(),
             dto.locationType(),
-//            dto.address(),
+            dto.address(),
             dto.detailedAddress(),
             dto.lat(),
             dto.lng(),

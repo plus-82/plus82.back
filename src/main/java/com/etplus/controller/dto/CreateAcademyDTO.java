@@ -19,8 +19,8 @@ public record CreateAcademyDTO(
     String description,
     @NotNull
     LocationType locationType,          // 위치 (시,도)
-//    @NotEmpty
-//    String address,
+    @NotEmpty
+    String address,
     String detailedAddress,             // 상세 주소
     @NotNull
     double lat,
