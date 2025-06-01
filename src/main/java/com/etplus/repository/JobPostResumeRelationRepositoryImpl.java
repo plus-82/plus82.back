@@ -1,7 +1,5 @@
 package com.etplus.repository;
 
-import static com.querydsl.core.types.dsl.Expressions.constant;
-
 import com.etplus.controller.dto.SearchJobPostResumeRelationDTO;
 import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.QAcademyEntity;
@@ -106,7 +104,7 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
                 jobPostResumeRelation.coverLetter,
                 jobPostResumeRelation.status,
                 jobPostResumeRelation.submittedDate,
-                constant(""),
+                null,
                 jobPostResumeRelation.resumeTitle,
                 jobPostResumeRelation.firstName,
                 jobPostResumeRelation.lastName,
