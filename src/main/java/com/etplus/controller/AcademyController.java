@@ -5,6 +5,7 @@ import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateAcademyDTO;
+import com.etplus.controller.dto.UpdateAcademyByAdminDto;
 import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.AcademyService;
@@ -67,7 +68,7 @@ public class AcademyController {
   @PutMapping(value = "/{academy-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> updateAcademyByAdmin(
       @PathVariable("academy-id") Long academyId,
-      @ModelAttribute @Valid CreateAcademyDTO dto,
+      @ModelAttribute @Valid UpdateAcademyByAdminDto dto,
       @AuthUser(RoleType.ADMIN) LoginUser loginUser) {
     academyService.updateAcademyByAdmin(academyId, dto, loginUser.userId());
     return new CommonResponse(CommonResponseCode.SUCCESS);

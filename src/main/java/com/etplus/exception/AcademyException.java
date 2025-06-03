@@ -11,6 +11,7 @@ public class AcademyException extends CustomBadRequestException {
   @Getter
   public enum AcademyExceptionCode implements ResponseCode {
     ALREADY_USED_BUSINESS_REGISTRATION_NUMBER("ACE-001","already used business registration number"),
+    CHECK_OLD_IMAGE_ID("ACE-002","check old image id"),
     ;
 
     private String code;

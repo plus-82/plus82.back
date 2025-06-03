@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
-public record UpdateAcademyDto(
+public record UpdateAcademyByAdminDto(
     // Academy
     @NotBlank
     String name,
@@ -15,6 +15,7 @@ public record UpdateAcademyDto(
     String nameEn,   // 학원 이름 (영어)
     @NotBlank
     String representativeName,          // 대표자명
+    String representativeEmail,         // 대표자 이메일
     String description,
     @NotNull
     LocationType locationType,          // 위치 (시,도)

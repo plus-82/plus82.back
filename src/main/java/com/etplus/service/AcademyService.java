@@ -2,7 +2,10 @@ package com.etplus.service;
 
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateAcademyDTO;
+import com.etplus.controller.dto.UpdateAcademyByAdminDto;
 import com.etplus.controller.dto.UpdateAcademyDto;
+import com.etplus.exception.AcademyException;
+import com.etplus.exception.AcademyException.AcademyExceptionCode;
 import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -112,22 +115,30 @@ public class AcademyService {
     academy.setForHighSchool(dto.forHighSchool());
     academy.setForAdult(dto.forAdult());
 
-    // 이미지 업로드
+    // 신규 이미지 업로드
     List<FileEntity> uploadedImageFiles = new ArrayList<>();
-    for (MultipartFile image : dto.images()) {
+    for (MultipartFile image : dto.newImages()) {
       uploadedImageFiles.add(s3Uploader.uploadImageAndSaveRepository(image, academy.getRepresentativeUser()));
     }
 
-    List<Long> uploadedImageFileIds = uploadedImageFiles.stream()
-        .map(FileEntity::getId)
-        .toList();
+    // 기존 이미지 ID 목록에 신규 이미지 ID 추가
+    List<Long> imageFileIdList = dto.oldImageIds();
 
-    academy.setImageFileIdList(uploadedImageFileIds);
+    List<Long> oldImageFileIdList = academy.getImageFileIdList();
+    if (!oldImageFileIdList.containsAll(imageFileIdList)) {
+      throw new AcademyException(AcademyExceptionCode.CHECK_OLD_IMAGE_ID);
+    }
+
+    imageFileIdList.addAll(uploadedImageFiles.stream()
+        .map(FileEntity::getId)
+        .toList());
+
+    academy.setImageFileIdList(imageFileIdList);
     academyRepository.save(academy);
   }
 
   @Transactional
-  public void updateAcademyByAdmin(long academyId, CreateAcademyDTO dto, long adminUserId) {
+  public void updateAcademyByAdmin(long academyId, UpdateAcademyByAdminDto dto, long adminUserId) {
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -152,18 +163,25 @@ public class AcademyService {
     academy.setForHighSchool(dto.forHighSchool());
     academy.setForAdult(dto.forAdult());
 
-    // 이미지 업로드
+    // 신규 이미지 업로드
     List<FileEntity> uploadedImageFiles = new ArrayList<>();
-    for (MultipartFile image : dto.images()) {
-      uploadedImageFiles.add(
-          s3Uploader.uploadImageAndSaveRepository(image, academy.getRepresentativeUser()));
+    for (MultipartFile image : dto.newImages()) {
+      uploadedImageFiles.add(s3Uploader.uploadImageAndSaveRepository(image, academy.getRepresentativeUser()));
     }
 
-    List<Long> uploadedImageFileIds = uploadedImageFiles.stream()
-        .map(FileEntity::getId)
-        .toList();
+    // 기존 이미지 ID 목록에 신규 이미지 ID 추가
+    List<Long> imageFileIdList = dto.oldImageIds();
 
-    academy.setImageFileIdList(uploadedImageFileIds);
+    List<Long> oldImageFileIdList = academy.getImageFileIdList();
+    if (!oldImageFileIdList.containsAll(imageFileIdList)) {
+      throw new AcademyException(AcademyExceptionCode.CHECK_OLD_IMAGE_ID);
+    }
+
+    imageFileIdList.addAll(uploadedImageFiles.stream()
+        .map(FileEntity::getId)
+        .toList());
+
+    academy.setImageFileIdList(imageFileIdList);
     academyRepository.save(academy);
   }
 
