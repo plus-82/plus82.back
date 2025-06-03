@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public record UpdateAcademyUserDto(
     @NotBlank
     String fullName,
-    @NotBlank
+    @NotNull
     GenderType genderType,
     @NotNull
     LocalDate birthDate

@@ -7,7 +7,6 @@ import com.etplus.controller.dto.RequestReIssueTokenDTO;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.ResetPasswordDto;
 import com.etplus.controller.dto.SignInDto;
-import com.etplus.controller.dto.SignUpAcademyDto;
 import com.etplus.controller.dto.SignUpDto;
 import com.etplus.controller.dto.VerifyEmailDto;
 import com.etplus.service.AuthService;
