@@ -1,8 +1,11 @@
 package com.etplus.repository;
 
+import static com.querydsl.core.types.dsl.Expressions.constant;
+
 import com.etplus.controller.dto.SearchJobPostResumeRelationDTO;
 import com.etplus.repository.domain.JobPostResumeRelationEntity;
 import com.etplus.repository.domain.QAcademyEntity;
+import com.etplus.repository.domain.QCountryEntity;
 import com.etplus.repository.domain.QJobPostEntity;
 import com.etplus.repository.domain.QJobPostResumeRelationEntity;
 import com.etplus.repository.domain.code.JobPostResumeRelationStatus;
@@ -28,6 +31,7 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
   private QJobPostResumeRelationEntity jobPostResumeRelation;
   private QJobPostEntity jobPost;
   private QAcademyEntity academy;
+  private QCountryEntity country;
 
   public JobPostResumeRelationRepositoryImpl(JPAQueryFactory query) {
     super(JobPostResumeRelationEntity.class);
@@ -35,6 +39,7 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
     jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
     jobPost = new QJobPostEntity("jobPost");
     academy = new QAcademyEntity("academy");
+    country = new QCountryEntity("country");
   }
 
   @Override
@@ -50,6 +55,9 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
                 jobPostResumeRelation.resumeTitle,
                 jobPostResumeRelation.firstName,
                 jobPostResumeRelation.lastName,
+                country.id,
+                country.countryNameEn,
+                country.countryCode,
                 jobPost.id,
                 jobPost.title,
                 academy.id,
@@ -79,6 +87,9 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
                 jobPostResumeRelation.resumeTitle,
                 jobPostResumeRelation.firstName,
                 jobPostResumeRelation.lastName,
+                country.id,
+                country.countryNameEn,
+                country.countryCode,
                 jobPost.id,
                 jobPost.title,
                 academy.id,
@@ -104,10 +115,13 @@ public class JobPostResumeRelationRepositoryImpl extends QuerydslRepositorySuppo
                 jobPostResumeRelation.coverLetter,
                 jobPostResumeRelation.status,
                 jobPostResumeRelation.submittedDate,
-                null,
+                constant(""),
                 jobPostResumeRelation.resumeTitle,
                 jobPostResumeRelation.firstName,
                 jobPostResumeRelation.lastName,
+                country.id,
+                country.countryNameEn,
+                country.countryCode,
                 jobPost.id,
                 jobPost.title,
                 academy.id,

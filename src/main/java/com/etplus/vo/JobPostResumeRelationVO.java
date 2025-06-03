@@ -17,6 +17,11 @@ public record JobPostResumeRelationVO(
     String resumeFirstName,
     String resumeLastName,
 
+    // Country
+    Long countryId,
+    String countryNameEn,
+    String countryCode,
+
     // JobPost
     Long jobPostId,
     String jobPostTitle,
@@ -40,6 +45,9 @@ public record JobPostResumeRelationVO(
         entity.getResumeTitle(),
         entity.getFirstName(),
         entity.getLastName(),
+        entity.getCountry() == null ? null : entity.getCountry().getId(),
+        entity.getCountry() == null ? null : entity.getCountry().getCountryNameEn(),
+        entity.getCountry() == null ? null : entity.getCountry().getCountryCode(),
         entity.getJobPost().getId(),
         entity.getJobPost().getTitle(),
         entity.getJobPost().getAcademy().getId(),
