@@ -12,6 +12,7 @@ public record AcademyVO(
     String representativeEmail,
     String businessRegistrationNumber,
     LocationType locationType,
+    String address,
     String detailedAddress,
     LocalDateTime updatedAt,
     boolean byAdmin
@@ -26,6 +27,7 @@ public record AcademyVO(
         entity.getRepresentativeEmail(),
         entity.getBusinessRegistrationNumber(),
         entity.getLocationType(),
+        entity.getAddress(),
         entity.getDetailedAddress(),
         entity.getUpdatedAt(),
         entity.isByAdmin()
