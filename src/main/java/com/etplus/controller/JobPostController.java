@@ -64,6 +64,14 @@ public class JobPostController {
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
+  @GetMapping("/{job-post-id}/by-academy")
+  public CommonResponse<JobPostDetailVO> getJobPostDetailByAcademy(
+      @AuthUser({RoleType.ACADEMY, RoleType.ADMIN}) LoginUser loginUser,
+      @PathVariable("job-post-id") Long jobPostId) {
+    JobPostDetailVO vo = jobPostService.getJobPostDetailByAcademy(jobPostId, loginUser.roleType(), loginUser.userId());
+    return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
   @GetMapping("/{job-post-id}/teacher/submitted-resume")
   public CommonResponse<JobPostResumeRelationVO> getSubmittedJobPostResumeRelation(
       @AuthUser({RoleType.TEACHER}) LoginUser loginUser,

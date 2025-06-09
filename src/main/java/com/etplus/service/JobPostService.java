@@ -116,6 +116,34 @@ public class JobPostService {
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
 
+    if (jobPost.isDraft()) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
+    }
+
+    List<Long> imageFileIdList = jobPost.getAcademy().getImageFileIdList();
+    List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
+
+    List<String> imagePathList = imageFileList.stream().map(FileEntity::getPath).toList();
+
+    return JobPostDetailVO.valueOf(jobPost, imagePathList);
+  }
+
+  public JobPostDetailVO getJobPostDetailByAcademy(Long jobPostId, RoleType roleType, long userId) {
+    JobPostEntity jobPost = jobPostRepository.findById(jobPostId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
+
+    if (RoleType.ADMIN.equals(roleType)) {
+      if (jobPost.getAcademy().getAdminUser() == null ||
+          jobPost.getAcademy().getAdminUser().getId() != userId) {
+        throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+      }
+    } else if (RoleType.ACADEMY.equals(roleType)) {
+      if (jobPost.getAcademy().getRepresentativeUser() == null ||
+          jobPost.getAcademy().getRepresentativeUser().getId() != userId) {
+        throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+      }
+    }
+
     List<Long> imageFileIdList = jobPost.getAcademy().getImageFileIdList();
     List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
 
@@ -264,7 +292,7 @@ public class JobPostService {
   }
 
   @Transactional
-  public void updateJobPost(long userId, long jobPostId,CreateJobPostDTO dto) {
+  public void updateJobPost(long userId, long jobPostId, CreateJobPostDTO dto) {
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));

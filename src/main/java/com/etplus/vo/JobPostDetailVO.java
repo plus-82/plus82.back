@@ -22,6 +22,7 @@ public record JobPostDetailVO(
     boolean forMiddleSchool,
     boolean forHighSchool,
     boolean forAdult,
+    boolean isDraft,
 
     // academy
     Long academyId,
@@ -54,6 +55,7 @@ public record JobPostDetailVO(
         jobPostEntity.isForMiddleSchool(),
         jobPostEntity.isForHighSchool(),
         jobPostEntity.isForAdult(),
+        jobPostEntity.isDraft(),
         jobPostEntity.getAcademy().getId(),
         jobPostEntity.getAcademy().getName(),
         jobPostEntity.getAcademy().getNameEn(),
