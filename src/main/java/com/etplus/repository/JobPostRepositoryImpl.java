@@ -73,7 +73,8 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
         ))
         .from(jobPost)
         .innerJoin(jobPost.academy, academy)
-        .where(whereCondition)
+        .where(whereCondition
+            .and(jobPost.isDraft.isFalse()))
         .orderBy(orderSpecifier);
 
     List<JobPostVO> content = jpaQuery
