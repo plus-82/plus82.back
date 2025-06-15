@@ -7,6 +7,7 @@ import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.vo.NotificationSettingVO;
 import com.etplus.vo.NotificationVO;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,13 @@ public class NotificationService {
     UserEntity user = userRepository.findById(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
     return new NotificationSettingVO(user.isAllowEmail());
+  }
+
+  @Transactional
+  public void updateMyNotificationSetting(long userId, boolean allowEmail) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    user.setAllowEmail(allowEmail);
+    userRepository.save(user);
   }
 }
