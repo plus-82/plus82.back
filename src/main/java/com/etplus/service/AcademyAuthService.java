@@ -36,10 +36,12 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AcademyAuthService {
@@ -62,6 +64,7 @@ public class AcademyAuthService {
 
   @Transactional
   public void signUpAcademy(SignUpAcademyDto dto) {
+    log.info("Academy sign up request: {}", dto);
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
       throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
@@ -145,6 +148,7 @@ public class AcademyAuthService {
 
   @Transactional
   public void requestEmailVerification(RequestEmailVerificationDto dto) {
+    log.info("Academy email verification request: {}", dto);
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
       throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
@@ -181,6 +185,7 @@ public class AcademyAuthService {
 
   @Transactional
   public void requestResetPassword(RequestResetPasswordDto dto) {
+    log.info("Academy reset password request: {}", dto);
     UserEntity user = userRepository.findByEmailAndDeletedIsFalse(dto.email()).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 

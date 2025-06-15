@@ -26,12 +26,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class JobPostResumeRelationService {
@@ -113,6 +115,8 @@ public class JobPostResumeRelationService {
 
   @Transactional
   public void updateJobPostResumeRelationStatus(RoleType roleType, long jobPostResumeRelationId, JobPostResumeRelationStatus status, long userId) {
+    log.info("updateJobPostResumeRelationStatus. roleType: {}, jobPostResumeRelationId: {}, status: {}, userId: {}",
+        roleType, jobPostResumeRelationId, status, userId);
     JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository.findById(
         jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
         ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
@@ -196,6 +200,8 @@ public class JobPostResumeRelationService {
 
   @Transactional
   public void updateJobPostResumeRelationMemo(RoleType roleType, long jobPostResumeRelationId, String memo, long userId) {
+    log.info("updateJobPostResumeRelationMemo. roleType: {}, jobPostResumeRelationId: {}, memo: {}, userId: {}",
+        roleType, jobPostResumeRelationId, memo, userId);
     JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository.findById(
         jobPostResumeRelationId).orElseThrow(() -> new ResourceNotFoundException(
         ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));

@@ -22,9 +22,11 @@ import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.UserVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -65,6 +67,7 @@ public class UserService {
 
   @Transactional
   public void createAdminUser(String email, String password) {
+    log.info("Creating admin user with email: {}", email);
     UserEntity userEntity = new UserEntity(
         null,
         null,
@@ -84,6 +87,7 @@ public class UserService {
 
   @Transactional
   public void updateMe(long userId, UpdateUserDto dto) {
+    log.info("updateMe. userId: {}, dto: {}", userId, dto);
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
@@ -102,6 +106,7 @@ public class UserService {
 
   @Transactional
   public void updateMeByAcademy(long userId, UpdateAcademyUserDto dto) {
+    log.info("updateMeByAcademy. userId: {}, dto: {}", userId, dto);
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
@@ -113,6 +118,7 @@ public class UserService {
 
   @Transactional
   public void updateProfileImage(long userId, UpdateProfileImageDTO dto) {
+    log.info("updateProfileImage. userId: {}, dto: {}", userId, dto);
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
@@ -124,6 +130,7 @@ public class UserService {
 
   @Transactional
   public void deleteProfileImage(long userId) {
+    log.info("deleteProfileImage. userId: {}", userId);
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
@@ -140,6 +147,7 @@ public class UserService {
 
   @Transactional
   public void deleteUser(long userId) {
+    log.info("deleteUser. userId: {}", userId);
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
@@ -149,6 +157,7 @@ public class UserService {
 
   @Transactional
   public void updatePassword(long userId, UpdatePasswordDto dto) {
+    log.info("updatePassword. userId: {}");
     UserEntity userEntity = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 

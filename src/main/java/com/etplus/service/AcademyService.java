@@ -26,9 +26,11 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AcademyService {
@@ -93,6 +95,7 @@ public class AcademyService {
 
   @Transactional
   public void updateMyAcademy(UpdateAcademyDto dto, LoginUser loginUser) {
+    log.info("updateMyAcademy. dto : {}, loginUser : {}", dto, loginUser);
     AcademyEntity academy = academyRepository.findByRepresentativeUserId(loginUser.userId())
         .orElse(null);
 
@@ -139,6 +142,7 @@ public class AcademyService {
 
   @Transactional
   public void updateAcademyByAdmin(long academyId, UpdateAcademyByAdminDto dto, long adminUserId) {
+    log.info("updateAcademyByAdmin. academyId: {}, dto: {}, adminUserId: {}", academyId, dto, adminUserId);
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -187,6 +191,7 @@ public class AcademyService {
 
   @Transactional
   public void createAcademy(CreateAcademyDTO dto, long adminUserId) {
+    log.info("createAcademy. dto: {}, adminUserId: {}", dto, adminUserId);
     UserEntity adminUser = userRepository.findById(adminUserId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));

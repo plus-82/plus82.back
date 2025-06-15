@@ -22,9 +22,11 @@ import com.etplus.vo.ResumeDetailVO;
 import com.etplus.vo.ResumeVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ResumeService {
@@ -53,6 +55,7 @@ public class ResumeService {
 
   @Transactional
   public void createResume(long userId, CreateResumeDTO dto) {
+    log.info("Creating resume for userId: {}, dto: {}", userId, dto);
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
@@ -88,6 +91,7 @@ public class ResumeService {
 
   @Transactional
   public void createDraftResume(long userId, CreateResumeDTO dto) {
+    log.info("Creating draft resume for userId: {}, dto: {}", userId, dto);
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
@@ -115,6 +119,7 @@ public class ResumeService {
 
   @Transactional
   public void copyResume(long userId, long resumeId) {
+    log.info("Copying resume for userId: {}, resumeId: {}", userId, resumeId);
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
@@ -142,6 +147,7 @@ public class ResumeService {
 
   @Transactional
   public void createResumeWithFile(long userId, CreateResumeWithFileDTO dto) {
+    log.info("Creating resume with file for userId: {}, dto: {}", userId, dto);
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
@@ -152,6 +158,7 @@ public class ResumeService {
 
   @Transactional
   public void updateResume(long userId, long resumeId, UpdateResumeDTO dto) {
+    log.info("Updating resume for userId: {}, resumeId: {}, dto: {}", userId, resumeId, dto);
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
@@ -214,6 +221,7 @@ public class ResumeService {
 
   @Transactional
   public void updateDraftResume(long userId, long resumeId, UpdateResumeDTO dto) {
+    log.info("Updating draft resume for userId: {}, resumeId: {}, dto: {}", userId, resumeId, dto);
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
@@ -266,6 +274,7 @@ public class ResumeService {
 
   @Transactional
   public void deleteResume(long userId, long resumeId) {
+    log.info("Deleting resume for userId: {}, resumeId: {}", userId, resumeId);
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));

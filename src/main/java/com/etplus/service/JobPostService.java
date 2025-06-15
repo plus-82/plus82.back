@@ -56,8 +56,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class JobPostService {
 
@@ -163,6 +163,7 @@ public class JobPostService {
 
   @Transactional
   public void createJobPost(long userId, CreateJobPostDTO dto) {
+    log.info("createJobPost. userId: {}, dto: {}", userId, dto);
     AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -198,6 +199,7 @@ public class JobPostService {
 
   @Transactional
   public void copyJobPost(long userId, long jobPostId) {
+    log.info("copyJobPost. userId: {}, jobPostId: {}", userId, jobPostId);
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
@@ -222,6 +224,7 @@ public class JobPostService {
 
   @Transactional
   public void createJobPostByAdmin(long academyId, CreateJobPostDTO dto, long adminUserId) {
+    log.info("createJobPostByAdmin. academyId: {}, dto: {}, adminUserId: {}", academyId, dto, adminUserId);
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
@@ -239,6 +242,7 @@ public class JobPostService {
 
   @Transactional
   public void createDraftJobPost(long userId, CreateJobPostDTO dto) {
+    log.info("createDraftJobPost. userId: {}, dto: {}", userId, dto);
     if (!StringUtils.hasText(dto.title())) {
       throw new JobPostException(JobPostExceptionCode.CHECK_TITLE);
     }
@@ -255,6 +259,7 @@ public class JobPostService {
 
   @Transactional
   public void updateJobPostByAdmin(long academyId, long jobPostId, CreateJobPostDTO dto, long adminUserId) {
+    log.info("updateJobPostByAdmin. academyId: {}, jobPostId: {}, dto: {}, adminUserId: {}", academyId, jobPostId, dto, adminUserId);
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
@@ -293,6 +298,7 @@ public class JobPostService {
 
   @Transactional
   public void updateJobPost(long userId, long jobPostId, CreateJobPostDTO dto) {
+    log.info("updateJobPost. userId: {}, jobPostId: {}, dto: {}", userId, jobPostId, dto);
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
@@ -332,6 +338,7 @@ public class JobPostService {
 
   @Transactional
   public void updateDraftJobPost(long userId, long jobPostId, CreateJobPostDTO dto) {
+    log.info("updateDraftJobPost. userId: {}, jobPostId: {}, dto: {}", userId, jobPostId, dto);
     if (!StringUtils.hasText(dto.title())) {
       throw new JobPostException(JobPostExceptionCode.CHECK_TITLE);
     }
@@ -369,6 +376,7 @@ public class JobPostService {
 
   @Transactional
   public void closeJobPost(long userId, long jobPostId, String closeReason) {
+    log.info("closeJobPost. userId: {}, jobPostId: {}, closeReason: {}", userId, jobPostId, closeReason);
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
@@ -442,6 +450,7 @@ public class JobPostService {
 
   @Transactional
   public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
+    log.info("submitResume. userId: {}, jobPostId: {}, resumeId: {}, dto: {}", userId, jobPostId, resumeId, dto);
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
