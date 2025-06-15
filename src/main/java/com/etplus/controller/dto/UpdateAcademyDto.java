@@ -4,6 +4,7 @@ import com.etplus.repository.domain.code.LocationType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,10 +38,12 @@ public record UpdateAcademyDto(
     Boolean forAdult,
 
     // Images
-    @NotNull
     List<MultipartFile> newImages,
-    @NotNull
     List<Long> oldImageIds
 ) {
 
+  public UpdateAcademyDto {
+    newImages = newImages == null ? new ArrayList<MultipartFile>() : newImages;
+    oldImageIds = oldImageIds == null ? new ArrayList<Long>() : oldImageIds;
+  }
 }
