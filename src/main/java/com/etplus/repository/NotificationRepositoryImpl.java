@@ -29,7 +29,9 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
                 notification.title,
                 notification.titleEn,
                 notification.content,
-                notification.contentEn
+                notification.contentEn,
+                notification.targetUrl,
+                notification.createdAt
             ))
         .from(notification)
         .where(notification.user.id.eq(userId)
