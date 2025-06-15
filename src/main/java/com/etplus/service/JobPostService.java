@@ -194,7 +194,7 @@ public class JobPostService {
 
     // 학원 알림 목록 추가
     notificationRepository.save(new NotificationEntity(null, "등록", "Registered",
-        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", user));
+        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", "/my-job-posts", user));
   }
 
   @Transactional
@@ -540,6 +540,7 @@ public class JobPostService {
     notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
         String.format("%s에 이력서를 제출 완료했습니다", jobPost.getAcademy().getName()),
         String.format("Resume submitted to %s", jobPost.getAcademy().getNameEn()),
+        "/setting/my-job-posting",
         user));
 
     // 학원 알림 추가
@@ -548,6 +549,7 @@ public class JobPostService {
       notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
           String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
           String.format("New application for {%s}", jobPost.getTitle()),
+          "/setting/resume",
           representativeUser));
     }
 

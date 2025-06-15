@@ -62,6 +62,7 @@ public class NotificationScheduler {
         createdNotificationList.add(new NotificationEntity(null, "마감", "Expired",
             String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
             String.format("job posting {%s} has closed", jobPost.getTitle()),
+            "/my-job-posts",
             user));
       }
       jobPost.setClosed(true);

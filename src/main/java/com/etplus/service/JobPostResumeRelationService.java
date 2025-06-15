@@ -192,7 +192,8 @@ public class JobPostResumeRelationService {
             jobPostResumeRelation.getJobPost().getTitle(), academy.getNameEn());
       }
     }
-    notificationRepository.save(new NotificationEntity(null, title, titleEn, content, contentEn, teacher));
+    notificationRepository.save(new NotificationEntity(null, title, titleEn, content, contentEn,
+        "/setting/my-job-posting", teacher));
 
     jobPostResumeRelation.setStatus(status);
     jobPostResumeRelationRepository.save(jobPostResumeRelation);

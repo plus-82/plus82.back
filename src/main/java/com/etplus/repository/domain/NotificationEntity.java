@@ -33,18 +33,21 @@ public class NotificationEntity extends BaseEntity {
   private String content;
   @Column(length = 100)
   private String contentEn;
+  @Column(length = 30)
+  private String targetUrl;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
   private UserEntity user;
 
   public NotificationEntity(Long id, String title, String titleEn, String content, String contentEn,
-      UserEntity user) {
+      String targetUrl, UserEntity user) {
     this.id = id;
     this.title = title;
     this.titleEn = titleEn;
     this.content = content;
     this.contentEn = contentEn;
+    this.targetUrl = targetUrl;
     this.user = user;
   }
 }
