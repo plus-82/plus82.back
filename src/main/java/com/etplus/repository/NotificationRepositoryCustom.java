@@ -1,10 +1,11 @@
 package com.etplus.repository;
 
+import com.etplus.controller.dto.PagingDTO;
 import com.etplus.vo.NotificationVO;
-import java.util.List;
+import org.springframework.data.domain.Slice;
 
 interface NotificationRepositoryCustom {
 
-  List<NotificationVO> findAllNotificationsByUserId(long userId);
+  Slice<NotificationVO> findAllNotificationsByUserId(long userId, PagingDTO dto);
 
 }
