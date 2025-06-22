@@ -8,9 +8,11 @@ import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import com.amazonaws.services.simpleemail.model.SendEmailResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class EmailProvider {
@@ -21,6 +23,7 @@ public class EmailProvider {
   private String defaultSenderEmail;
 
   public String send(String to, String subject, String content) {
+    log.info("Sending email to: {}, subject: {}, content: {}", to, subject, content);
     SendEmailRequest request = new SendEmailRequest()
         .withSource(defaultSenderEmail)
         .withDestination(new Destination().withToAddresses(to))
