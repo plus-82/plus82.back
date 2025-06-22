@@ -34,6 +34,9 @@ public class FeedEntity extends BaseEntity {
   @Column(nullable = false)
   private FeedVisibility feedVisibility;
 
+  @Column(nullable = false)
+  private boolean deleted;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "created_user_id", referencedColumnName = "id", nullable = false)
   private UserEntity createdUser;
@@ -41,11 +44,11 @@ public class FeedEntity extends BaseEntity {
   @JoinColumn(name = "image_id", referencedColumnName = "id")
   private FileEntity image;
 
-  public FeedEntity(Long id, String content, FeedVisibility feedVisibility, UserEntity createdUser,
+  public FeedEntity(String content, FeedVisibility feedVisibility, UserEntity createdUser,
       FileEntity image) {
-    this.id = id;
     this.content = content;
     this.feedVisibility = feedVisibility;
+    this.deleted = false;
     this.createdUser = createdUser;
     this.image = image;
   }

@@ -11,6 +11,7 @@ import com.etplus.service.FeedService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +40,14 @@ public class FeedController {
       @PathVariable("feed-id") Long feedId,
       @Valid @ModelAttribute UpdateFeedDTO dto) {
     feedService.updateFeed(loginUser.userId(), feedId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @DeleteMapping("/{feed-id}")
+  public CommonResponse<Void> deleteFeed(
+      @AuthUser({RoleType.ADMIN, RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId) {
+    feedService.deleteFeed(loginUser.userId(), loginUser.roleType(), feedId);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 

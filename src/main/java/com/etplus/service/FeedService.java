@@ -14,6 +14,7 @@ import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.FeedEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.repository.domain.code.RoleType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,13 +37,13 @@ public class FeedService {
       image = s3Uploader.uploadImageAndSaveRepository(dto.image(), user);
     }
 
-    FeedEntity feed = new FeedEntity(null, dto.content(), dto.feedVisibility(), user, image);
+    FeedEntity feed = new FeedEntity(dto.content(), dto.feedVisibility(), user, image);
     feedRepository.save(feed);
   }
 
   @Transactional
   public void updateFeed(Long userId, Long feedId, UpdateFeedDTO dto) {
-    FeedEntity feed = feedRepository.findById(feedId)
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
     UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId)
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
@@ -64,6 +65,21 @@ public class FeedService {
     feed.setContent(dto.content());
     feed.setFeedVisibility(dto.feedVisibility());
 
+    feedRepository.save(feed);
+  }
+
+  @Transactional
+  public void deleteFeed(Long userId, RoleType userRole, Long feedId) {
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
+    // 어드민이 아니고 피드 작성자가 아닌 경우 삭제 불가
+    if (userRole != RoleType.ADMIN && !feed.getCreatedUser().getId().equals(userId)) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    // Soft delete 적용
+    feed.setDeleted(true);
     feedRepository.save(feed);
   }
 }
