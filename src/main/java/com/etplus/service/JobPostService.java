@@ -177,24 +177,26 @@ public class JobPostService {
         dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(),
         dto.forHighSchool(), dto.forAdult(), null, false, false, academy));
 
-    // 이메일 템플릿 조회 & 파싱 & 발송
-    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
-        "NEW_JOB_POST", MessageTemplateType.EMAIL).orElse(null);
+    if (user.isAllowEmail()) {
+      // 이메일 템플릿 조회 & 파싱 & 발송
+      MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+          "NEW_JOB_POST", MessageTemplateType.EMAIL).orElse(null);
 
-    Map params = new HashMap();
-    params.put("name", user.getFullName());
-    params.put("jobTitle", dto.title());
-    params.put("link", FRONT_URL + "/job-postings");
+      Map params = new HashMap();
+      params.put("name", user.getFullName());
+      params.put("jobTitle", dto.title());
+      params.put("link", FRONT_URL + "/job-postings");
 
-    StringSubstitutor sub = new StringSubstitutor(params);
-    String emailTitle = sub.replace(emailTemplate.getTitle());
-    String emailContent = sub.replace(emailTemplate.getContent());
+      StringSubstitutor sub = new StringSubstitutor(params);
+      String emailTitle = sub.replace(emailTemplate.getTitle());
+      String emailContent = sub.replace(emailTemplate.getContent());
 
-    emailProvider.send(user.getEmail(), emailTitle, emailContent);
+      emailProvider.send(user.getEmail(), emailTitle, emailContent);
+    }
 
     // 학원 알림 목록 추가
     notificationRepository.save(new NotificationEntity(null, "등록", "Registered",
-        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", user));
+        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", "/my-job-posts", user));
   }
 
   @Transactional
@@ -416,35 +418,37 @@ public class JobPostService {
     jobPostRepository.save(jobPost);
 
     // 이메일 발송
-    try {
-      MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
-              "JOB_POST_CLOSE_MANUALLY", MessageTemplateType.EMAIL).orElse(null);
+    if (user.isAllowEmail()) {
+      try {
+        MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+            "JOB_POST_CLOSE_MANUALLY", MessageTemplateType.EMAIL).orElse(null);
 
-      JobPostDueDateNotiVO notificationTarget = jobPostRepository
-          .findDueDateNotificationTargetByJobPostId(jobPostId).orElse(null);
+        JobPostDueDateNotiVO notificationTarget = jobPostRepository
+            .findDueDateNotificationTargetByJobPostId(jobPostId).orElse(null);
 
-      Map params = new HashMap();
-      params.put("name", notificationTarget.academyName());
-      params.put("jobTitle", notificationTarget.title());
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-      params.put("todayStr", LocalDate.now().format(formatter));
-      params.put("jobPostResumeTotalCount", notificationTarget.jobPostResumeTotalCount());
-      params.put("jobPostResumeSubmittedCount", notificationTarget.jobPostResumeSubmittedCount());
-      params.put("jobPostResumeReviewedCount", notificationTarget.jobPostResumeReviewedCount());
-      params.put("link", FRONT_URL + "/my-job-posts");
+        Map params = new HashMap();
+        params.put("name", notificationTarget.academyName());
+        params.put("jobTitle", notificationTarget.title());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        params.put("todayStr", LocalDate.now().format(formatter));
+        params.put("jobPostResumeTotalCount", notificationTarget.jobPostResumeTotalCount());
+        params.put("jobPostResumeSubmittedCount", notificationTarget.jobPostResumeSubmittedCount());
+        params.put("jobPostResumeReviewedCount", notificationTarget.jobPostResumeReviewedCount());
+        params.put("link", FRONT_URL + "/my-job-posts");
 
-      StringSubstitutor sub = new StringSubstitutor(params);
-      String emailTitle = sub.replace(emailTemplate.getTitle());
-      String emailContent = sub.replace(emailTemplate.getContent());
+        StringSubstitutor sub = new StringSubstitutor(params);
+        String emailTitle = sub.replace(emailTemplate.getTitle());
+        String emailContent = sub.replace(emailTemplate.getContent());
 
-      String receiverEmail = notificationTarget.representativeEmail();
-      if (notificationTarget.byAdmin()) {
-        receiverEmail = notificationTarget.adminUserEmail();
+        String receiverEmail = notificationTarget.representativeEmail();
+        if (notificationTarget.byAdmin()) {
+          receiverEmail = notificationTarget.adminUserEmail();
+        }
+
+        emailProvider.send(receiverEmail, emailTitle, emailContent);
+      } catch (Exception e) {
+        log.error("Failed to send email for job post close", e);
       }
-
-      emailProvider.send(receiverEmail, emailTitle, emailContent);
-    } catch (Exception e) {
-      log.error("Failed to send email for job post close", e);
     }
   }
 
@@ -484,24 +488,26 @@ public class JobPostService {
     }
 
     // 선생님 이메일 템플릿 조회 & 파싱 & 발송
-    try {
-      MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
-              "JOB_POST_STATUS_" + JobPostResumeRelationStatus.SUBMITTED, MessageTemplateType.EMAIL)
-          .orElse(null);
+    if (user.isAllowEmail()) {
+      try {
+        MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+                "JOB_POST_STATUS_" + JobPostResumeRelationStatus.SUBMITTED, MessageTemplateType.EMAIL)
+            .orElse(null);
 
-      Map params = new HashMap();
-      params.put("name", user.getFirstName() + " " + user.getLastName());
-      params.put("jobTitle", jobPost.getTitle());
-      params.put("academyName", jobPost.getAcademy().getNameEn());
-      params.put("link", FRONT_URL + "/setting/my-job-posting");
+        Map params = new HashMap();
+        params.put("name", user.getFirstName() + " " + user.getLastName());
+        params.put("jobTitle", jobPost.getTitle());
+        params.put("academyName", jobPost.getAcademy().getNameEn());
+        params.put("link", FRONT_URL + "/setting/my-job-posting");
 
-      StringSubstitutor sub = new StringSubstitutor(params);
-      String emailTitle = sub.replace(emailTemplate.getTitle());
-      String emailContent = sub.replace(emailTemplate.getContent());
+        StringSubstitutor sub = new StringSubstitutor(params);
+        String emailTitle = sub.replace(emailTemplate.getTitle());
+        String emailContent = sub.replace(emailTemplate.getContent());
 
-      emailProvider.send(user.getEmail(), emailTitle, emailContent);
-    } catch (Exception e) {
-      log.error("Failed to send email teacher for job post resume submission", e);
+        emailProvider.send(user.getEmail(), emailTitle, emailContent);
+      } catch (Exception e) {
+        log.error("Failed to send email teacher for job post resume submission", e);
+      }
     }
 
     // 접근 코드
@@ -540,6 +546,7 @@ public class JobPostService {
     notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
         String.format("%s에 이력서를 제출 완료했습니다", jobPost.getAcademy().getName()),
         String.format("Resume submitted to %s", jobPost.getAcademy().getNameEn()),
+        "/setting/my-job-posting",
         user));
 
     // 학원 알림 추가
@@ -548,6 +555,7 @@ public class JobPostService {
       notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
           String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
           String.format("New application for {%s}", jobPost.getTitle()),
+          "/setting/resume",
           representativeUser));
     }
 

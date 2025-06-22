@@ -62,6 +62,7 @@ public class NotificationScheduler {
         createdNotificationList.add(new NotificationEntity(null, "마감", "Expired",
             String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
             String.format("job posting {%s} has closed", jobPost.getTitle()),
+            "/my-job-posts",
             user));
       }
       jobPost.setClosed(true);
@@ -94,6 +95,10 @@ public class NotificationScheduler {
 
     // 이메일 발송
     for (JobPostDueDateNotiVO vo : jobPosts) {
+      if (!vo.academyUserAllowEmail()) {
+        log.info("Skipping email notification for academy {} {} as email notifications are disabled", vo.academyId(), vo.academyName());
+        continue;
+      }
       Map params = new HashMap();
       params.put("name", vo.academyName());
       params.put("jobTitle", vo.title());
@@ -143,6 +148,10 @@ public class NotificationScheduler {
 
     // 이메일 발송
     for (JobPostNewApplicantNotiVO vo : jobPosts) {
+      if (!vo.academyUserAllowEmail()) {
+        log.info("Skipping email notification for academy {} {} as email notifications are disabled", vo.academyId(), vo.academyName());
+        continue;
+      }
       Map params = new HashMap();
       params.put("name", vo.academyName());
       params.put("jobTitle", vo.title());

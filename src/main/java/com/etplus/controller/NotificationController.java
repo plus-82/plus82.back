@@ -4,14 +4,18 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.PagingDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.NotificationService;
 import com.etplus.vo.NotificationSettingVO;
 import com.etplus.vo.NotificationVO;
-import java.util.List;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -22,9 +26,10 @@ public class NotificationController {
   private final NotificationService notificationService;
 
   @GetMapping
-  public CommonResponse<List<NotificationVO>> getNotifications(
-      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
-    List<NotificationVO> vo = notificationService.getNotifications(loginUser.userId());
+  public CommonResponse<Slice<NotificationVO>> getNotifications(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @Valid PagingDTO dto) {
+    Slice<NotificationVO> vo = notificationService.getNotifications(loginUser.userId(), dto);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
@@ -33,6 +38,14 @@ public class NotificationController {
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
     NotificationSettingVO vo = notificationService.getMyNotificationSetting(loginUser.userId());
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/setting/me")
+  public CommonResponse<Void> updateMyNotificationSetting(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @RequestParam boolean allowEmail) {
+    notificationService.updateMyNotificationSetting(loginUser.userId(), allowEmail);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
 }

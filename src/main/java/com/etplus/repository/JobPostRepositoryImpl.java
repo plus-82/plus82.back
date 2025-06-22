@@ -170,6 +170,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
   @Override
   public List<JobPostDueDateNotiVO> findDueDateNotificationTarget(LocalDate today) {
     QUserEntity adminUser = new QUserEntity("adminUser");
+    QUserEntity academyUser = new QUserEntity("academyUser");
     QJobPostResumeRelationEntity jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
 
     JPAQuery<JobPostDueDateNotiVO> jpaQuery = query.select(
@@ -181,6 +182,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
                 academy.representativeName,
                 academy.representativeEmail,
                 academy.byAdmin,
+                academyUser.allowEmail,
                 adminUser.id,
                 adminUser.email,
                 JPAExpressions
@@ -211,6 +213,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
   @Override
   public Optional<JobPostDueDateNotiVO> findDueDateNotificationTargetByJobPostId(long jobPostId) {
     QUserEntity adminUser = new QUserEntity("adminUser");
+    QUserEntity academyUser = new QUserEntity("academyUser");
     QJobPostResumeRelationEntity jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
 
     JobPostDueDateNotiVO result = query.select(
@@ -222,6 +225,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
                 academy.representativeName,
                 academy.representativeEmail,
                 academy.byAdmin,
+                academyUser.allowEmail,
                 adminUser.id,
                 adminUser.email,
                 JPAExpressions
@@ -251,6 +255,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
   @Override
   public List<JobPostNewApplicantNotiVO> findNewApplicantNotificationTarget(LocalDate today) {
     QUserEntity adminUser = new QUserEntity("adminUser");
+    QUserEntity academyUser = new QUserEntity("academyUser");
     QJobPostResumeRelationEntity jobPostResumeRelation = new QJobPostResumeRelationEntity("jobPostResumeRelation");
 
     JPAQuery<JobPostNewApplicantNotiVO> jpaQuery = query.select(
@@ -262,6 +267,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
             academy.representativeName,
             academy.representativeEmail,
             academy.byAdmin,
+            academyUser.allowEmail,
             adminUser.id,
             adminUser.email,
             jobPostResumeRelation.count()
