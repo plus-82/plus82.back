@@ -8,7 +8,9 @@ import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.vo.NotificationSettingVO;
 import com.etplus.vo.NotificationVO;
+import com.etplus.vo.UnreadNotificationCount;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,23 @@ public class NotificationService {
   private final NotificationRepository notificationRepository;
 
   public Slice<NotificationVO> getNotifications(long userId, PagingDTO dto) {
-    return notificationRepository.findAllNotificationsByUserId(userId, dto);
+    Slice<NotificationVO> notifications = notificationRepository
+        .findAllNotificationsByUserId(userId, dto);
+
+    // TODO async event publish
+    UserEntity user = userRepository.findById(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    user.setLastNotificationReadAt(LocalDateTime.now());
+    userRepository.save(user);
+
+    return notifications;
+  }
+
+  public UnreadNotificationCount getUnreadNotificationCount(long userId) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    long count = notificationRepository.countByCreatedAtAfter(user.getLastNotificationReadAt());
+    return new UnreadNotificationCount(count > 0, count);
   }
 
   public NotificationSettingVO getMyNotificationSetting(long userId) {

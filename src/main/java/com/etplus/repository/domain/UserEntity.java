@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,8 @@ public class UserEntity extends BaseEntity {
   private String password;
 
   private boolean allowEmail;
+  @Column(nullable = false)
+  private LocalDateTime lastNotificationReadAt;
 
 //  @Enumerated(EnumType.STRING)
 //  private OauthProviderType providerType;
@@ -76,6 +79,7 @@ public class UserEntity extends BaseEntity {
     this.email = email;
     this.password = password;
     this.allowEmail = allowEmail;
+    this.lastNotificationReadAt = LocalDateTime.now();
     this.roleType = roleType;
     this.country = country;
     this.profileImage = profileImage;

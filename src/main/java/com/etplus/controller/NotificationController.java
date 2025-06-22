@@ -9,6 +9,7 @@ import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.NotificationService;
 import com.etplus.vo.NotificationSettingVO;
 import com.etplus.vo.NotificationVO;
+import com.etplus.vo.UnreadNotificationCount;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -31,6 +32,13 @@ public class NotificationController {
       @Valid PagingDTO dto) {
     Slice<NotificationVO> vo = notificationService.getNotifications(loginUser.userId(), dto);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/unread-count")
+  public CommonResponse<UnreadNotificationCount> getUnreadNotificationCount(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser) {
+    UnreadNotificationCount count = notificationService.getUnreadNotificationCount(loginUser.userId());
+    return new CommonResponse<>(count, CommonResponseCode.SUCCESS);
   }
 
   @GetMapping("/setting/me")
