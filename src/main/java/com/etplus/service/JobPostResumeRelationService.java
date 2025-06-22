@@ -150,21 +150,23 @@ public class JobPostResumeRelationService {
 
     UserEntity teacher = jobPostResumeRelation.getUser();
 
-    // 이메일 템플릿 조회 & 파싱 & 발송
-    MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
-        "JOB_POST_STATUS_" + status, MessageTemplateType.EMAIL).orElse(null);
+    if (teacher.isAllowEmail()) {
+      // 이메일 템플릿 조회 & 파싱 & 발송
+      MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
+          "JOB_POST_STATUS_" + status, MessageTemplateType.EMAIL).orElse(null);
 
-    Map params = new HashMap();
-    params.put("name", teacher.getFirstName() + " " + teacher.getLastName());
-    params.put("jobTitle", jobPostResumeRelation.getJobPost().getTitle());
-    params.put("academyName", academy.getName());
-    params.put("link", FRONT_URL + "setting/my-job-posting");
+      Map params = new HashMap();
+      params.put("name", teacher.getFirstName() + " " + teacher.getLastName());
+      params.put("jobTitle", jobPostResumeRelation.getJobPost().getTitle());
+      params.put("academyName", academy.getName());
+      params.put("link", FRONT_URL + "setting/my-job-posting");
 
-    StringSubstitutor sub = new StringSubstitutor(params);
-    String emailTitle = sub.replace(emailTemplate.getTitle());
-    String emailContent = sub.replace(emailTemplate.getContent());
+      StringSubstitutor sub = new StringSubstitutor(params);
+      String emailTitle = sub.replace(emailTemplate.getTitle());
+      String emailContent = sub.replace(emailTemplate.getContent());
 
-    emailProvider.send(teacher.getEmail(), emailTitle, emailContent);
+      emailProvider.send(teacher.getEmail(), emailTitle, emailContent);
+    }
 
     // 선생님 알림 목록 추가
     String title = "", titleEn = "", content = "", contentEn = "";

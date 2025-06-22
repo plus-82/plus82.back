@@ -95,6 +95,10 @@ public class NotificationScheduler {
 
     // 이메일 발송
     for (JobPostDueDateNotiVO vo : jobPosts) {
+      if (!vo.academyUserAllowEmail()) {
+        log.info("Skipping email notification for academy {} {} as email notifications are disabled", vo.academyId(), vo.academyName());
+        continue;
+      }
       Map params = new HashMap();
       params.put("name", vo.academyName());
       params.put("jobTitle", vo.title());
@@ -144,6 +148,10 @@ public class NotificationScheduler {
 
     // 이메일 발송
     for (JobPostNewApplicantNotiVO vo : jobPosts) {
+      if (!vo.academyUserAllowEmail()) {
+        log.info("Skipping email notification for academy {} {} as email notifications are disabled", vo.academyId(), vo.academyName());
+        continue;
+      }
       Map params = new HashMap();
       params.put("name", vo.academyName());
       params.put("jobTitle", vo.title());
