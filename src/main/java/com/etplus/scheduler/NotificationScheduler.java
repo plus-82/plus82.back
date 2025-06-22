@@ -62,7 +62,7 @@ public class NotificationScheduler {
         createdNotificationList.add(new NotificationEntity(null, "마감", "Expired",
             String.format("{%s} 공고가 마감되었어요", jobPost.getTitle()),
             String.format("job posting {%s} has closed", jobPost.getTitle()),
-            "/my-job-posts",
+            "/business/job-posting",
             user));
       }
       jobPost.setClosed(true);
@@ -107,7 +107,7 @@ public class NotificationScheduler {
       params.put("jobPostResumeTotalCount", vo.jobPostResumeTotalCount());
       params.put("jobPostResumeSubmittedCount", vo.jobPostResumeSubmittedCount());
       params.put("jobPostResumeReviewedCount", vo.jobPostResumeReviewedCount());
-      params.put("link", FRONT_URL + "/my-job-posts");
+      params.put("link", FRONT_URL + "/business/job-posting");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String title = sub.replace(emailTemplate.getTitle());

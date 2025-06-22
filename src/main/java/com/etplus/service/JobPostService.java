@@ -196,7 +196,7 @@ public class JobPostService {
 
     // 학원 알림 목록 추가
     notificationRepository.save(new NotificationEntity(null, "등록", "Registered",
-        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", "/my-job-posts", user));
+        "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", "/business/job-posting", user));
   }
 
   @Transactional
@@ -434,7 +434,7 @@ public class JobPostService {
         params.put("jobPostResumeTotalCount", notificationTarget.jobPostResumeTotalCount());
         params.put("jobPostResumeSubmittedCount", notificationTarget.jobPostResumeSubmittedCount());
         params.put("jobPostResumeReviewedCount", notificationTarget.jobPostResumeReviewedCount());
-        params.put("link", FRONT_URL + "/my-job-posts");
+        params.put("link", FRONT_URL + "/business/job-posting");
 
         StringSubstitutor sub = new StringSubstitutor(params);
         String emailTitle = sub.replace(emailTemplate.getTitle());
