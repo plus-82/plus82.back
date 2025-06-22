@@ -1,6 +1,11 @@
 package com.etplus.service;
 
 import com.etplus.controller.dto.CreateFeedDTO;
+import com.etplus.controller.dto.UpdateFeedDTO;
+import com.etplus.exception.AuthException;
+import com.etplus.exception.AuthException.AuthExceptionCode;
+import com.etplus.exception.ResourceDeniedException;
+import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.S3Uploader;
@@ -32,6 +37,33 @@ public class FeedService {
     }
 
     FeedEntity feed = new FeedEntity(null, dto.content(), dto.feedVisibility(), user, image);
+    feedRepository.save(feed);
+  }
+
+  @Transactional
+  public void updateFeed(Long userId, Long feedId, UpdateFeedDTO dto) {
+    FeedEntity feed = feedRepository.findById(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    // 피드 작성자만 수정 가능
+    if (!feed.getCreatedUser().getId().equals(userId)) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    // 이미지 업데이트
+    if (dto.image() != null) {
+      FileEntity newImage = s3Uploader.uploadImageAndSaveRepository(dto.image(), user);
+      feed.setImage(newImage);
+    } else {
+      feed.setImage(null);
+    }
+
+    // 피드 내용 및 공개 설정 업데이트
+    feed.setContent(dto.content());
+    feed.setFeedVisibility(dto.feedVisibility());
+
     feedRepository.save(feed);
   }
 }
