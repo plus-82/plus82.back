@@ -11,6 +11,7 @@ public class FeedException extends CustomBadRequestException {
   @Getter
   public enum FeedExceptionCode implements ResponseCode {
     ALREADY_LIKED_FEED("FED-001", "already liked feed"),
+    ALREADY_LIKED_FEED_COMMENT("FED-002", "already liked feed comment"),
     ;
 
     private String code;

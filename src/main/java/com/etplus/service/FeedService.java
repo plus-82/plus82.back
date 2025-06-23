@@ -12,11 +12,13 @@ import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.S3Uploader;
+import com.etplus.repository.FeedCommentLikeRepository;
 import com.etplus.repository.FeedCommentRepository;
 import com.etplus.repository.FeedLikeRepository;
 import com.etplus.repository.FeedRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.FeedCommentEntity;
+import com.etplus.repository.domain.FeedCommentLike;
 import com.etplus.repository.domain.FeedEntity;
 import com.etplus.repository.domain.FeedLike;
 import com.etplus.repository.domain.FileEntity;
@@ -34,6 +36,7 @@ public class FeedService {
   private final UserRepository userRepository;
   private final FeedLikeRepository feedLikeRepository;
   private final FeedCommentRepository feedCommentRepository;
+  private final FeedCommentLikeRepository feedCommentLikeRepository;
   private final S3Uploader s3Uploader;
 
   @Transactional
@@ -175,5 +178,43 @@ public class FeedService {
     // TODO 댓글 신고하기 삭제 ??
 
     feedCommentRepository.delete(feedComment);
+  }
+
+  @Transactional
+  public void addFeedCommentLike(Long userId, Long feedId, Long commentId) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    
+    FeedCommentEntity feedComment = feedCommentRepository.findById(commentId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND));
+
+    // 댓글이 해당 피드의 댓글이 맞는지 확인
+    if (!feedComment.getFeed().getId().equals(feedId)) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    // 이미 좋아요를 눌렀는지 확인
+    if (feedCommentLikeRepository.existsByFeedCommentIdAndUserId(commentId, userId)) {
+      throw new FeedException(FeedExceptionCode.ALREADY_LIKED_FEED_COMMENT);
+    }
+
+    FeedCommentLike feedCommentLike = new FeedCommentLike(null, user, feedComment);
+    feedCommentLikeRepository.save(feedCommentLike);
+  }
+
+  @Transactional
+  public void removeFeedCommentLike(Long userId, Long feedId, Long commentId) {
+    FeedCommentEntity feedComment = feedCommentRepository.findById(commentId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND));
+
+    // 댓글이 해당 피드의 댓글이 맞는지 확인
+    if (!feedComment.getFeed().getId().equals(feedId)) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    FeedCommentLike feedCommentLike = feedCommentLikeRepository.findByFeedCommentIdAndUserId(commentId, userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_LIKE_NOT_FOUND));
+
+    feedCommentLikeRepository.delete(feedCommentLike);
   }
 }

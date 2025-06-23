@@ -98,4 +98,22 @@ public class FeedController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/{feed-id}/comments/{comment-id}/like")
+  public CommonResponse<Void> addFeedCommentLike(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId,
+      @PathVariable("comment-id") Long commentId) {
+    feedService.addFeedCommentLike(loginUser.userId(), feedId, commentId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @DeleteMapping("/{feed-id}/comments/{comment-id}/like")
+  public CommonResponse<Void> removeFeedCommentLike(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId,
+      @PathVariable("comment-id") Long commentId) {
+    feedService.removeFeedCommentLike(loginUser.userId(), feedId, commentId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
 }
