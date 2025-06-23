@@ -6,6 +6,7 @@ import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateFeedCommentDTO;
 import com.etplus.controller.dto.CreateFeedDTO;
+import com.etplus.controller.dto.UpdateFeedCommentDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.FeedService;
@@ -75,6 +76,25 @@ public class FeedController {
       @PathVariable("feed-id") Long feedId,
       @Valid @RequestBody CreateFeedCommentDTO dto) {
     feedService.createFeedComment(loginUser.userId(), feedId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/{feed-id}/comments/{comment-id}")
+  public CommonResponse<Void> updateFeedComment(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId,
+      @PathVariable("comment-id") Long commentId,
+      @Valid @RequestBody UpdateFeedCommentDTO dto) {
+    feedService.updateFeedComment(loginUser.userId(), feedId, commentId, dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @DeleteMapping("/{feed-id}/comments/{comment-id}")
+  public CommonResponse<Void> deleteFeedComment(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId,
+      @PathVariable("comment-id") Long commentId) {
+    feedService.deleteFeedComment(loginUser.userId(), feedId, commentId);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 

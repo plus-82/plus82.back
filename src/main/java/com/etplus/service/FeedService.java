@@ -2,6 +2,7 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.CreateFeedCommentDTO;
 import com.etplus.controller.dto.CreateFeedDTO;
+import com.etplus.controller.dto.UpdateFeedCommentDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
@@ -126,5 +127,53 @@ public class FeedService {
 
     FeedCommentEntity feedComment = new FeedCommentEntity(null, dto.comment(), user, feed);
     feedCommentRepository.save(feedComment);
+  }
+
+  @Transactional
+  public void updateFeedComment(Long userId, Long feedId, Long commentId, UpdateFeedCommentDTO dto) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
+    FeedCommentEntity feedComment = feedCommentRepository.findById(commentId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND));
+
+    // 댓글이 해당 피드의 댓글이 맞는지 확인
+    if (!feedComment.getFeed().getId().equals(feedId)) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    // 댓글 작성자만 수정 가능
+    if (!feedComment.getUser().getId().equals(userId)) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+
+    feedComment.setComment(dto.comment());
+    feedCommentRepository.save(feedComment);
+  }
+
+  @Transactional
+  public void deleteFeedComment(Long userId, Long feedId, Long commentId) {
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
+    FeedCommentEntity feedComment = feedCommentRepository.findById(commentId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND));
+
+    // 댓글이 해당 피드의 댓글이 맞는지 확인
+    if (!feedComment.getFeed().getId().equals(feedId)) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    // 댓글 작성자만 삭제 가능
+    if (!feedComment.getUser().getId().equals(userId)) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
+    // TODO 댓글 좋아요 삭제
+    // TODO 댓글 신고하기 삭제 ??
+
+    feedCommentRepository.delete(feedComment);
   }
 }
