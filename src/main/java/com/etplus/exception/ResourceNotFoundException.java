@@ -18,6 +18,7 @@ public class ResourceNotFoundException extends CustomBadRequestException {
     RESUME_NOT_FOUND("RNF-006", "resume not found"),
     JOB_POST_RESUME_RELATION_NOT_FOUND("RNF-007", "job post resume relation not found"),
     FEED_NOT_FOUND("RNF-008", "feed not found"),
+    FEED_LIKE_NOT_FOUND("RNF-009", "feed like not found"),
     ;
 
     private String code;

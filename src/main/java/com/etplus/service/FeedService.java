@@ -4,14 +4,18 @@ import com.etplus.controller.dto.CreateFeedDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
+import com.etplus.exception.FeedException;
+import com.etplus.exception.FeedException.FeedExceptionCode;
 import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.S3Uploader;
+import com.etplus.repository.FeedLikeRepository;
 import com.etplus.repository.FeedRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.FeedEntity;
+import com.etplus.repository.domain.FeedLike;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
@@ -25,6 +29,7 @@ public class FeedService {
 
   private final FeedRepository feedRepository;
   private final UserRepository userRepository;
+  private final FeedLikeRepository feedLikeRepository;
   private final S3Uploader s3Uploader;
 
   @Transactional
@@ -81,5 +86,30 @@ public class FeedService {
     // Soft delete 적용
     feed.setDeleted(true);
     feedRepository.save(feed);
+  }
+
+  @Transactional
+  public void addFeedLike(Long userId, Long feedId) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
+    // 이미 좋아요를 눌렀는지 확인
+    if (feedLikeRepository.existsByFeedIdAndUserId(feedId, userId)) {
+      throw new FeedException(FeedExceptionCode.ALREADY_LIKED_FEED);
+    }
+
+    FeedLike feedLike = new FeedLike(null, user, feed);
+    feedLikeRepository.save(feedLike);
+  }
+
+  @Transactional
+  public void removeFeedLike(Long userId, Long feedId) {
+    FeedLike feedLike = feedLikeRepository.findByFeedIdAndUserId(feedId, userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_LIKE_NOT_FOUND));
+
+    feedLikeRepository.delete(feedLike);
   }
 }

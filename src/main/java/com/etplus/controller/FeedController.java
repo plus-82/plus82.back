@@ -51,4 +51,20 @@ public class FeedController {
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
+  @PostMapping("/{feed-id}/like")
+  public CommonResponse<Void> addFeedLike(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId) {
+    feedService.addFeedLike(loginUser.userId(), feedId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @DeleteMapping("/{feed-id}/like")
+  public CommonResponse<Void> removeFeedLike(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId) {
+    feedService.removeFeedLike(loginUser.userId(), feedId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
 }
