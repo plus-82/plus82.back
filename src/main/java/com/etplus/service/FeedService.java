@@ -1,5 +1,6 @@
 package com.etplus.service;
 
+import com.etplus.controller.dto.CreateFeedCommentDTO;
 import com.etplus.controller.dto.CreateFeedDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.exception.AuthException;
@@ -7,13 +8,14 @@ import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.FeedException;
 import com.etplus.exception.FeedException.FeedExceptionCode;
 import com.etplus.exception.ResourceDeniedException;
-import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.S3Uploader;
+import com.etplus.repository.FeedCommentRepository;
 import com.etplus.repository.FeedLikeRepository;
 import com.etplus.repository.FeedRepository;
 import com.etplus.repository.UserRepository;
+import com.etplus.repository.domain.FeedCommentEntity;
 import com.etplus.repository.domain.FeedEntity;
 import com.etplus.repository.domain.FeedLike;
 import com.etplus.repository.domain.FileEntity;
@@ -30,6 +32,7 @@ public class FeedService {
   private final FeedRepository feedRepository;
   private final UserRepository userRepository;
   private final FeedLikeRepository feedLikeRepository;
+  private final FeedCommentRepository feedCommentRepository;
   private final S3Uploader s3Uploader;
 
   @Transactional
@@ -111,5 +114,17 @@ public class FeedService {
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_LIKE_NOT_FOUND));
 
     feedLikeRepository.delete(feedLike);
+  }
+
+  @Transactional
+  public void createFeedComment(Long userId, Long feedId, CreateFeedCommentDTO dto) {
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
+    FeedCommentEntity feedComment = new FeedCommentEntity(null, dto.comment(), user, feed);
+    feedCommentRepository.save(feedComment);
   }
 }

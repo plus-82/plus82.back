@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "feed")
+@Table(name = "feed_comment")
 public class FeedCommentEntity extends BaseEntity {
 
   @Id

@@ -4,6 +4,7 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.CreateFeedCommentDTO;
 import com.etplus.controller.dto.CreateFeedDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.repository.domain.code.RoleType;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,6 +66,15 @@ public class FeedController {
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
       @PathVariable("feed-id") Long feedId) {
     feedService.removeFeedLike(loginUser.userId(), feedId);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/{feed-id}/comments")
+  public CommonResponse<Void> createFeedComment(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId,
+      @Valid @RequestBody CreateFeedCommentDTO dto) {
+    feedService.createFeedComment(loginUser.userId(), feedId, dto);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
