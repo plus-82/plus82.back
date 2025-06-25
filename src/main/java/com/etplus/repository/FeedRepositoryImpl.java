@@ -47,7 +47,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
   public Slice<FeedVO> findAllFeeds(long userId, SearchFeedDTO dto) {
     BooleanBuilder whereCondition = new BooleanBuilder();
     if (StringUtils.hasText(dto.getKeyword())) {
-      whereCondition.and(feed.content.containsIgnoreCase(dto.getKeyword()));
+      whereCondition.and(feed.content.containsIgnoreCase(dto.getKeyword())
+          .or(creator.fullName.containsIgnoreCase(dto.getKeyword()))
+          .or(creator.firstName.containsIgnoreCase(dto.getKeyword()))
+          .or(creator.lastName.containsIgnoreCase(dto.getKeyword())));
     }
 
     JPAQuery<FeedVO> jpaQuery = query.select(
@@ -95,7 +98,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
   public Slice<FeedVO> findAllPublicFeeds(SearchFeedDTO dto) {
     BooleanBuilder whereCondition = new BooleanBuilder();
     if (StringUtils.hasText(dto.getKeyword())) {
-      whereCondition.and(feed.content.containsIgnoreCase(dto.getKeyword()));
+      whereCondition.and(feed.content.containsIgnoreCase(dto.getKeyword())
+          .or(creator.fullName.containsIgnoreCase(dto.getKeyword()))
+          .or(creator.firstName.containsIgnoreCase(dto.getKeyword()))
+          .or(creator.lastName.containsIgnoreCase(dto.getKeyword())));
     }
 
     JPAQuery<FeedVO> jpaQuery = query.select(
