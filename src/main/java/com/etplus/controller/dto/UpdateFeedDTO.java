@@ -10,7 +10,8 @@ public record UpdateFeedDTO(
     String content,
     @NotNull
     FeedVisibility feedVisibility,
-    MultipartFile image
+    MultipartFile newImage,
+    Long oldImageId
 ) {
 
 } 

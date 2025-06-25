@@ -75,12 +75,17 @@ public class FeedService {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
-    // 이미지 업데이트
-    if (dto.image() != null) {
-      FileEntity newImage = s3Uploader.uploadImageAndSaveRepository(dto.image(), user);
-      feed.setImage(newImage);
-    } else {
-      feed.setImage(null);
+    if (dto.oldImageId() == null) {
+      // TODO s3 delete image
+
+      // 이미지 업로드
+      if (dto.newImage() != null) {
+        FileEntity newImage = s3Uploader.uploadImageAndSaveRepository(dto.newImage(), user);
+        feed.setImage(newImage);
+      } else {
+        // 이미지 삭제
+        feed.setImage(null);
+      }
     }
 
     // 피드 내용 및 공개 설정 업데이트
