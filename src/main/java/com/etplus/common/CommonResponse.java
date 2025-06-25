@@ -13,4 +13,8 @@ public record CommonResponse<T>(
   public CommonResponse(ResponseCode responseCode) {
     this(null, responseCode.getCode(), responseCode.getMessage());
   }
+
+  public CommonResponse(String message) {
+    this(null, "CM-999", message);
+  }
 }

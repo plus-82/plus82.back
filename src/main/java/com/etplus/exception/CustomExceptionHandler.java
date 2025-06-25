@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -83,6 +84,14 @@ public class CustomExceptionHandler {
     log.info("handleMaxUploadSizeExceededException : {}", e);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
         new CommonResponse<>(FileExceptionCode.FILE_SIZE_EXCEEDED));
+  }
+
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  public ResponseEntity<Object> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+    // 지원하지 않는 미디어 타입
+    log.info("handleHttpMediaTypeNotSupportedException : {}", e);
+    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+        .body(new CommonResponse("Content-Type is not supported"));
   }
 
   /**
