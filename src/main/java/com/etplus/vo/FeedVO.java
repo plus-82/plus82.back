@@ -7,7 +7,16 @@ public record FeedVO(
     Long id,
     String content,
     LocalDateTime createdAt,
+
+    // creator
+    String creatorFirstName,
+    String creatorLastName,
+    String creatorFullName,
+    String creatorProfileImagePath,
+
+    // image
     String imagePath,
+
     Long commentCount,
     Long likeCount,
     boolean isLiked,

@@ -5,6 +5,7 @@ import com.etplus.repository.domain.QFeedCommentEntity;
 import com.etplus.repository.domain.QFeedEntity;
 import com.etplus.repository.domain.QFeedLike;
 import com.etplus.repository.domain.QFileEntity;
+import com.etplus.repository.domain.QUserEntity;
 import com.etplus.repository.domain.code.FeedVisibility;
 import com.etplus.vo.FeedVO;
 import com.etplus.vo.QFeedVO;
@@ -22,6 +23,8 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
   private final JPAQueryFactory query;
   private QFeedEntity feed;
+  private QUserEntity creator;
+  private QFileEntity creatorProfileImage;
   private QFileEntity image;
   private QFeedCommentEntity comment;
   private QFeedLike like;
@@ -31,6 +34,8 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
   public FeedRepositoryImpl(JPAQueryFactory query) {
     this.query = query;
     feed = new QFeedEntity("feed");
+    creator = new QUserEntity("creator");
+    creatorProfileImage = new QFileEntity("creatorProfileImage");
     image = new QFileEntity("image");
     comment = new QFeedCommentEntity("comment");
     like = new QFeedLike("like");
@@ -50,6 +55,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 feed.id,
                 feed.content,
                 feed.createdAt,
+                creator.firstName,
+                creator.lastName,
+                creator.fullName,
+                creatorProfileImage.path,
                 image.path,
                 comment.count(),
                 like.count(),
@@ -57,6 +66,8 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 userComment.id.isNotNull()
             ))
         .from(feed)
+        .innerJoin(feed.createdUser, creator)
+        .leftJoin(creator.profileImage, creatorProfileImage)
         .leftJoin(feed.image, image)
         .leftJoin(comment).on(comment.feed.eq(feed))
         .leftJoin(like).on(like.feed.eq(feed))
@@ -92,6 +103,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 feed.id,
                 feed.content,
                 feed.createdAt,
+                creator.firstName,
+                creator.lastName,
+                creator.fullName,
+                creatorProfileImage.path,
                 image.path,
                 comment.count(),
                 like.count(),
@@ -99,6 +114,8 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 Expressions.constant(false)
             ))
         .from(feed)
+        .innerJoin(feed.createdUser, creator)
+        .leftJoin(creator.profileImage, creatorProfileImage)
         .leftJoin(feed.image, image)
         .leftJoin(comment).on(comment.feed.eq(feed))
         .leftJoin(like).on(like.feed.eq(feed))
