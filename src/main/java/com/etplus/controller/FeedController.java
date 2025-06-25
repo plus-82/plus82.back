@@ -6,14 +6,18 @@ import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateFeedCommentDTO;
 import com.etplus.controller.dto.CreateFeedDTO;
+import com.etplus.controller.dto.SearchFeedDTO;
 import com.etplus.controller.dto.UpdateFeedCommentDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.FeedService;
+import com.etplus.vo.FeedVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +32,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeedController {
 
   private final FeedService feedService;
+
+  @GetMapping
+  public CommonResponse<Slice<FeedVO>> getFeeds(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @Valid SearchFeedDTO dto) {
+    Slice<FeedVO> result = feedService.getFeeds(loginUser.userId(), dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/public")
+  public CommonResponse<Slice<FeedVO>> getPublicFeeds(
+      @Valid SearchFeedDTO dto) {
+    Slice<FeedVO> result = feedService.getPublicFeeds(dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public CommonResponse<Void> createFeed(

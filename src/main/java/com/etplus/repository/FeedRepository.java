@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FeedRepository extends JpaRepository<FeedEntity, Long> {
+public interface FeedRepository extends JpaRepository<FeedEntity, Long>, FeedRepositoryCustom {
 
   Optional<FeedEntity> findByIdAndDeletedIsFalse(Long id);
   

@@ -2,13 +2,13 @@ package com.etplus.service;
 
 import com.etplus.controller.dto.CreateFeedCommentDTO;
 import com.etplus.controller.dto.CreateFeedDTO;
+import com.etplus.controller.dto.SearchFeedDTO;
 import com.etplus.controller.dto.UpdateFeedCommentDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.FeedException;
 import com.etplus.exception.FeedException.FeedExceptionCode;
-import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.provider.S3Uploader;
@@ -24,8 +24,10 @@ import com.etplus.repository.domain.FeedLike;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.FeedVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -38,6 +40,14 @@ public class FeedService {
   private final FeedCommentRepository feedCommentRepository;
   private final FeedCommentLikeRepository feedCommentLikeRepository;
   private final S3Uploader s3Uploader;
+
+  public Slice<FeedVO> getFeeds(Long userId, SearchFeedDTO dto) {
+    return feedRepository.findAllFeeds(userId, dto);
+  }
+
+  public Slice<FeedVO> getPublicFeeds(SearchFeedDTO dto) {
+    return feedRepository.findAllPublicFeeds(dto);
+  }
 
   @Transactional
   public void createFeed(Long userId, CreateFeedDTO dto) {
