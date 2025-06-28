@@ -125,14 +125,23 @@ public class FeedService {
 
     FeedLike feedLike = new FeedLike(null, user, feed);
     feedLikeRepository.save(feedLike);
+
+    feed.setLikeCount(feed.getLikeCount() + 1);
+    feedRepository.save(feed);
   }
 
   @Transactional
   public void removeFeedLike(Long userId, Long feedId) {
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
     FeedLike feedLike = feedLikeRepository.findByFeedIdAndUserId(feedId, userId)
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_LIKE_NOT_FOUND));
 
     feedLikeRepository.delete(feedLike);
+
+    feed.setLikeCount(feed.getLikeCount() - 1);
+    feedRepository.save(feed);
   }
 
   @Transactional
@@ -145,6 +154,9 @@ public class FeedService {
 
     FeedCommentEntity feedComment = new FeedCommentEntity(null, dto.comment(), user, feed);
     feedCommentRepository.save(feedComment);
+
+    feed.setCommentCount(feed.getCommentCount() + 1);
+    feedRepository.save(feed);
   }
 
   @Transactional
@@ -193,6 +205,9 @@ public class FeedService {
     // TODO 댓글 신고하기 삭제 ??
 
     feedCommentRepository.delete(feedComment);
+
+    feed.setCommentCount(feed.getCommentCount() - 1);
+    feedRepository.save(feed);
   }
 
   @Transactional
