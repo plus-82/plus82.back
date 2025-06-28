@@ -11,6 +11,7 @@ import com.etplus.vo.FeedVO;
 import com.etplus.vo.QFeedVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Slice;
@@ -26,8 +27,6 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
   private QUserEntity creator;
   private QFileEntity creatorProfileImage;
   private QFileEntity image;
-  private QFeedCommentEntity comment;
-  private QFeedLike like;
   private QFeedLike userLike;
   private QFeedCommentEntity userComment;
 
@@ -37,8 +36,6 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     creator = new QUserEntity("creator");
     creatorProfileImage = new QFileEntity("creatorProfileImage");
     image = new QFileEntity("image");
-    comment = new QFeedCommentEntity("comment");
-    like = new QFeedLike("like");
     userLike = new QFeedLike("userLike");
     userComment = new QFeedCommentEntity("userComment");
   }
@@ -62,22 +59,27 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                     creator.fullName, creator.firstName, creator.lastName),
                 creatorProfileImage.path,
                 image.path,
-                comment.count(),
-                like.count(),
-                userLike.id.isNotNull(),
-                userComment.id.isNotNull()
+                feed.commentCount,
+                feed.likeCount,
+                JPAExpressions
+                    .selectOne()
+                    .from(userLike)
+                    .where(userLike.user.id.eq(userId))
+                    .exists(),
+                JPAExpressions
+                    .selectOne()
+                    .from(userComment)
+                    .where(userComment.user.id.eq(userId))
+                    .exists()
             ))
         .from(feed)
         .innerJoin(feed.createdUser, creator)
         .leftJoin(creator.profileImage, creatorProfileImage)
         .leftJoin(feed.image, image)
-        .leftJoin(comment).on(comment.feed.eq(feed))
-        .leftJoin(like).on(like.feed.eq(feed))
-        .leftJoin(userLike).on(userLike.feed.eq(feed).and(userLike.user.id.eq(userId)))
-        .leftJoin(userComment).on(userComment.feed.eq(feed).and(userComment.user.id.eq(userId)))
         .where(whereCondition
             .and(feed.deleted.isFalse()))
-        .groupBy(feed.id, feed.content, image.path, feed.feedVisibility, feed.createdAt, userLike.id, userComment.id)
+        .groupBy(feed.id, feed.content, feed.createdAt, Expressions.stringTemplate("CASE WHEN {0} IS NOT NULL THEN {0} ELSE CONCAT({1}, ' ', {2}) END",
+            creator.fullName, creator.firstName, creator.lastName), creatorProfileImage.path, image.path, feed.commentCount, feed.likeCount)
         .orderBy(feed.createdAt.desc());
 
     List<FeedVO> content = jpaQuery
@@ -112,8 +114,8 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                     creator.fullName, creator.firstName, creator.lastName),
                 creatorProfileImage.path,
                 image.path,
-                comment.count(),
-                like.count(),
+                feed.commentCount,
+                feed.likeCount,
                 Expressions.constant(false),
                 Expressions.constant(false)
             ))
@@ -121,12 +123,10 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
         .innerJoin(feed.createdUser, creator)
         .leftJoin(creator.profileImage, creatorProfileImage)
         .leftJoin(feed.image, image)
-        .leftJoin(comment).on(comment.feed.eq(feed))
-        .leftJoin(like).on(like.feed.eq(feed))
         .where(whereCondition
             .and(feed.deleted.isFalse())
             .and(feed.feedVisibility.eq(FeedVisibility.PUBLIC)))
-        .groupBy(feed.id, feed.content, image.path, feed.feedVisibility, feed.createdAt)
+        .groupBy(feed.id)
         .orderBy(feed.createdAt.desc());
 
     List<FeedVO> content = jpaQuery

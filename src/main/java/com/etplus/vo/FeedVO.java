@@ -15,8 +15,8 @@ public record FeedVO(
     // image
     String imagePath,
 
-    Long commentCount,
-    Long likeCount,
+    int commentCount,
+    int likeCount,
     boolean isLiked,
     boolean isCommented
 ) {
