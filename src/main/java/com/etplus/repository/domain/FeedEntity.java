@@ -36,6 +36,10 @@ public class FeedEntity extends BaseEntity {
 
   @Column(nullable = false)
   private boolean deleted;
+  @Column(nullable = false)
+  private int commentCount;
+  @Column(nullable = false)
+  private int likeCount;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "created_user_id", referencedColumnName = "id", nullable = false)
@@ -49,6 +53,8 @@ public class FeedEntity extends BaseEntity {
     this.content = content;
     this.feedVisibility = feedVisibility;
     this.deleted = false;
+    this.commentCount = 0;
+    this.likeCount = 0;
     this.createdUser = createdUser;
     this.image = image;
   }
