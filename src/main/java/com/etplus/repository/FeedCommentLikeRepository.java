@@ -12,5 +12,7 @@ public interface FeedCommentLikeRepository extends JpaRepository<FeedCommentLike
   Optional<FeedCommentLike> findByFeedCommentIdAndUserId(Long feedCommentId, Long userId);
   
   boolean existsByFeedCommentIdAndUserId(Long feedCommentId, Long userId);
+
+  void deleteAllByFeedCommentId(Long feedCommentId);
   
 } 

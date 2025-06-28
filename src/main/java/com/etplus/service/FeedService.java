@@ -201,7 +201,10 @@ public class FeedService {
     if (!feedComment.getUser().getId().equals(userId)) {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
-    // TODO 댓글 좋아요 삭제
+
+    // 댓글 좋아요 삭제
+    feedCommentLikeRepository.deleteAllByFeedCommentId(commentId);
+
     // TODO 댓글 신고하기 삭제 ??
 
     feedCommentRepository.delete(feedComment);
