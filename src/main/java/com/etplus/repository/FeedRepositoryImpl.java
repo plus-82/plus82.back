@@ -45,9 +45,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     BooleanBuilder whereCondition = new BooleanBuilder();
     if (StringUtils.hasText(dto.getKeyword())) {
       whereCondition.and(feed.content.containsIgnoreCase(dto.getKeyword())
-          .or(creator.fullName.containsIgnoreCase(dto.getKeyword()))
-          .or(creator.firstName.containsIgnoreCase(dto.getKeyword()))
-          .or(creator.lastName.containsIgnoreCase(dto.getKeyword())));
+          .or(creator.name.containsIgnoreCase(dto.getKeyword())));
     }
 
     JPAQuery<FeedVO> jpaQuery = query.select(
@@ -55,8 +53,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 feed.id,
                 feed.content,
                 feed.createdAt,
-                Expressions.stringTemplate("CASE WHEN {0} IS NOT NULL THEN {0} ELSE CONCAT({1}, ' ', {2}) END", 
-                    creator.fullName, creator.firstName, creator.lastName),
+                creator.name,
                 creatorProfileImage.path,
                 image.path,
                 feed.commentCount,
@@ -78,8 +75,6 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
         .leftJoin(feed.image, image)
         .where(whereCondition
             .and(feed.deleted.isFalse()))
-        .groupBy(feed.id, feed.content, feed.createdAt, Expressions.stringTemplate("CASE WHEN {0} IS NOT NULL THEN {0} ELSE CONCAT({1}, ' ', {2}) END",
-            creator.fullName, creator.firstName, creator.lastName), creatorProfileImage.path, image.path, feed.commentCount, feed.likeCount)
         .orderBy(feed.createdAt.desc());
 
     List<FeedVO> content = jpaQuery
@@ -100,9 +95,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     BooleanBuilder whereCondition = new BooleanBuilder();
     if (StringUtils.hasText(dto.getKeyword())) {
       whereCondition.and(feed.content.containsIgnoreCase(dto.getKeyword())
-          .or(creator.fullName.containsIgnoreCase(dto.getKeyword()))
-          .or(creator.firstName.containsIgnoreCase(dto.getKeyword()))
-          .or(creator.lastName.containsIgnoreCase(dto.getKeyword())));
+          .or(creator.name.containsIgnoreCase(dto.getKeyword())));
     }
 
     JPAQuery<FeedVO> jpaQuery = query.select(
@@ -110,8 +103,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 feed.id,
                 feed.content,
                 feed.createdAt,
-                Expressions.stringTemplate("CASE WHEN {0} IS NOT NULL THEN {0} ELSE CONCAT({1}, ' ', {2}) END", 
-                    creator.fullName, creator.firstName, creator.lastName),
+                creator.name,
                 creatorProfileImage.path,
                 image.path,
                 feed.commentCount,
@@ -126,7 +118,6 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
         .where(whereCondition
             .and(feed.deleted.isFalse())
             .and(feed.feedVisibility.eq(FeedVisibility.PUBLIC)))
-        .groupBy(feed.id)
         .orderBy(feed.createdAt.desc());
 
     List<FeedVO> content = jpaQuery
