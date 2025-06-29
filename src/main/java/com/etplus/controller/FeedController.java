@@ -11,6 +11,7 @@ import com.etplus.controller.dto.UpdateFeedCommentDTO;
 import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.FeedService;
+import com.etplus.vo.FeedDetailVO;
 import com.etplus.vo.FeedVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,21 @@ public class FeedController {
   public CommonResponse<Slice<FeedVO>> getPublicFeeds(
       @Valid SearchFeedDTO dto) {
     Slice<FeedVO> result = feedService.getPublicFeeds(dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/{feed-id}")
+  public CommonResponse<FeedDetailVO> getFeedDetail(
+      @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("feed-id") Long feedId) {
+    FeedDetailVO result = feedService.getFeedDetail(loginUser.userId(), feedId);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/public/{feed-id}")
+  public CommonResponse<FeedDetailVO> getPublicFeedDetail(
+      @PathVariable("feed-id") Long feedId) {
+    FeedDetailVO result = feedService.getFeedDetail(null, feedId);
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 

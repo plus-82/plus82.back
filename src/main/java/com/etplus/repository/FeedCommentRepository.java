@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FeedCommentRepository extends JpaRepository<FeedCommentEntity, Long> {
+public interface FeedCommentRepository extends JpaRepository<FeedCommentEntity, Long>,
+    FeedCommentRepositoryCustom {
 
-} 
+  boolean existsByFeedIdAndUserId(Long feedId, Long userId);
+
+}

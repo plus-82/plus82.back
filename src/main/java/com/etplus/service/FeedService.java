@@ -23,9 +23,12 @@ import com.etplus.repository.domain.FeedEntity;
 import com.etplus.repository.domain.FeedLike;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.repository.domain.code.FeedVisibility;
 import com.etplus.repository.domain.code.RoleType;
+import com.etplus.vo.FeedDetailVO;
 import com.etplus.vo.FeedVO;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,41 @@ public class FeedService {
 
   public Slice<FeedVO> getPublicFeeds(SearchFeedDTO dto) {
     return feedRepository.findAllPublicFeeds(dto);
+  }
+
+  public FeedDetailVO getFeedDetail(Long userId, long feedId) {
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+
+    boolean isLiked;
+    boolean isCommented;
+    List<FeedDetailVO.CommentVO> feedComments;
+    if (userId != null) {
+      isLiked = feedLikeRepository.existsByFeedIdAndUserId(feedId, userId);
+      isCommented = feedCommentRepository.existsByFeedIdAndUserId(feedId, userId);
+      feedComments = feedCommentRepository.findAllByUserIdAndFeedId(userId, feedId);
+    } else {
+      if (FeedVisibility.PRIVATE.equals(feed.getFeedVisibility())) {
+        throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+      }
+      isLiked = false;
+      isCommented = false;
+      feedComments = feedCommentRepository.findAllByFeedId(feedId);
+    }
+
+    return FeedDetailVO.builder()
+        .id(feed.getId())
+        .content(feed.getContent())
+        .createdAt(feed.getCreatedAt())
+        .creatorName(feed.getCreatedUser().getName())
+        .creatorProfileImagePath(feed.getCreatedUser().getProfileImage() != null ? feed.getCreatedUser().getProfileImage().getPath() : null)
+        .imagePath(feed.getImage() != null ? feed.getImage().getPath() : null)
+        .commentCount(feed.getCommentCount())
+        .likeCount(feed.getLikeCount())
+        .isLiked(isLiked)
+        .isCommented(isCommented)
+        .comments(feedComments)
+        .build();
   }
 
   @Transactional
