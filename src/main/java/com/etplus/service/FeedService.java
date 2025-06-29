@@ -271,6 +271,9 @@ public class FeedService {
 
     FeedCommentLike feedCommentLike = new FeedCommentLike(null, user, feedComment);
     feedCommentLikeRepository.save(feedCommentLike);
+
+    feedComment.setLikeCount(feedComment.getLikeCount() + 1);
+    feedCommentRepository.save(feedComment);
   }
 
   @Transactional
@@ -287,5 +290,8 @@ public class FeedService {
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_COMMENT_LIKE_NOT_FOUND));
 
     feedCommentLikeRepository.delete(feedCommentLike);
+
+    feedComment.setLikeCount(feedComment.getLikeCount() - 1);
+    feedCommentRepository.save(feedComment);
   }
 }

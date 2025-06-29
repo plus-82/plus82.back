@@ -27,6 +27,8 @@ public class FeedCommentEntity extends BaseEntity {
 
   @Column(columnDefinition = "VARCHAR(250)", nullable = false)
   private String comment;
+  @Column(nullable = false)
+  private int likeCount;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -38,6 +40,7 @@ public class FeedCommentEntity extends BaseEntity {
   public FeedCommentEntity(Long id, String comment, UserEntity user, FeedEntity feed) {
     this.id = id;
     this.comment = comment;
+    this.likeCount = 0;
     this.user = user;
     this.feed = feed;
   }

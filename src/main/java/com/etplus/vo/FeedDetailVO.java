@@ -32,6 +32,7 @@ public record FeedDetailVO(
       Long id,
       String comment,
       LocalDateTime createdAt,
+      int likeCount,
 
       Long userId,
       String userName,

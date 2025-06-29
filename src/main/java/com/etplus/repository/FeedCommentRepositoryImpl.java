@@ -33,6 +33,7 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
                 feedComment.id,
                 feedComment.comment,
                 feedComment.createdAt,
+                feedComment.likeCount,
                 creator.id,
                 creator.name,
                 Expressions.constant(false)
@@ -52,6 +53,7 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
                 feedComment.id,
                 feedComment.comment,
                 feedComment.createdAt,
+                feedComment.likeCount,
                 creator.id,
                 creator.name,
                 JPAExpressions
