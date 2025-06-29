@@ -61,12 +61,14 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 JPAExpressions
                     .selectOne()
                     .from(userLike)
-                    .where(userLike.user.id.eq(userId))
+                    .where(userLike.user.id.eq(userId)
+                        .and(userLike.feed.id.eq(feed.id)))
                     .exists(),
                 JPAExpressions
                     .selectOne()
                     .from(userComment)
-                    .where(userComment.user.id.eq(userId))
+                    .where(userComment.user.id.eq(userId)
+                        .and(userComment.feed.id.eq(feed.id)))
                     .exists()
             ))
         .from(feed)
