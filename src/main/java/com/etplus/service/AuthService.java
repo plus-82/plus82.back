@@ -87,6 +87,7 @@ public class AuthService {
         dto.firstName(),
         dto.lastName(),
         null,
+        dto.firstName() + " " + dto.lastName(),
         dto.genderType(),
         dto.birthDate(),
         dto.email(),

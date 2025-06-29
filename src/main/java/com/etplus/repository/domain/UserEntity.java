@@ -34,6 +34,8 @@ public class UserEntity extends BaseEntity {
   private String firstName;
   private String lastName;
   private String fullName;
+  @Column(nullable = false)
+  private String name; // firstName + lastName or fullName
   @Enumerated(EnumType.STRING)
   private GenderType genderType;
   private LocalDate birthDate;
@@ -67,13 +69,14 @@ public class UserEntity extends BaseEntity {
   @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
   private FileEntity profileImage;
 
-  public UserEntity(Long id, String firstName, String lastName, String fullName,
+  public UserEntity(Long id, String firstName, String lastName, String fullName, String name,
       GenderType genderType, LocalDate birthDate, String email, String password, boolean allowEmail,
       RoleType roleType, CountryEntity country, FileEntity profileImage) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.fullName = fullName;
+    this.name = name;
     this.genderType = genderType;
     this.birthDate = birthDate;
     this.email = email;

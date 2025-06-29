@@ -88,6 +88,7 @@ public class AcademyAuthService {
         null,
         null,
         dto.fullName(),
+        dto.fullName(),
         dto.genderType(),
         dto.birthDate(),
         dto.email(),

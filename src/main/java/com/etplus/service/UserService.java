@@ -73,6 +73,7 @@ public class UserService {
         null,
         null,
         null,
+        "관리자",
         GenderType.MALE,
         null,
         email,
@@ -93,6 +94,7 @@ public class UserService {
 
     user.setFirstName(dto.firstName());
     user.setLastName(dto.lastName());
+    user.setName(dto.firstName() + dto.lastName());
     user.setGenderType(dto.genderType());
     user.setBirthDate(dto.birthDate());
 
@@ -111,6 +113,7 @@ public class UserService {
         () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
 
     user.setFullName(dto.fullName());
+    user.setName(dto.fullName());
     user.setGenderType(dto.genderType());
     user.setBirthDate(dto.birthDate());
     userRepository.save(user);
