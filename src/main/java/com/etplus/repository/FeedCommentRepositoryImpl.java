@@ -41,7 +41,7 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
         .from(feedComment)
         .innerJoin(feedComment.user, creator)
         .where(feedComment.feed.id.eq(feedId))
-        .orderBy(feedComment.createdAt.desc());
+        .orderBy(feedComment.createdAt.asc());
 
     return jpaQuery.fetch();
   }
@@ -65,7 +65,7 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
         .from(feedComment)
         .innerJoin(feedComment.user, creator)
         .where(feedComment.feed.id.eq(feedId))
-        .orderBy(feedComment.createdAt.desc());
+        .orderBy(feedComment.createdAt.asc());
 
     return jpaQuery.fetch();
   }
