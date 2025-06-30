@@ -3,7 +3,7 @@ package com.etplus.repository;
 import com.etplus.controller.dto.SearchFeedDTO;
 import com.etplus.repository.domain.QFeedCommentEntity;
 import com.etplus.repository.domain.QFeedEntity;
-import com.etplus.repository.domain.QFeedLike;
+import com.etplus.repository.domain.QFeedLikeEntity;
 import com.etplus.repository.domain.QFileEntity;
 import com.etplus.repository.domain.QUserEntity;
 import com.etplus.repository.domain.code.FeedVisibility;
@@ -27,7 +27,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
   private QUserEntity creator;
   private QFileEntity creatorProfileImage;
   private QFileEntity image;
-  private QFeedLike userLike;
+  private QFeedLikeEntity userLike;
   private QFeedCommentEntity userComment;
 
   public FeedRepositoryImpl(JPAQueryFactory query) {
@@ -36,7 +36,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     creator = new QUserEntity("creator");
     creatorProfileImage = new QFileEntity("creatorProfileImage");
     image = new QFileEntity("image");
-    userLike = new QFeedLike("userLike");
+    userLike = new QFeedLikeEntity("userLike");
     userComment = new QFeedCommentEntity("userComment");
   }
 

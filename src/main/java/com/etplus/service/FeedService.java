@@ -20,7 +20,7 @@ import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.FeedCommentEntity;
 import com.etplus.repository.domain.FeedCommentLike;
 import com.etplus.repository.domain.FeedEntity;
-import com.etplus.repository.domain.FeedLike;
+import com.etplus.repository.domain.FeedLikeEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.FeedVisibility;
@@ -161,7 +161,7 @@ public class FeedService {
       throw new FeedException(FeedExceptionCode.ALREADY_LIKED_FEED);
     }
 
-    FeedLike feedLike = new FeedLike(null, user, feed);
+    FeedLikeEntity feedLike = new FeedLikeEntity(null, user, feed);
     feedLikeRepository.save(feedLike);
 
     feed.setLikeCount(feed.getLikeCount() + 1);
@@ -173,7 +173,7 @@ public class FeedService {
     FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
 
-    FeedLike feedLike = feedLikeRepository.findByFeedIdAndUserId(feedId, userId)
+    FeedLikeEntity feedLike = feedLikeRepository.findByFeedIdAndUserId(feedId, userId)
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_LIKE_NOT_FOUND));
 
     feedLikeRepository.delete(feedLike);
