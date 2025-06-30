@@ -26,6 +26,7 @@ import com.etplus.repository.domain.UserEntity;
 import com.etplus.repository.domain.code.FeedVisibility;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.FeedDetailVO;
+import com.etplus.vo.FeedLikeVO;
 import com.etplus.vo.FeedVO;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -146,6 +147,12 @@ public class FeedService {
     // Soft delete 적용
     feed.setDeleted(true);
     feedRepository.save(feed);
+  }
+
+  public List<FeedLikeVO> getFeedLikes(long feedId) {
+    FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
+    return feedLikeRepository.findAllByFeedId(feedId);
   }
 
   @Transactional

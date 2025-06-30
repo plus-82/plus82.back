@@ -12,8 +12,10 @@ import com.etplus.controller.dto.UpdateFeedDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.FeedService;
 import com.etplus.vo.FeedDetailVO;
+import com.etplus.vo.FeedLikeVO;
 import com.etplus.vo.FeedVO;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
@@ -87,6 +89,13 @@ public class FeedController {
       @PathVariable("feed-id") Long feedId) {
     feedService.deleteFeed(loginUser.userId(), loginUser.roleType(), feedId);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/{feed-id}/like")
+  public CommonResponse<List<FeedLikeVO>> getFeedLikes(
+      @PathVariable("feed-id") Long feedId) {
+    List<FeedLikeVO> result = feedService.getFeedLikes(feedId);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 
   @PostMapping("/{feed-id}/like")
