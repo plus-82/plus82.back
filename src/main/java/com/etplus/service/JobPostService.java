@@ -231,7 +231,7 @@ public class JobPostService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
-    if (academy.getAdminUser().getId() != adminUserId) {
+    if (academy.getAdminUser() != null && academy.getAdminUser().getId() != adminUserId) {
       throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
     }
 
@@ -266,7 +266,7 @@ public class JobPostService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
 
-    if (jobPost.getAcademy().getAdminUser().getId() != adminUserId) {
+    if (jobPost.getAcademy().getAdminUser() != null && jobPost.getAcademy().getAdminUser().getId() != adminUserId) {
       throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
     }
 

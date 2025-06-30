@@ -40,13 +40,13 @@ public class UserController {
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
-  @GetMapping
-  public CommonResponse<Slice<UserVO>> getAllUsers(
-      @AuthUser(RoleType.ADMIN) LoginUser loginUser,
-      @Valid SearchUserDTO dto) {
-    Slice<UserVO> users = userService.getAllUsers(dto);
-    return new CommonResponse<>(users, CommonResponseCode.SUCCESS);
-  }
+//  @GetMapping
+//  public CommonResponse<Slice<UserVO>> getAllUsers(
+//      @AuthUser(RoleType.ADMIN) LoginUser loginUser,
+//      @Valid SearchUserDTO dto) {
+//    Slice<UserVO> users = userService.getAllUsers(dto);
+//    return new CommonResponse<>(users, CommonResponseCode.SUCCESS);
+//  }
 
   @PostMapping("/admin")
   public CommonResponse<Void> createAdminUser(@RequestParam String email, @RequestParam String password) {

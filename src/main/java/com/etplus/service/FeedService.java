@@ -138,8 +138,8 @@ public class FeedService {
     FeedEntity feed = feedRepository.findByIdAndDeletedIsFalse(feedId)
         .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.FEED_NOT_FOUND));
 
-    // 어드민이 아니고 피드 작성자가 아닌 경우 삭제 불가
-    if (userRole != RoleType.ADMIN && !feed.getCreatedUser().getId().equals(userId)) {
+    // 피드 작성자가 아닌 경우 삭제 불가
+    if (!feed.getCreatedUser().getId().equals(userId)) {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 

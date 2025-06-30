@@ -6,6 +6,8 @@ import com.etplus.controller.dto.UpdateAcademyByAdminDto;
 import com.etplus.controller.dto.UpdateAcademyDto;
 import com.etplus.exception.AcademyException;
 import com.etplus.exception.AcademyException.AcademyExceptionCode;
+import com.etplus.exception.AuthException;
+import com.etplus.exception.AuthException.AuthExceptionCode;
 import com.etplus.exception.ResourceDeniedException;
 import com.etplus.exception.ResourceDeniedException.ResourceDeniedExceptionCode;
 import com.etplus.exception.ResourceNotFoundException;
@@ -41,8 +43,8 @@ public class AcademyService {
   private final FileRepository fileRepository;
 
   public List<AcademyVO> getAcademiesByAdmin(long adminUserId) {
-    List<AcademyEntity> all = academyRepository.findByAdminUserId(adminUserId);
-    return all.stream().map(AcademyVO::valueOf).toList();
+    List<AcademyEntity> academyList = academyRepository.findByAdminUserId(adminUserId);
+    return academyList.stream().map(AcademyVO::valueOf).toList();
   }
 
   public AcademyDetailVO getAcademyDetail(Long academyId) {
@@ -60,10 +62,14 @@ public class AcademyService {
     return AcademyDetailVO.valueOf(academy, imageVOList);
   }
 
-  public AcademyDetailByAdminVO getAcademyDetailByAdmin(Long academyId) {
+  public AcademyDetailByAdminVO getAcademyDetailByAdmin(Long academyId, Long userId) {
     AcademyEntity academy = academyRepository.findById(academyId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
+
+    if (academy.getAdminUser() != null && academy.getAdminUser().getId() != userId) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
+    }
 
     List<Long> imageFileIdList = academy.getImageFileIdList();
     List<FileEntity> imageFileList = fileRepository.findAllByIdIn(imageFileIdList);
@@ -147,8 +153,8 @@ public class AcademyService {
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
-    if (academy.getAdminUser().getId() != adminUserId) {
-      throw new ResourceDeniedException(ResourceDeniedExceptionCode.ACCESS_DENIED);
+    if (academy.getAdminUser() != null && academy.getAdminUser().getId() != adminUserId) {
+      throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
     academy.setName(dto.name());
