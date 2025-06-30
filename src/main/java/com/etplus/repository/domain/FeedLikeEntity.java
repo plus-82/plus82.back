@@ -22,7 +22,7 @@ import lombok.Setter;
     name = "feed_like",
     uniqueConstraints = @UniqueConstraint(columnNames = {"feed_id", "user_id"})
 )
-public class FeedLike extends BaseEntity {
+public class FeedLikeEntity extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class FeedLike extends BaseEntity {
   @JoinColumn(name = "feed_id", referencedColumnName = "id", nullable = false)
   private FeedEntity feed;
 
-  public FeedLike(Long id, UserEntity user, FeedEntity feed) {
+  public FeedLikeEntity(Long id, UserEntity user, FeedEntity feed) {
     this.id = id;
     this.user = user;
     this.feed = feed;
