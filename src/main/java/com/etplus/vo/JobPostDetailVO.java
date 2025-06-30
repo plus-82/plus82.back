@@ -33,6 +33,7 @@ public record JobPostDetailVO(
     LocationType academyLocationType,
     double lat,
     double lng,
+    String academyAddress,
     String academyDetailedAddress,
     List<String> academyImageUrls
 ) {
@@ -64,6 +65,7 @@ public record JobPostDetailVO(
         jobPostEntity.getAcademy().getLocationType(),
         jobPostEntity.getAcademy().getLat(),
         jobPostEntity.getAcademy().getLng(),
+        jobPostEntity.getAcademy().getAddress(),
         jobPostEntity.getAcademy().getDetailedAddress(),
         academyImageUrls
     );
