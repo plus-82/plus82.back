@@ -43,12 +43,12 @@ public class ReportEntity extends BaseEntity {
   @JoinColumn(name = "comment_id", referencedColumnName = "id")
   private FeedCommentEntity comment;
 
-  public ReportEntity(String reason, String otherReason, UserEntity reporter, FeedEntity feed) {
+  public ReportEntity(String reason, String otherReason, UserEntity reporter,
+      FeedEntity feed) {
     this.reason = reason;
     this.otherReason = otherReason;
     this.reporter = reporter;
     this.feed = feed;
-    this.comment = null;
   }
 
   public ReportEntity(String reason, String otherReason, UserEntity reporter,
@@ -56,7 +56,6 @@ public class ReportEntity extends BaseEntity {
     this.reason = reason;
     this.otherReason = otherReason;
     this.reporter = reporter;
-    this.feed = null;
     this.comment = comment;
   }
 } 

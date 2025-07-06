@@ -30,4 +30,13 @@ public class ReportController {
     reportService.reportFeed(feedId, dto, loginUser.userId());
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
+
+  @PostMapping("/comments/{comment-id}")
+  public CommonResponse<Void> reportComment(
+      @AuthUser({RoleType.ADMIN, RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
+      @PathVariable("comment-id") Long commentId,
+      @RequestBody @Valid CreateReportDTO dto) {
+    reportService.reportComment(commentId, dto, loginUser.userId());
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+  }
 } 
