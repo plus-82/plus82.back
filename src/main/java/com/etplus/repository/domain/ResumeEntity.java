@@ -113,6 +113,8 @@ public class ResumeEntity extends BaseEntity {
   public ResumeEntity(String title, UserEntity user, FileEntity file, boolean isDraft) {
     this.title = title;
     this.user = user;
+    this.country = user.getCountry();
+    this.residenceCountry = user.getCountry();
     this.firstName = user.getFirstName();
     this.lastName = user.getLastName();
     this.file = file;
