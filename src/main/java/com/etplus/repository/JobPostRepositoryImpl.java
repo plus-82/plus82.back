@@ -201,6 +201,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
                         .and(jobPostResumeRelation.status.eq(JobPostResumeRelationStatus.REVIEWED)))
             ))
         .from(jobPost)
+        .leftJoin(academy.representativeUser, academyUser)
         .innerJoin(jobPost.academy, academy)
         .leftJoin(academy.adminUser, adminUser)
         .where(jobPost.dueDate.eq(today)
@@ -245,6 +246,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
             ))
         .from(jobPost)
         .innerJoin(jobPost.academy, academy)
+        .leftJoin(academy.representativeUser, academyUser)
         .leftJoin(academy.adminUser, adminUser)
         .where(jobPost.id.eq(jobPostId))
         .fetchOne();
@@ -274,6 +276,7 @@ public class JobPostRepositoryImpl extends QuerydslRepositorySupportCustom imple
         ))
         .from(jobPost)
         .innerJoin(jobPost.academy, academy)
+        .leftJoin(academy.representativeUser, academyUser)
         .leftJoin(academy.adminUser, adminUser)
         .leftJoin(jobPostResumeRelation)
         .on(jobPost.id.eq(jobPostResumeRelation.jobPost.id)
