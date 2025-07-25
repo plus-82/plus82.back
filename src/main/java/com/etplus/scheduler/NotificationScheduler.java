@@ -157,7 +157,7 @@ public class NotificationScheduler {
       params.put("jobTitle", vo.title());
       params.put("date", today.minusDays(1l).format(formatter));
       params.put("count", vo.yesterdayJobPostResumeTotalCount());
-      params.put("link", FRONT_URL + "my-job-posts");
+      params.put("link", FRONT_URL + "/business/job-posting/" + vo.id() + "/applicant-management");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String title = sub.replace(emailTemplate.getTitle());

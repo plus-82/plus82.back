@@ -185,7 +185,7 @@ public class JobPostService {
       Map params = new HashMap();
       params.put("name", user.getFullName());
       params.put("jobTitle", dto.title());
-      params.put("link", FRONT_URL + "/job-postings");
+      params.put("link", FRONT_URL + "/business/job-posting");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String emailTitle = sub.replace(emailTemplate.getTitle());
@@ -555,7 +555,7 @@ public class JobPostService {
       notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
           String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
           String.format("New application for {%s}", jobPost.getTitle()),
-          "/setting/resume",
+          "/business/job-posting/" + jobPost.getId() + " /applicant-management",
           representativeUser));
     }
 

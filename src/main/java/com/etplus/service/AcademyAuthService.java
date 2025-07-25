@@ -216,7 +216,7 @@ public class AcademyAuthService {
     // 이메일 템플릿 조회 & 파싱 & 발송
     MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
         "ACADEMY_EMAIL_VERIFICATION_RESET_PASSWORD", MessageTemplateType.EMAIL).orElse(null);
-    StringSubstitutor sub = new StringSubstitutor(Map.of("link", FRONT_URL + "/password/reset?code=" + emailVerificationCodeEntity.getCode()));
+    StringSubstitutor sub = new StringSubstitutor(Map.of("link", FRONT_URL + "/business/password/reset?code=" + emailVerificationCodeEntity.getCode()));
     String title = sub.replace(emailTemplate.getTitle());
     String content = sub.replace(emailTemplate.getContent());
 

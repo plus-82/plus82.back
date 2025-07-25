@@ -159,7 +159,7 @@ public class JobPostResumeRelationService {
       params.put("name", teacher.getFirstName() + " " + teacher.getLastName());
       params.put("jobTitle", jobPostResumeRelation.getJobPost().getTitle());
       params.put("academyName", academy.getName());
-      params.put("link", FRONT_URL + "setting/my-job-posting");
+      params.put("link", FRONT_URL + "/setting/my-job-posting");
 
       StringSubstitutor sub = new StringSubstitutor(params);
       String emailTitle = sub.replace(emailTemplate.getTitle());
