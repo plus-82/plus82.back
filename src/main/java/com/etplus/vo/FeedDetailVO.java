@@ -1,5 +1,6 @@
 package com.etplus.vo;
 
+import com.etplus.repository.domain.code.FeedVisibility;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,6 +9,7 @@ import lombok.Builder;
 @Builder
 public record FeedDetailVO(
     Long id,
+    FeedVisibility feedVisibility,
     String content,
     LocalDateTime createdAt,
 

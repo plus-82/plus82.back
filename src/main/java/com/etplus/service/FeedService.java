@@ -75,6 +75,7 @@ public class FeedService {
 
     return FeedDetailVO.builder()
         .id(feed.getId())
+        .feedVisibility(feed.getFeedVisibility())
         .content(feed.getContent())
         .createdAt(feed.getCreatedAt())
         .creatorName(feed.getCreatedUser().getName())
