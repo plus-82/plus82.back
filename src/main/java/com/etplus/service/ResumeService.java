@@ -3,6 +3,7 @@ package com.etplus.service;
 import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
+import com.etplus.controller.dto.SearchRepresentativeResumeDto;
 import com.etplus.controller.dto.UpdateResumeDTO;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
@@ -18,11 +19,13 @@ import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.FileEntity;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.vo.RepresentativeResumeVO;
 import com.etplus.vo.ResumeDetailVO;
 import com.etplus.vo.ResumeVO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -285,5 +288,9 @@ public class ResumeService {
     }
 
     resumeRepository.delete(resume);
+  }
+
+  public Page<RepresentativeResumeVO> getRepresentativeResumes(SearchRepresentativeResumeDto dto) {
+    return resumeRepository.findAllRepresentativeResumes(dto);
   }
 }

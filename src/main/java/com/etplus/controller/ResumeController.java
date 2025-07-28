@@ -7,13 +7,16 @@ import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
+import com.etplus.controller.dto.SearchRepresentativeResumeDto;
 import com.etplus.controller.dto.UpdateResumeDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.ResumeService;
 import com.etplus.vo.ResumeDetailVO;
+import com.etplus.vo.RepresentativeResumeVO;
 import com.etplus.vo.ResumeVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -103,5 +106,14 @@ public class ResumeController {
     resumeService.deleteResume(loginUser.userId(), resumeId);
     return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
+
+  @GetMapping("/representatives")
+  public CommonResponse<Page<RepresentativeResumeVO>> getRepresentativeResumes(
+      @Valid SearchRepresentativeResumeDto dto,
+      @AuthUser({RoleType.ADMIN}) LoginUser loginUser) {
+    Page<RepresentativeResumeVO> vo = resumeService.getRepresentativeResumes(dto);
+    return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
+  }
+
 
 }
