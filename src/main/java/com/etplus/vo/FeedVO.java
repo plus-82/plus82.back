@@ -9,6 +9,7 @@ public record FeedVO(
     LocalDateTime createdAt,
 
     // creator
+    Long creatorId,
     String creatorName,
     String creatorProfileImagePath,
 
