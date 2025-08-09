@@ -43,6 +43,10 @@ public class ReportEntity extends BaseEntity {
   @JoinColumn(name = "comment_id", referencedColumnName = "id")
   private FeedCommentEntity comment;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  private UserEntity user;
+
   public ReportEntity(String reason, String otherReason, UserEntity reporter,
       FeedEntity feed) {
     this.reason = reason;
@@ -57,5 +61,13 @@ public class ReportEntity extends BaseEntity {
     this.otherReason = otherReason;
     this.reporter = reporter;
     this.comment = comment;
+  }
+
+  public ReportEntity(String reason, String otherReason, UserEntity reporter,
+      UserEntity user) {
+    this.reason = reason;
+    this.otherReason = otherReason;
+    this.reporter = reporter;
+    this.user = user;
   }
 } 

@@ -46,4 +46,15 @@ public class ReportService {
 
     reportRepository.save(new ReportEntity(dto.reason(), dto.otherReason(), reporter, comment));
   }
+
+  @Transactional
+  public void reportUser(Long targetUserId, CreateReportDTO dto, Long reporterUserId) {
+    UserEntity targetUser = userRepository.findByIdAndDeletedIsFalse(targetUserId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    UserEntity reporter = userRepository.findByIdAndDeletedIsFalse(reporterUserId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    reportRepository.save(new ReportEntity(dto.reason(), dto.otherReason(), reporter, targetUser));
+  }
 } 
