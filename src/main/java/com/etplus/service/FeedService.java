@@ -28,6 +28,7 @@ import com.etplus.repository.domain.code.RoleType;
 import com.etplus.vo.FeedDetailVO;
 import com.etplus.vo.FeedLikeVO;
 import com.etplus.vo.FeedVO;
+import com.etplus.vo.common.ImageVO;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +74,11 @@ public class FeedService {
       feedComments = feedCommentRepository.findAllByFeedId(feedId);
     }
 
+    ImageVO imageVO = null;
+    if (feed.getImage() != null) {
+      imageVO = new ImageVO(feed.getImage().getId(), feed.getImage().getPath());
+    }
+
     return FeedDetailVO.builder()
         .id(feed.getId())
         .feedVisibility(feed.getFeedVisibility())
@@ -80,7 +86,7 @@ public class FeedService {
         .createdAt(feed.getCreatedAt())
         .creatorName(feed.getCreatedUser().getName())
         .creatorProfileImagePath(feed.getCreatedUser().getProfileImage() != null ? feed.getCreatedUser().getProfileImage().getPath() : null)
-        .imagePath(feed.getImage() != null ? feed.getImage().getPath() : null)
+        .image(imageVO)
         .commentCount(feed.getCommentCount())
         .likeCount(feed.getLikeCount())
         .isLiked(isLiked)

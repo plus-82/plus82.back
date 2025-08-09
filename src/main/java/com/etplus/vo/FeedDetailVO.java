@@ -1,6 +1,7 @@
 package com.etplus.vo;
 
 import com.etplus.repository.domain.code.FeedVisibility;
+import com.etplus.vo.common.ImageVO;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,13 +18,12 @@ public record FeedDetailVO(
     String creatorName,
     String creatorProfileImagePath,
 
-    // image
-    String imagePath,
-
     int commentCount,
     int likeCount,
     boolean isLiked,
     boolean isCommented,
+
+    ImageVO image,
 
     // comments
     List<CommentVO> comments
