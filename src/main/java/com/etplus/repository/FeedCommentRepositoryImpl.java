@@ -2,6 +2,7 @@ package com.etplus.repository;
 
 import com.etplus.repository.domain.QFeedCommentEntity;
 import com.etplus.repository.domain.QFeedCommentLike;
+import com.etplus.repository.domain.QFileEntity;
 import com.etplus.repository.domain.QUserEntity;
 import com.etplus.vo.FeedDetailVO;
 import com.etplus.vo.FeedDetailVO.CommentVO;
@@ -18,12 +19,14 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
   private QFeedCommentEntity feedComment;
   private QUserEntity creator;
   private QFeedCommentLike feedCommentLike;
+  private QFileEntity creatorProfileImage;
 
   public FeedCommentRepositoryImpl(JPAQueryFactory query) {
     this.query = query;
     feedComment = new QFeedCommentEntity("feedComment");
     creator = new QUserEntity("creator");
     feedCommentLike = new QFeedCommentLike("feedCommentLike");
+    creatorProfileImage = new QFileEntity("creatorProfileImage");
   }
 
   @Override
@@ -36,10 +39,12 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
                 feedComment.likeCount,
                 creator.id,
                 creator.name,
-                Expressions.constant(false)
+                Expressions.constant(false),
+                creatorProfileImage.path
             ))
         .from(feedComment)
         .innerJoin(feedComment.user, creator)
+        .leftJoin(creator.profileImage, creatorProfileImage)
         .where(feedComment.feed.id.eq(feedId))
         .orderBy(feedComment.createdAt.asc());
 
@@ -61,10 +66,12 @@ public class FeedCommentRepositoryImpl implements FeedCommentRepositoryCustom {
                     .from(feedCommentLike)
                     .where(feedCommentLike.user.id.eq(userId)
                         .and(feedCommentLike.feedComment.id.eq(feedComment.id)))
-                    .exists()
+                    .exists(),
+                creatorProfileImage.path
             ))
         .from(feedComment)
         .innerJoin(feedComment.user, creator)
+        .leftJoin(creator.profileImage, creatorProfileImage)
         .where(feedComment.feed.id.eq(feedId))
         .orderBy(feedComment.createdAt.asc());
 

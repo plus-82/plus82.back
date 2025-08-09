@@ -38,7 +38,10 @@ public record FeedDetailVO(
 
       Long userId,
       String userName,
-      boolean isLiked
+      boolean isLiked,
+
+      // file
+      String profileImagePath
   ) {
 
     @QueryProjection
