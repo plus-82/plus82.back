@@ -84,6 +84,7 @@ public class FeedService {
         .feedVisibility(feed.getFeedVisibility())
         .content(feed.getContent())
         .createdAt(feed.getCreatedAt())
+        .creatorId(feed.getCreatedUser().getId())
         .creatorName(feed.getCreatedUser().getName())
         .creatorProfileImagePath(feed.getCreatedUser().getProfileImage() != null ? feed.getCreatedUser().getProfileImage().getPath() : null)
         .image(imageVO)

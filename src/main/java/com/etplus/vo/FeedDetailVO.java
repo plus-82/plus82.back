@@ -15,6 +15,7 @@ public record FeedDetailVO(
     LocalDateTime createdAt,
 
     // creator
+    Long creatorId,
     String creatorName,
     String creatorProfileImagePath,
 
