@@ -3,6 +3,7 @@ package com.etplus.vo;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.code.GenderType;
 import com.etplus.repository.domain.code.VisaType;
+import com.etplus.util.MaskingUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -54,6 +55,40 @@ public record ResumeDetailVO(
         resumeEntity.getFirstName(),
         resumeEntity.getLastName(),
         resumeEntity.getEmail(),
+        resumeEntity.getDegree(),
+        resumeEntity.getMajor(),
+        resumeEntity.getGenderType(),
+        resumeEntity.getBirthDate(),
+        resumeEntity.getHasVisa(),
+        resumeEntity.getVisaType(),
+        resumeEntity.getIsRepresentative(),
+        resumeEntity.getForKindergarten(),
+        resumeEntity.getForElementary(),
+        resumeEntity.getForMiddleSchool(),
+        resumeEntity.getForHighSchool(),
+        resumeEntity.getForAdult(),
+        resumeEntity.isDraft(),
+        resumeEntity.getCreatedAt(),
+        resumeEntity.getUpdatedAt(),
+
+        resumeEntity.getCountry() == null ? null : resumeEntity.getCountry().getId(),
+        resumeEntity.getCountry() == null ? null : resumeEntity.getCountry().getCountryNameEn(),
+        resumeEntity.getResidenceCountry() == null ? null : resumeEntity.getResidenceCountry().getId(),
+        resumeEntity.getResidenceCountry() == null ? null : resumeEntity.getResidenceCountry().getCountryNameEn(),
+        resumeEntity.getProfileImage() == null ? null : resumeEntity.getProfileImage().getPath(),
+        resumeEntity.getFile() == null ? null : resumeEntity.getFile().getPath(),
+        resumeEntity.getFile() == null ? null : resumeEntity.getFile().getFileName()
+    );
+  }
+
+  public static ResumeDetailVO valueOfWithMasking(ResumeEntity resumeEntity) {
+    return new ResumeDetailVO(
+        resumeEntity.getId(),
+        resumeEntity.getTitle(),
+        resumeEntity.getPersonalIntroduction(),
+        resumeEntity.getFirstName(),
+        resumeEntity.getLastName(),
+        MaskingUtil.maskEmail(resumeEntity.getEmail()),
         resumeEntity.getDegree(),
         resumeEntity.getMajor(),
         resumeEntity.getGenderType(),

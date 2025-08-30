@@ -301,6 +301,6 @@ public class ResumeService {
     if (!Boolean.TRUE.equals(resume.getIsRepresentative())) {
       throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.RESUME_NOT_FOUND);
     }
-    return ResumeDetailVO.valueOf(resume);
+    return ResumeDetailVO.valueOfWithMasking(resume);
   }
 }
