@@ -115,5 +115,12 @@ public class ResumeController {
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }
 
+  @GetMapping("/representatives/{resume-id}")
+  public CommonResponse<ResumeDetailVO> getRepresentativeResumeDetail(
+      @PathVariable("resume-id") Long resumeId,
+      @AuthUser({RoleType.ADMIN}) LoginUser loginUser) {
+    ResumeDetailVO resume = resumeService.getRepresentativeResumeDetail(resumeId);
+    return new CommonResponse<>(resume, CommonResponseCode.SUCCESS);
+  }
 
 }

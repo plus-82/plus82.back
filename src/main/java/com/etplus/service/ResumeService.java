@@ -293,4 +293,14 @@ public class ResumeService {
   public Page<RepresentativeResumeVO> getRepresentativeResumes(SearchRepresentativeResumeDto dto) {
     return resumeRepository.findAllRepresentativeResumes(dto);
   }
+
+  public ResumeDetailVO getRepresentativeResumeDetail(long resumeId) {
+    ResumeEntity resume = resumeRepository.findById(resumeId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
+    if (!Boolean.TRUE.equals(resume.getIsRepresentative())) {
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.RESUME_NOT_FOUND);
+    }
+    return ResumeDetailVO.valueOf(resume);
+  }
 }
