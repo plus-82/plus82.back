@@ -29,7 +29,7 @@ public class JobPostEntity extends BaseEntity {
   @Column(nullable = false)
   private String title;    // 제목
 
-  @Column(columnDefinition = "VARCHAR(500)")
+  @Column(columnDefinition = "VARCHAR(2000)")
   private String jobDescription;  // 직무 설명
   @Column(columnDefinition = "VARCHAR(1000)")
   private String requiredQualification;   // 자격 요건
