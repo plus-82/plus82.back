@@ -53,25 +53,31 @@
     </encoder>
   </appender>
 
-  <!-- Root logger configuration -->
-  <root level="INFO">
-    <appender-ref ref="ACCESS_FILE"/>
-    <appender-ref ref="ERROR_FILE"/>
-<!--    <appender-ref ref="CONSOLE"/>-->
-  </root>
-
   <!-- 환경별 logger -->
-<!--  <springProfile name="local">-->
-<!--    <root level="INFO">-->
-<!--      <appender-ref ref="CONSOLE"/>-->
-<!--    </root>-->
-<!--  </springProfile>-->
+  <springProfile name="local">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
 
-<!--  <springProfile name="dev">-->
-<!--    <root level="INFO">-->
-<!--      <appender-ref ref="ACCESS_FILE"/>-->
-<!--      <appender-ref ref="ERROR_FILE"/>-->
-<!--    </root>-->
-<!--  </springProfile>-->
+  <springProfile name="dev">
+    <root level="INFO">
+      <appender-ref ref="ACCESS_FILE"/>
+      <appender-ref ref="ERROR_FILE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="live">
+    <root level="INFO">
+      <appender-ref ref="ASYNC-NEWRELIC"/>
+      <appender-ref ref="ACCESS_FILE"/>
+      <appender-ref ref="ERROR_FILE"/>
+    </root>
+  </springProfile>
+
+  <!-- 기본 설정 (프로필이 지정되지 않은 경우) -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
 
 </configuration>
