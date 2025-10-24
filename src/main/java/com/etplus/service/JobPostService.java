@@ -555,7 +555,7 @@ public class JobPostService {
       notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
           String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
           String.format("New application for {%s}", jobPost.getTitle()),
-          "/business/job-posting/" + jobPost.getId() + " /applicant-management",
+          "/business/job-posting/" + jobPost.getId() + "/applicant-management",
           representativeUser));
     }
 
