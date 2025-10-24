@@ -33,7 +33,7 @@ public class NotificationEntity extends BaseEntity {
   private String content;
   @Column(length = 100)
   private String contentEn;
-  @Column(length = 30)
+  @Column(length = 100)
   private String targetUrl;
 
   @ManyToOne(fetch = FetchType.LAZY)
