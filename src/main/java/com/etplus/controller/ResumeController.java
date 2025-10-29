@@ -110,7 +110,7 @@ public class ResumeController {
   @GetMapping("/representatives")
   public CommonResponse<Page<RepresentativeResumeVO>> getRepresentativeResumes(
       @Valid SearchRepresentativeResumeDto dto,
-      @AuthUser({RoleType.ADMIN}) LoginUser loginUser) {
+      @AuthUser({RoleType.ADMIN, RoleType.ACADEMY}) LoginUser loginUser) {
     Page<RepresentativeResumeVO> vo = resumeService.getRepresentativeResumes(dto);
     return new CommonResponse<>(vo, CommonResponseCode.SUCCESS);
   }

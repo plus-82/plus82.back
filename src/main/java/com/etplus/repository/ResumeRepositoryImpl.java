@@ -80,8 +80,8 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
     if (dto.getGenderType() != null) {
       whereCondition.and(resume.genderType.eq(dto.getGenderType()));
     }
-    if (dto.getCountryId() != null) {
-      whereCondition.and(country.id.eq(dto.getCountryId()));
+    if (dto.getCountryIdList() != null && !dto.getCountryIdList().isEmpty()) {
+      whereCondition.and(country.id.in(dto.getCountryIdList()));
     }
     if (dto.getFromBirthDate() != null) {
       whereCondition.and(resume.birthDate.goe(dto.getFromBirthDate()));
@@ -92,8 +92,23 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
     if (dto.getHasVisa() != null) {
       whereCondition.and(resume.hasVisa.eq(dto.getHasVisa()));
     }
-    if (dto.getVisaType() != null) {
-      whereCondition.and(resume.visaType.eq(dto.getVisaType()));
+    if (dto.getVisaTypeList() != null && !dto.getVisaTypeList().isEmpty()) {
+      whereCondition.and(resume.visaType.in(dto.getVisaTypeList()));
+    }
+    if (dto.getForKindergarten() != null) {
+      whereCondition.and(resume.forKindergarten.eq(dto.getForKindergarten()));
+    }
+    if (dto.getForElementary() != null) {
+      whereCondition.and(resume.forElementary.eq(dto.getForElementary()));
+    }
+    if (dto.getForMiddleSchool() != null) {
+      whereCondition.and(resume.forMiddleSchool.eq(dto.getForMiddleSchool()));
+    }
+    if (dto.getForHighSchool() != null) {
+      whereCondition.and(resume.forHighSchool.eq(dto.getForHighSchool()));
+    }
+    if (dto.getForAdult() != null) {
+      whereCondition.and(resume.forAdult.eq(dto.getForAdult()));
     }
 
     JPAQuery<RepresentativeResumeVO> jpaQuery = query.select(
@@ -109,6 +124,11 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
             resume.birthDate,
             resume.createdAt,
             resume.updatedAt,
+            resume.forKindergarten,
+            resume.forElementary,
+            resume.forMiddleSchool,
+            resume.forHighSchool,
+            resume.forAdult,
             country.id,
             country.countryNameEn,
             country.countryCode,

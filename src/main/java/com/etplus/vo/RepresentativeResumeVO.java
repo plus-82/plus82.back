@@ -19,6 +19,11 @@ public record RepresentativeResumeVO(
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
 
+    Boolean forKindergarten,
+    Boolean forElementary,
+    Boolean forMiddleSchool,
+    Boolean forHighSchool,
+    Boolean forAdult,
     // Country
     Long countryId,
     String countryNameEn,
