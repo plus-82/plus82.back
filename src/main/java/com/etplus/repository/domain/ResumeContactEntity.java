@@ -53,7 +53,14 @@ public class ResumeContactEntity extends BaseEntity {
   private Boolean forElementary;
   private Boolean forMiddleSchool;
   private Boolean forHighSchool;
+  private Boolean forAdult;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "country_id", referencedColumnName = "id")
+  private CountryEntity country;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "residence_country_id", referencedColumnName = "id")
+  private CountryEntity residenceCountry;
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "teacher_user_id", referencedColumnName = "id", nullable = false)
   private UserEntity teacher;
@@ -66,9 +73,9 @@ public class ResumeContactEntity extends BaseEntity {
       String additionalMessage, String contactEmail, long resumeId, String resumeTitle,
       String personalIntroduction, String firstName, String lastName, String email, String degree,
       String major, GenderType genderType, LocalDate birthDate, Boolean hasVisa, VisaType visaType,
-      Boolean forKindergarten, Boolean forElementary, Boolean forMiddleSchool,
-      Boolean forHighSchool,
-      UserEntity teacher, UserEntity academyUser) {
+      Boolean forKindergarten, Boolean forElementary, Boolean forMiddleSchool, Boolean forHighSchool,
+      Boolean forAdult,
+      CountryEntity country, CountryEntity residenceCountry, UserEntity teacher, UserEntity academyUser) {
     this.id = id;
     this.interestReason = interestReason;
     this.appealMessage = appealMessage;
@@ -90,6 +97,9 @@ public class ResumeContactEntity extends BaseEntity {
     this.forElementary = forElementary;
     this.forMiddleSchool = forMiddleSchool;
     this.forHighSchool = forHighSchool;
+    this.forAdult = forAdult;
+    this.country = country;
+    this.residenceCountry = residenceCountry;
     this.teacher = teacher;
     this.academyUser = academyUser;
   }
@@ -118,7 +128,10 @@ public class ResumeContactEntity extends BaseEntity {
         .forElementary(resume.getForElementary())
         .forMiddleSchool(resume.getForMiddleSchool())
         .forHighSchool(resume.getForHighSchool())
+        .forAdult(resume.getForAdult())
         
+        .country(resume.getCountry())
+        .residenceCountry(resume.getResidenceCountry())
         .teacher(resume.getUser())
         .academyUser(academyUser)
         .build();
