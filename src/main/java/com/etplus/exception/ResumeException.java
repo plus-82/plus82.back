@@ -13,6 +13,7 @@ public class ResumeException extends CustomBadRequestException {
     REPRESENTATIVE_RESUME_EXISTS("RSM-001", "representative resume already exists"),
     FILE_RESUME_CANNOT_BE_MODIFIED("RSM-002", "file resume cannot be modified"),
     DRAFT_RESUME("RSM-003", "draft resume"),
+    RESUME_ALREADY_CONTACTED("RSM-004", "resume already contacted"),
     ;
 
     private String code;

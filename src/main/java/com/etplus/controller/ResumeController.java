@@ -4,6 +4,7 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
+import com.etplus.controller.dto.ContactResumeDTO;
 import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -121,6 +123,15 @@ public class ResumeController {
       @AuthUser({RoleType.ADMIN, RoleType.ACADEMY}) LoginUser loginUser) {
     ResumeDetailVO resume = resumeService.getRepresentativeResumeDetail(resumeId);
     return new CommonResponse<>(resume, CommonResponseCode.SUCCESS);
+  }
+
+  @PostMapping("/representatives/{resume-id}/contact")
+  public CommonResponse<Void> contactResume(
+      @PathVariable("resume-id") Long resumeId,
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
+      @RequestBody @Valid ContactResumeDTO dto) {
+    resumeService.contactResume(resumeId, loginUser.userId(), dto);
+    return new CommonResponse<>(CommonResponseCode.SUCCESS);
   }
 
 }

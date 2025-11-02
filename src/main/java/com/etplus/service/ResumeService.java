@@ -1,5 +1,6 @@
 package com.etplus.service;
 
+import com.etplus.controller.dto.ContactResumeDTO;
 import com.etplus.controller.dto.CreateResumeDTO;
 import com.etplus.controller.dto.CreateResumeWithFileDTO;
 import com.etplus.controller.dto.PagingDTO;
@@ -13,10 +14,12 @@ import com.etplus.exception.ResumeException;
 import com.etplus.exception.ResumeException.ResumeExceptionCode;
 import com.etplus.provider.S3Uploader;
 import com.etplus.repository.CountryRepository;
+import com.etplus.repository.ResumeContactRepository;
 import com.etplus.repository.ResumeRepository;
 import com.etplus.repository.UserRepository;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.FileEntity;
+import com.etplus.repository.domain.ResumeContactEntity;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
 import com.etplus.vo.RepresentativeResumeVO;
@@ -37,6 +40,7 @@ public class ResumeService {
   private final ResumeRepository resumeRepository;
   private final UserRepository userRepository;
   private final CountryRepository countryRepository;
+  private final ResumeContactRepository resumeContactRepository;
   private final S3Uploader s3Uploader;
 
   public Slice<ResumeVO> getMyResumes(long userId, PagingDTO dto) {
@@ -302,5 +306,35 @@ public class ResumeService {
       throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.RESUME_NOT_FOUND);
     }
     return ResumeDetailVO.valueOfWithMasking(resume);
+  }
+
+  @Transactional
+  public void contactResume(long resumeId, long userId, ContactResumeDTO dto) {
+    log.info("Contacting resume - resumeId: {}, userId: {}", resumeId, userId);
+    ResumeEntity resume = resumeRepository.findById(resumeId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
+    if (!Boolean.TRUE.equals(resume.getIsRepresentative())) {
+      log.warn("Not representative resume - resumeId: {}", resumeId);
+      throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.RESUME_NOT_FOUND);
+    }
+
+    UserEntity academyUser = userRepository.findById(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    // 중복 컨택 확인
+    if (resumeContactRepository.existsByResumeIdAndAcademyUser(resumeId, academyUser)) {
+      log.warn("Resume already contacted - resumeId: {}, academyUserId: {}", resumeId, userId);
+      throw new ResumeException(ResumeExceptionCode.RESUME_ALREADY_CONTACTED);
+    }
+
+    // TODO 이메일, 알림
+
+    ResumeContactEntity contact = ResumeContactEntity.create(resume, academyUser,
+        dto.interestReason(), dto.appealMessage(), dto.additionalMessage(), dto.contactEmail());
+    resumeContactRepository.save(contact);
+    log.info("Resume contact created successfully - contactId: {}, resumeId: {}, academyUserId: {}",
+        contact.getId(), resumeId, userId);
   }
 }
