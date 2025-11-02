@@ -21,6 +21,7 @@ public class ResourceNotFoundException extends CustomBadRequestException {
     FEED_LIKE_NOT_FOUND("RNF-009", "feed like not found"),
     FEED_COMMENT_NOT_FOUND("RNF-010", "feed comment not found"),
     FEED_COMMENT_LIKE_NOT_FOUND("RNF-011", "feed comment like not found"),
+    RESUME_CONTACT_NOT_FOUND("RNF-012", "resume contact not found"),
     ;
 
     private String code;

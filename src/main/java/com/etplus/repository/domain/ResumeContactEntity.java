@@ -62,6 +62,9 @@ public class ResumeContactEntity extends BaseEntity {
   @JoinColumn(name = "residence_country_id", referencedColumnName = "id")
   private CountryEntity residenceCountry;
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_image_id", referencedColumnName = "id")
+  private FileEntity profileImage;
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "teacher_user_id", referencedColumnName = "id", nullable = false)
   private UserEntity teacher;
   @ManyToOne(fetch = FetchType.LAZY)
@@ -75,7 +78,8 @@ public class ResumeContactEntity extends BaseEntity {
       String major, GenderType genderType, LocalDate birthDate, Boolean hasVisa, VisaType visaType,
       Boolean forKindergarten, Boolean forElementary, Boolean forMiddleSchool, Boolean forHighSchool,
       Boolean forAdult,
-      CountryEntity country, CountryEntity residenceCountry, UserEntity teacher, UserEntity academyUser) {
+      CountryEntity country, CountryEntity residenceCountry, FileEntity profileImage,
+      UserEntity teacher, UserEntity academyUser) {
     this.id = id;
     this.interestReason = interestReason;
     this.appealMessage = appealMessage;
@@ -100,6 +104,7 @@ public class ResumeContactEntity extends BaseEntity {
     this.forAdult = forAdult;
     this.country = country;
     this.residenceCountry = residenceCountry;
+    this.profileImage = profileImage;
     this.teacher = teacher;
     this.academyUser = academyUser;
   }
@@ -129,9 +134,10 @@ public class ResumeContactEntity extends BaseEntity {
         .forMiddleSchool(resume.getForMiddleSchool())
         .forHighSchool(resume.getForHighSchool())
         .forAdult(resume.getForAdult())
-        
+
         .country(resume.getCountry())
         .residenceCountry(resume.getResidenceCountry())
+        .profileImage(resume.getProfileImage())
         .teacher(resume.getUser())
         .academyUser(academyUser)
         .build();

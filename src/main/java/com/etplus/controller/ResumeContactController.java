@@ -7,11 +7,13 @@ import com.etplus.common.LoginUser;
 import com.etplus.controller.dto.SearchResumeContactDTO;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.ResumeContactService;
+import com.etplus.vo.ResumeContactDetailVO;
 import com.etplus.vo.ResumeContactVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +30,15 @@ public class ResumeContactController {
       @Valid SearchResumeContactDTO dto) {
     Page<ResumeContactVO> result = resumeContactService.getMyResumeContacts(
         loginUser.userId(), dto);
+    return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
+  }
+
+  @GetMapping("/{contact-id}")
+  public CommonResponse<ResumeContactDetailVO> getResumeContactDetail(
+      @PathVariable("contact-id") Long contactId,
+      @AuthUser({RoleType.ACADEMY}) LoginUser loginUser) {
+    ResumeContactDetailVO result = resumeContactService.getResumeContactDetail(
+        loginUser.userId(), contactId);
     return new CommonResponse<>(result, CommonResponseCode.SUCCESS);
   }
 }
