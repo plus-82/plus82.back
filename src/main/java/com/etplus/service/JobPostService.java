@@ -14,6 +14,7 @@ import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.exception.ResumeException;
 import com.etplus.exception.ResumeException.ResumeExceptionCode;
+import com.etplus.provider.DiscordNotificationProvider;
 import com.etplus.provider.EmailProvider;
 import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.FileRepository;
@@ -70,6 +71,7 @@ public class JobPostService {
   private final MessageTemplateRepository messageTemplateRepository;
   private final NotificationRepository notificationRepository;
   private final EmailProvider emailProvider;
+  private final DiscordNotificationProvider discordNotificationProvider;
 
   @Value("${url.front}")
   private String FRONT_URL;
@@ -454,23 +456,29 @@ public class JobPostService {
 
   @Transactional
   public void submitResume(long userId, long jobPostId, long resumeId, SubmitResumeDTO dto) {
-    log.info("submitResume. userId: {}, jobPostId: {}, resumeId: {}, dto: {}", userId, jobPostId, resumeId, dto);
+    log.info("submitResume 시작 - userId: {}, jobPostId: {}, resumeId: {}", userId, jobPostId, resumeId);
+    
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
     JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND));
 
     if (jobPost.isDraft()) {
+      log.warn("Draft 공고에 지원 시도 - jobPostId: {}, userId: {}", jobPostId, userId);
       throw new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_NOT_FOUND);
     }
 
     if (jobPost.getDueDate() != null && jobPost.getDueDate().isBefore(LocalDate.now())) {
+      log.warn("마감된 공고에 지원 시도 - jobPostId: {}, dueDate: {}, userId: {}", 
+          jobPostId, jobPost.getDueDate(), userId);
       throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);
     }
 
     if (jobPost.isClosed()) {
+      log.warn("닫힌 공고에 지원 시도 - jobPostId: {}, userId: {}", jobPostId, userId);
       throw new JobPostException(JobPostExceptionCode.JOB_POST_CLOSED);
     }
 
@@ -480,15 +488,20 @@ public class JobPostService {
 
     // 임시 이력서인 경우
     if (resume.isDraft()) {
+      log.warn("Draft 이력서로 지원 시도 - resumeId: {}, userId: {}", resumeId, userId);
       throw new ResumeException(ResumeExceptionCode.DRAFT_RESUME);
     }
 
     if (jobPostResumeRelationRepository.existsByJobPostIdAndUserId(jobPostId, userId)) {
+      log.warn("이미 지원한 공고에 재지원 시도 - jobPostId: {}, userId: {}", jobPostId, userId);
       throw new JobPostException(JobPostExceptionCode.RESUME_ALREADY_SUBMITTED);
     }
+    
+    log.info("submitResume 검증 완료 - userId: {}, jobPostId: {}, resumeId: {}", userId, jobPostId, resumeId);
 
     // 선생님 이메일 템플릿 조회 & 파싱 & 발송
     if (user.isAllowEmail()) {
+      log.info("선생님 이메일 전송 시도 - userId: {}, email: {}", userId, user.getEmail());
       try {
         MessageTemplateEntity emailTemplate = messageTemplateRepository.findByCodeAndType(
                 "JOB_POST_STATUS_" + JobPostResumeRelationStatus.SUBMITTED, MessageTemplateType.EMAIL)
@@ -505,16 +518,22 @@ public class JobPostService {
         String emailContent = sub.replace(emailTemplate.getContent());
 
         emailProvider.send(user.getEmail(), emailTitle, emailContent);
+        log.info("선생님 이메일 전송 성공 - userId: {}, email: {}", userId, user.getEmail());
       } catch (Exception e) {
-        log.error("Failed to send email teacher for job post resume submission", e);
+        log.error("선생님 이메일 전송 실패 - userId: {}, email: {}", userId, user.getEmail(), e);
       }
+    } else {
+      log.info("선생님 이메일 알림 비활성화 - userId: {}", userId);
     }
 
     // 접근 코드
     String code = UuidProvider.generateUuid();
+    log.info("접근 코드 생성 - code: {}", code);
 
     // 어드민이 올린 공고인 경우 학원에 이메일 전달
     if (jobPost.getAcademy().isByAdmin()) {
+      log.info("어드민 공고에 대한 학원 이메일 전송 시도 - jobPostId: {}, academyId: {}", 
+          jobPostId, jobPost.getAcademy().getId());
       try {
         String adminUserEmail = jobPost.getAcademy().getAdminUser().getEmail();
 
@@ -534,31 +553,69 @@ public class JobPostService {
         // 학원 대표 이메일로 전송
         String academyUserEmail = jobPost.getAcademy().getRepresentativeEmail();
         emailProvider.send(academyUserEmail, emailTitle, emailContent);
+        log.info("학원 대표 이메일 전송 성공 - academyEmail: {}", academyUserEmail);
 
         // 어드민 이메일로 전송
         emailProvider.send(adminUserEmail, emailTitle, emailContent);
+        log.info("어드민 이메일 전송 성공 - adminEmail: {}", adminUserEmail);
       } catch (Exception e) {
-        log.error("Failed to send email to academy for job post resume submission", e);
+        log.error("학원/어드민 이메일 전송 실패 - jobPostId: {}", jobPostId, e);
       }
     }
 
     // 선생님 알림 추가
+    log.info("선생님 알림 저장 시도 - userId: {}", userId);
     notificationRepository.save(new NotificationEntity(null, "지원완료", "Submitted",
         String.format("%s에 이력서를 제출 완료했습니다", jobPost.getAcademy().getName()),
         String.format("Resume submitted to %s", jobPost.getAcademy().getNameEn()),
         "/setting/my-job-posting",
         user));
+    log.info("선생님 알림 저장 완료 - userId: {}", userId);
 
     // 학원 알림 추가
     UserEntity representativeUser = jobPost.getAcademy().getRepresentativeUser();
     if (representativeUser != null) {
+      log.info("학원 알림 저장 시도 - representativeUserId: {}, jobPostId: {}", 
+          representativeUser.getId(), jobPostId);
       notificationRepository.save(new NotificationEntity(null, "신규 지원자", "Applicated",
           String.format("{%s} 공고에 새로운 지원자가 있어요.", jobPost.getTitle()),
           String.format("New application for {%s}", jobPost.getTitle()),
           "/business/job-posting/" + jobPost.getId() + "/applicant-management",
           representativeUser));
+      log.info("학원 알림 저장 완료 - representativeUserId: {}", representativeUser.getId());
+    } else {
+      log.warn("학원 대표 유저 없음 - academyId: {}, jobPostId: {}",
+          jobPost.getAcademy().getId(), jobPostId);
     }
 
+    // Discord 알림 전송
+    log.info("Discord 알림 전송 시도 - userId: {}, jobPostId: {}", userId, jobPostId);
+    try {
+      String teacherName = user.getName() != null ? user.getName() : 
+          (user.getFirstName() + " " + user.getLastName());
+
+      String message = String.format("📝 새로운 이력서 제출\n" +
+          "선생님: %s\n" +
+          "학원: %s\n" +
+          "공고제목: %s\n" +
+          "이력서제목: %s\n" +
+          "선생님 이메일: %s",
+          teacherName,
+          jobPost.getAcademy().getName(),
+          jobPost.getTitle(),
+          resume.getTitle() != null ? resume.getTitle() : "제목 없음",
+          user.getEmail()
+      );
+
+      discordNotificationProvider.sendDiscordNotification(message);
+      log.info("Discord 알림 전송 성공 - userId: {}, jobPostId: {}", userId, jobPostId);
+    } catch (Exception e) {
+      log.warn("Discord 알림 전송 실패 - userId: {}, jobPostId: {}", userId, jobPostId, e);
+    }
+
+    // 이력서 제출 관계 저장
+    log.info("JobPostResumeRelation 저장 시도 - userId: {}, jobPostId: {}, resumeId: {}", 
+        userId, jobPostId, resumeId);
     jobPostResumeRelationRepository.save(
         new JobPostResumeRelationEntity(null, dto.coverLetter(),
             JobPostResumeRelationStatus.SUBMITTED, LocalDate.now(), null, jobPost,
@@ -570,6 +627,7 @@ public class JobPostService {
             code, resume.getCountry(), resume.getResidenceCountry(), resume.getUser(),
             resume.getProfileImage(), resume.getFile()
         ));
+    log.info("submitResume 완료 - userId: {}, jobPostId: {}, resumeId: {}", userId, jobPostId, resumeId);
   }
 
 }
