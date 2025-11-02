@@ -16,6 +16,7 @@ import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.exception.UserException;
 import com.etplus.exception.UserException.UserExceptionCode;
+import com.etplus.provider.DiscordNotificationProvider;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.JwtProvider;
 import com.etplus.provider.PasswordProvider;
@@ -62,6 +63,7 @@ public class AuthService {
   private final EmailProvider emailProvider;
   private final JwtProvider jwtProvider;
   private final RedisStorage redisStorage;
+  private final DiscordNotificationProvider discordNotificationProvider;
 
   @Transactional
   public void signUp(SignUpDto dto) {
@@ -98,6 +100,28 @@ public class AuthService {
         null
     );
     userRepository.save(userEntity);
+
+    // Discord 알림 전송
+    String userName = userEntity.getName() != null ? userEntity.getName() : 
+        (userEntity.getFirstName() + " " + userEntity.getLastName());
+    String countryName = country != null && country.getCountryNameEn() != null ? 
+        country.getCountryNameEn() : "";
+    
+    String message = String.format("🎉 새로운 선생님 회원가입 🎉\n" +
+        "이름: %s\n" +
+        "이메일: %s\n" +
+        "%s" +
+        "%s" +
+        "%s",
+        userName,
+        userEntity.getEmail(),
+        userEntity.getGenderType() != null ? 
+            String.format("성별: %s\n", userEntity.getGenderType()) : "",
+        userEntity.getBirthDate() != null ? 
+            String.format("생년월일: %s\n", userEntity.getBirthDate()) : "",
+        !countryName.isEmpty() ? String.format("국가: %s", countryName) : ""
+    );
+    discordNotificationProvider.sendDiscordNotification(message);
   }
 
   public TokenVO signIn(SignInDto dto) {

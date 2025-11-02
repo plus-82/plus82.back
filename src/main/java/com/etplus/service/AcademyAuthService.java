@@ -16,6 +16,7 @@ import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.exception.UserException;
 import com.etplus.exception.UserException.UserExceptionCode;
+import com.etplus.provider.DiscordNotificationProvider;
 import com.etplus.provider.EmailProvider;
 import com.etplus.provider.JwtProvider;
 import com.etplus.provider.PasswordProvider;
@@ -61,6 +62,7 @@ public class AcademyAuthService {
   private final EmailProvider emailProvider;
   private final JwtProvider jwtProvider;
   private final RedisStorage redisStorage;
+  private final DiscordNotificationProvider discordNotificationProvider;
 
   @Transactional
   public void signUpAcademy(SignUpAcademyDto dto) {
@@ -120,6 +122,23 @@ public class AcademyAuthService {
             userEntity,
             null
         ));
+
+    // Discord 알림 전송
+    String message = String.format("🎉 새로운 학원 회원가입 🎉\n" +
+        "학원명: %s\n" +
+        "이름: %s\n" +
+        "대표자명: %s\n" +
+        "이메일: %s\n" +
+        "사업자등록번호: %s\n" +
+        "%s",
+        dto.academyName(),
+        dto.fullName(),
+        dto.representativeName(),
+        dto.email(),
+        dto.businessRegistrationNumber(),
+        dto.address() != null ? String.format("주소: %s\n", dto.address()) : ""
+    );
+    discordNotificationProvider.sendDiscordNotification(message);
   }
 
   public TokenVO signInAcademy(SignInDto dto) {
