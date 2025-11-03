@@ -66,14 +66,17 @@ public class AcademyAuthService {
 
   @Transactional
   public void signUpAcademy(SignUpAcademyDto dto) {
-    log.info("Academy sign up request: {}", dto);
+    log.info("signUpAcademy 시작 - email: {}, fullName: {}, academyName: {}, representativeName: {}, businessRegistrationNumber: {}",
+        dto.email(), dto.fullName(), dto.academyName(), dto.representativeName(), dto.businessRegistrationNumber());
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
+      log.warn("이미 가입한 이메일 - email: {}", dto.email());
       throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
     }
 
     // 이미 등록된 사업자 등록번호인 경우 예외 처리
     if (academyRepository.existsByBusinessRegistrationNumber(dto.businessRegistrationNumber())) {
+      log.warn("이미 등록된 사업자 등록번호 - businessRegistrationNumber: {}", dto.businessRegistrationNumber());
       throw new AcademyException(AcademyExceptionCode.ALREADY_USED_BUSINESS_REGISTRATION_NUMBER);
     }
 
@@ -81,6 +84,7 @@ public class AcademyAuthService {
     boolean isEmailVerified = emailVerificationCodeRepository
         .existsByEmailAndEmailVerificationCodeTypeAndVerifiedIsTrue(dto.email(), EmailVerificationCodeType.SIGN_UP);
     if (!isEmailVerified) {
+      log.warn("이메일 인증되지 않음 - email: {}", dto.email());
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
@@ -102,7 +106,7 @@ public class AcademyAuthService {
     ));
 
     // 학원 저장
-    academyRepository.save(
+    AcademyEntity academyEntity = academyRepository.save(
         new AcademyEntity(
             null,
             dto.academyName(),
@@ -139,6 +143,8 @@ public class AcademyAuthService {
         dto.address() != null ? String.format("주소: %s\n", dto.address()) : ""
     );
     discordNotificationProvider.sendDiscordNotification(message);
+    
+    log.info("signUpAcademy 완료 - userId: {}, academyId: {}", userEntity.getId(), academyEntity.getId());
   }
 
   public TokenVO signInAcademy(SignInDto dto) {

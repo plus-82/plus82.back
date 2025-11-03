@@ -199,6 +199,8 @@ public class JobPostService {
     // 학원 알림 목록 추가
     notificationRepository.save(new NotificationEntity(null, "등록", "Registered",
         "새로운 공고를 성공적으로 등록했습니다", "New job posting registered", "/business/job-posting", user));
+    
+    log.info("createJobPost 완료 - userId: {}", userId);
   }
 
   @Transactional
@@ -589,29 +591,23 @@ public class JobPostService {
     }
 
     // Discord 알림 전송
-    log.info("Discord 알림 전송 시도 - userId: {}, jobPostId: {}", userId, jobPostId);
-    try {
-      String teacherName = user.getName() != null ? user.getName() : 
-          (user.getFirstName() + " " + user.getLastName());
+    String teacherName = user.getName() != null ? user.getName() : 
+        (user.getFirstName() + " " + user.getLastName());
 
-      String message = String.format("📝 새로운 이력서 제출\n" +
-          "선생님: %s\n" +
-          "학원: %s\n" +
-          "공고제목: %s\n" +
-          "이력서제목: %s\n" +
-          "선생님 이메일: %s",
-          teacherName,
-          jobPost.getAcademy().getName(),
-          jobPost.getTitle(),
-          resume.getTitle() != null ? resume.getTitle() : "제목 없음",
-          user.getEmail()
-      );
+    String message = String.format("📝새로운 이력서 제출📝\n\n" +
+        "선생님: %s\n" +
+        "학원: %s\n" +
+        "공고제목: %s\n" +
+        "이력서제목: %s\n" +
+        "선생님 이메일: %s",
+        teacherName,
+        jobPost.getAcademy().getName(),
+        jobPost.getTitle(),
+        resume.getTitle() != null ? resume.getTitle() : "제목 없음",
+        user.getEmail()
+    );
 
-      discordNotificationProvider.sendDiscordNotification(message);
-      log.info("Discord 알림 전송 성공 - userId: {}, jobPostId: {}", userId, jobPostId);
-    } catch (Exception e) {
-      log.warn("Discord 알림 전송 실패 - userId: {}, jobPostId: {}", userId, jobPostId, e);
-    }
+    discordNotificationProvider.sendDiscordNotification(message);
 
     // 이력서 제출 관계 저장
     log.info("JobPostResumeRelation 저장 시도 - userId: {}, jobPostId: {}, resumeId: {}", 

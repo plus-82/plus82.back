@@ -20,7 +20,7 @@ public class DiscordNotificationProvider {
 
   public void sendDiscordNotification(String content) {
     try {
-      log.info("try discord notification: {}", content);
+      log.info("Discord 알림 전송 시도 - content: {}", content);
 
       WebClient webClient = WebClient.create(DISCORD_URL);
 
@@ -36,13 +36,13 @@ public class DiscordNotificationProvider {
           .bodyToMono(String.class);
 
       response.subscribe(
-          result -> log.info("discord notification sent successfully: {}", result),
-          error -> log.error("discord notification error: {}", error.getMessage())
+          result -> log.info("Discord 알림 전송 성공 - result: {}", result),
+          error -> log.error("Discord 알림 전송 실패 - error: {}", error.getMessage())
       );
     } catch (JsonProcessingException e) {
-      log.error("discord notification json error: {}", e);
+      log.error("Discord 알림 JSON 생성 오류", e);
     } catch (Exception e) {
-      log.error("discord notification error: {}", e);
+      log.error("Discord 알림 전송 오류", e);
     }
   }
 

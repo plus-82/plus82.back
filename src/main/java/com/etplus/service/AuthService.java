@@ -67,9 +67,11 @@ public class AuthService {
 
   @Transactional
   public void signUp(SignUpDto dto) {
-    log.info("Sign up request: {}", dto);
+    log.info("signUp 시작 - email: {}, firstName: {}, lastName: {}, genderType: {}, birthDate: {}, countryId: {}",
+        dto.email(), dto.firstName(), dto.lastName(), dto.genderType(), dto.birthDate(), dto.countryId());
     // 이미 가입한 이메일인 경우 예외 처리
     if (userRepository.existsByEmail(dto.email())) {
+      log.warn("이미 가입한 이메일 - email: {}", dto.email());
       throw new UserException(UserExceptionCode.ALREADY_USED_EMAIL);
     }
 
@@ -77,6 +79,7 @@ public class AuthService {
     boolean isEmailVerified = emailVerificationCodeRepository
         .existsByEmailAndEmailVerificationCodeTypeAndVerifiedIsTrue(dto.email(), EmailVerificationCodeType.SIGN_UP);
     if (!isEmailVerified) {
+      log.warn("이메일 인증되지 않음 - email: {}", dto.email());
       throw new UserException(UserExceptionCode.NOT_VERIFIED_EMAIL);
     }
 
@@ -122,22 +125,29 @@ public class AuthService {
         !countryName.isEmpty() ? String.format("국가: %s", countryName) : ""
     );
     discordNotificationProvider.sendDiscordNotification(message);
+    
+    log.info("signUp 완료 - userId: {}, email: {}", userEntity.getId(), dto.email());
   }
 
   public TokenVO signIn(SignInDto dto) {
+    log.info("signIn 시작 - email: {}", dto.email());
+    
     UserEntity user = userRepository.findByEmail(dto.email()).orElseThrow(
         () -> new AuthException(AuthExceptionCode.EMAIL_NOT_CORRECT));
 
     if (user.isDeleted()) {
+      log.warn("삭제된 사용자 로그인 시도 - userId: {}, email: {}", user.getId(), dto.email());
       throw new AuthException(AuthExceptionCode.DELETED_USER);
     }
 
     if (!passwordProvider.matches(dto.password(), user.getPassword())) {
+      log.warn("비밀번호 불일치 - userId: {}, email: {}", user.getId(), dto.email());
       throw new AuthException(AuthExceptionCode.PW_NOT_CORRECT);
     }
 
     // 선생님이 아닌 경우 예외 처리
     if (!RoleType.TEACHER.equals(user.getRoleType())) {
+      log.warn("접근 권한 없음 - userId: {}, roleType: {}", user.getId(), user.getRoleType());
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
@@ -146,6 +156,8 @@ public class AuthService {
     // TODO key 에 deviceId 추가?
     redisStorage.save("RefreshToken::userId=" + user.getId(),
         tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    
+    log.info("signIn 완료 - userId: {}, email: {}", user.getId(), dto.email());
     return tokenVO;
   }
 
@@ -291,19 +303,21 @@ public class AuthService {
 
   @Transactional
   public void resetPassword(ResetPasswordDto dto) {
-    log.info("Reset password. code : {}", dto.code());
+    log.info("resetPassword 시작 - code: {}", dto.code());
+    
     EmailVerificationCodeEntity emailVerificationCodeEntity = emailVerificationCodeRepository
         .findByCodeAndEmailVerificationCodeTypeAndExpireDateTimeAfter(dto.code(),
             EmailVerificationCodeType.RESET_PASSWORD, LocalDateTime.now())
         .orElseThrow(() -> new ResourceNotFoundException(
-            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND)
-        );
+            ResourceNotFoundExceptionCode.EMAIL_VERIFICATION_CODE_NOT_FOUND));
 
     if (emailVerificationCodeEntity.isVerified()) {
+      log.warn("이미 검증된 코드 - code: {}", dto.code());
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.ALREADY_VERIFIED_CODE);
     }
 
     if (emailVerificationCodeEntity.getExpireDateTime().isBefore(LocalDateTime.now())) {
+      log.warn("만료된 인증 코드 - code: {}", dto.code());
       throw new EmailVerificationCodeException(EmailVerificationCodeExceptionCode.EXPIRED_CODE);
     }
 
@@ -316,5 +330,7 @@ public class AuthService {
 
     userEntity.setPassword(passwordProvider.encode(dto.password()));
     userRepository.save(userEntity);
+    
+    log.info("resetPassword 완료 - userId: {}, email: {}", userEntity.getId(), emailVerificationCodeEntity.getEmail());
   }
 }
