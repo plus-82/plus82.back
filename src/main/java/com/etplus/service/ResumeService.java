@@ -12,6 +12,7 @@ import com.etplus.exception.ResourceNotFoundException;
 import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionCode;
 import com.etplus.exception.ResumeException;
 import com.etplus.exception.ResumeException.ResumeExceptionCode;
+import com.etplus.provider.DiscordNotificationProvider;
 import com.etplus.provider.S3Uploader;
 import com.etplus.repository.CountryRepository;
 import com.etplus.repository.ResumeContactRepository;
@@ -42,6 +43,7 @@ public class ResumeService {
   private final CountryRepository countryRepository;
   private final ResumeContactRepository resumeContactRepository;
   private final S3Uploader s3Uploader;
+  private final DiscordNotificationProvider discordNotificationProvider;
 
   public Slice<ResumeVO> getMyResumes(long userId, PagingDTO dto) {
     return resumeRepository.findAllByUserId(userId, dto);
@@ -62,7 +64,8 @@ public class ResumeService {
 
   @Transactional
   public void createResume(long userId, CreateResumeDTO dto) {
-    log.info("Creating resume for userId: {}, dto: {}", userId, dto);
+    log.info("createResume 시작 - userId: {}, dto: {}", userId, dto);
+    
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
@@ -76,6 +79,7 @@ public class ResumeService {
     // 대표 이력서 중복되는지 확인
     if (dto.isRepresentative()) {
       if (resumeRepository.existsByUserIdAndIsRepresentativeIsTrue(userId)) {
+        log.warn("이미 대표 이력서 존재 - userId: {}", userId);
         throw new ResumeException(ResumeExceptionCode.REPRESENTATIVE_RESUME_EXISTS);
       }
     }
@@ -94,6 +98,24 @@ public class ResumeService {
             dto.birthDate(), dto.hasVisa(), dto.visaType(), dto.isRepresentative(),
             dto.forKindergarten(), dto.forElementary(), dto.forMiddleSchool(), dto.forHighSchool(),
             dto.forAdult(), false, country, residenceCountry, user, fileEntity, null));
+
+    // Discord 알림 전송
+    String teacherName = user.getName() != null ? user.getName() : 
+        (user.getFirstName() + " " + user.getLastName());
+
+    String message = String.format("📝 새로운 이력서 생성 📝\n\n" +
+        "선생님: %s\n" +
+        "이력서제목: %s\n" +
+        "대표이력서: %s\n" +
+        "선생님 이메일: %s",
+        teacherName,
+        dto.title() != null ? dto.title() : "제목 없음",
+        dto.isRepresentative() ? "예" : "아니오",
+        user.getEmail()
+    );
+
+    discordNotificationProvider.sendDiscordNotification(message);
+    log.info("createResume 완료 - userId: {}, resumeId: {}", userId);
   }
 
   @Transactional
@@ -154,35 +176,58 @@ public class ResumeService {
 
   @Transactional
   public void createResumeWithFile(long userId, CreateResumeWithFileDTO dto) {
-    log.info("Creating resume with file for userId: {}, dto: {}", userId, dto);
+    log.info("createResumeWithFile 시작 - userId: {}", userId);
+    
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
     FileEntity file = s3Uploader.uploadResumeAndSaveRepository(dto.file(), user);
 
-    resumeRepository.save(new ResumeEntity(file.getFileName(), user, file, false));
+    ResumeEntity savedResume = resumeRepository.save(new ResumeEntity(file.getFileName(), user, file, false));
+
+    // Discord 알림 전송
+    String teacherName = user.getName() != null ? user.getName() : 
+        (user.getFirstName() + " " + user.getLastName());
+
+    String message = String.format("📝 파일 이력서 업로드 📝\n\n" +
+        "선생님: %s\n" +
+        "파일명: %s\n" +
+        "선생님 이메일: %s",
+        teacherName,
+        savedResume.getTitle() != null ? savedResume.getTitle() : "제목 없음",
+        user.getEmail()
+    );
+
+    discordNotificationProvider.sendDiscordNotification(message);
+    
+    log.info("createResumeWithFile 완료 - userId: {}, resumeId: {}", userId, savedResume.getId());
   }
 
   @Transactional
   public void updateResume(long userId, long resumeId, UpdateResumeDTO dto) {
-    log.info("Updating resume for userId: {}, resumeId: {}, dto: {}", userId, resumeId, dto);
+    log.info("updateResume 시작 - userId: {}, resumeId: {}", userId, resumeId);
+    
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.RESUME_NOT_FOUND));
 
     // 본인 이력서만 수정 가능
     if (resume.getUser().getId() != userId) {
+      log.warn("이력서 수정 권한 없음 - resumeId: {}, resumeUserId: {}, requestUserId: {}", 
+          resumeId, resume.getUser().getId(), userId);
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
     // 파일 이력서는 수정 불가
     if (resume.getFile() != null) {
+      log.warn("파일 이력서는 수정 불가 - resumeId: {}", resumeId);
       throw new ResumeException(ResumeExceptionCode.FILE_RESUME_CANNOT_BE_MODIFIED);
     }
 
     // 대표 이력서 중복되는지 확인
     if (dto.isRepresentative() && !resume.getIsRepresentative()) {
       if (resumeRepository.existsByUserIdAndIsRepresentativeIsTrue(userId)) {
+        log.warn("이미 대표 이력서 존재 - userId: {}", userId);
         throw new ResumeException(ResumeExceptionCode.REPRESENTATIVE_RESUME_EXISTS);
       }
     }
@@ -224,6 +269,8 @@ public class ResumeService {
     resume.setResidenceCountry(residenceCountry);
 
     resumeRepository.save(resume);
+    
+    log.info("updateResume 완료 - userId: {}, resumeId: {}", userId, resumeId);
   }
 
   @Transactional
