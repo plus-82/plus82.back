@@ -13,22 +13,32 @@ import com.etplus.exception.ResourceNotFoundException.ResourceNotFoundExceptionC
 import com.etplus.exception.ResumeException;
 import com.etplus.exception.ResumeException.ResumeExceptionCode;
 import com.etplus.provider.DiscordNotificationProvider;
+import com.etplus.provider.EmailProvider;
 import com.etplus.provider.S3Uploader;
+import com.etplus.repository.AcademyRepository;
 import com.etplus.repository.CountryRepository;
+import com.etplus.repository.MessageTemplateRepository;
 import com.etplus.repository.ResumeContactRepository;
 import com.etplus.repository.ResumeRepository;
 import com.etplus.repository.UserRepository;
+import com.etplus.repository.domain.AcademyEntity;
 import com.etplus.repository.domain.CountryEntity;
 import com.etplus.repository.domain.FileEntity;
+import com.etplus.repository.domain.MessageTemplateEntity;
 import com.etplus.repository.domain.ResumeContactEntity;
 import com.etplus.repository.domain.ResumeEntity;
 import com.etplus.repository.domain.UserEntity;
+import com.etplus.repository.domain.code.MessageTemplateType;
 import com.etplus.vo.RepresentativeResumeVO;
 import com.etplus.vo.ResumeDetailVO;
 import com.etplus.vo.ResumeVO;
 import jakarta.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.StringSubstitutor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -38,12 +48,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class ResumeService {
 
+  private final AcademyRepository academyRepository;
+  @Value("${url.front}")
+  private String FRONT_URL;
+
   private final ResumeRepository resumeRepository;
   private final UserRepository userRepository;
   private final CountryRepository countryRepository;
   private final ResumeContactRepository resumeContactRepository;
   private final S3Uploader s3Uploader;
   private final DiscordNotificationProvider discordNotificationProvider;
+  private final MessageTemplateRepository messageTemplateRepository;
+  private final EmailProvider emailProvider;
 
   public Slice<ResumeVO> getMyResumes(long userId, PagingDTO dto) {
     return resumeRepository.findAllByUserId(userId, dto);
@@ -369,6 +385,8 @@ public class ResumeService {
     UserEntity academyUser = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException(
             ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+    AcademyEntity academy = academyRepository.findByRepresentativeUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.ACADEMY_NOT_FOUND));
 
     // 중복 컨택 확인
     if (resumeContactRepository.existsByResumeIdAndAcademyUser(resumeId, academyUser)) {
@@ -376,7 +394,31 @@ public class ResumeService {
       throw new ResumeException(ResumeExceptionCode.RESUME_ALREADY_CONTACTED);
     }
 
-    // TODO 이메일, 알림
+    try {
+      log.info("선생님 컨택 이메일 전송 시도 - resumeId: {}, userId: {}, email: {}",
+          resumeId, userId, resume.getEmail());
+      MessageTemplateEntity emailTemplate = messageTemplateRepository
+          .findByCodeAndType("TEACHER_CONTACT", MessageTemplateType.EMAIL).orElse(null);
+
+      Map params = new HashMap();
+
+      params.put("name", resume.getLastName() + " " + resume.getFirstName());
+      params.put("academyName", academy.getNameEn());
+      params.put("interestReason", dto.interestReason());
+      params.put("appealMessage", dto.appealMessage());
+      params.put("additionalMessage", dto.additionalMessage());
+      params.put("academyEmail", academyUser.getEmail());
+      params.put("link", FRONT_URL);
+
+      StringSubstitutor sub = new StringSubstitutor(params);
+      String emailTitle = sub.replace(emailTemplate.getTitle());
+      String emailContent = sub.replace(emailTemplate.getContent());
+
+      emailProvider.send(resume.getEmail(), emailTitle, emailContent);
+      log.info("선생님 컨택 이메일 전송 성공 - userId: {}, email: {}", userId, resume.getEmail());
+    } catch (Exception e) {
+      log.error("선생님 컨택 이메일 전송 실패 - userId: {}, email: {}", userId, resume.getEmail(), e);
+    }
 
     ResumeContactEntity contact = ResumeContactEntity.create(resume, academyUser,
         dto.interestReason(), dto.appealMessage(), dto.additionalMessage(), dto.contactEmail());

@@ -156,6 +156,7 @@ public class JobPostService {
 
   public JobPostResumeRelationVO getSubmittedJobPostResumeRelation(
       long userId, long jobPostId) {
+    log.info("getSubmittedJobPostResumeRelation. userId: {}, jobPostId: {}", userId, jobPostId);
     JobPostResumeRelationEntity jobPostResumeRelation = jobPostResumeRelationRepository
         .findByUserIdAndJobPostId(userId, jobPostId).orElseThrow(() ->
             new ResourceNotFoundException(ResourceNotFoundExceptionCode.JOB_POST_RESUME_RELATION_NOT_FOUND));
