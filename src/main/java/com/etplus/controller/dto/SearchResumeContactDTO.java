@@ -2,7 +2,7 @@ package com.etplus.controller.dto;
 
 import com.etplus.repository.domain.code.GenderType;
 import com.etplus.repository.domain.code.VisaType;
-import java.time.LocalDate;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +11,10 @@ import lombok.Setter;
 public class SearchResumeContactDTO extends PagingDTO {
 
   private GenderType genderType;
-  private Long countryId;
-  private VisaType visaType;
-  private LocalDate fromBirthDate;
-  private LocalDate toBirthDate;
+  private List<Long> countryIdList;
+  private Integer fromAge;
+  private Integer toAge;
+  private List<VisaType> visaTypeList;
 
   private Boolean forKindergarten;
   private Boolean forElementary;

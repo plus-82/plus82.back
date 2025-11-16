@@ -14,6 +14,7 @@ import com.etplus.vo.ResumeVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
@@ -83,14 +84,13 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
     if (dto.getCountryIdList() != null && !dto.getCountryIdList().isEmpty()) {
       whereCondition.and(country.id.in(dto.getCountryIdList()));
     }
-    if (dto.getFromBirthDate() != null) {
-      whereCondition.and(resume.birthDate.goe(dto.getFromBirthDate()));
+    if (dto.getFromAge() != null) {
+      // fromAge 이상: 현재 날짜에서 fromAge년 전 이전에 태어난 사람들
+      whereCondition.and(resume.birthDate.goe(LocalDate.now().minusYears(dto.getFromAge())));
     }
-    if (dto.getToBirthDate() != null) {
-      whereCondition.and(resume.birthDate.loe(dto.getToBirthDate()));
-    }
-    if (dto.getHasVisa() != null) {
-      whereCondition.and(resume.hasVisa.eq(dto.getHasVisa()));
+    if (dto.getToAge() != null) {
+      // toAge 이하: 현재 날짜에서 (toAge+1)년 전 이후에 태어난 사람들
+      whereCondition.and(resume.birthDate.loe(LocalDate.now().minusYears(dto.getToAge() + 1)));
     }
     if (dto.getVisaTypeList() != null && !dto.getVisaTypeList().isEmpty()) {
       whereCondition.and(resume.visaType.in(dto.getVisaTypeList()));

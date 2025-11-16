@@ -13,9 +13,8 @@ public class SearchRepresentativeResumeDto extends PagingDTO {
 
   private GenderType genderType;
   private List<Long> countryIdList;
-  private LocalDate fromBirthDate;
-  private LocalDate toBirthDate;
-  private Boolean hasVisa;
+  private Integer fromAge;
+  private Integer toAge;
   private List<VisaType> visaTypeList;
 
   private Boolean forKindergarten;

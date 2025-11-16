@@ -10,6 +10,7 @@ import com.etplus.vo.ResumeContactVO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 
 public class ResumeContactRepositoryImpl extends QuerydslRepositorySupportCustom
@@ -35,20 +36,20 @@ public class ResumeContactRepositoryImpl extends QuerydslRepositorySupportCustom
     if (dto.getGenderType() != null) {
       whereCondition.and(resumeContact.genderType.eq(dto.getGenderType()));
     }
-    if (dto.getCountryId() != null) {
-      whereCondition.and(resumeContact.country.id.eq(dto.getCountryId()));
+    if (dto.getCountryIdList() != null && !dto.getCountryIdList().isEmpty()) {
+      whereCondition.and(country.id.in(dto.getCountryIdList()));
     }
-    if (dto.getVisaType() != null) {
-      whereCondition.and(resumeContact.visaType.eq(dto.getVisaType()));
+    if (dto.getFromAge() != null) {
+      // fromAge 이상: 현재 날짜에서 fromAge년 전 이전에 태어난 사람들
+      whereCondition.and(resumeContact.birthDate.loe(LocalDate.now().minusYears(dto.getFromAge())));
     }
-
-    if (dto.getFromBirthDate() != null) {
-      whereCondition.and(resumeContact.birthDate.goe(dto.getFromBirthDate()));
+    if (dto.getToAge() != null) {
+      // toAge 이하: 현재 날짜에서 (toAge+1)년 전 이후에 태어난 사람들
+      whereCondition.and(resumeContact.birthDate.goe(LocalDate.now().minusYears(dto.getToAge() + 1)));
     }
-    if (dto.getToBirthDate() != null) {
-      whereCondition.and(resumeContact.birthDate.loe(dto.getToBirthDate()));
+    if (dto.getVisaTypeList() != null && !dto.getVisaTypeList().isEmpty()) {
+      whereCondition.and(resumeContact.visaType.in(dto.getVisaTypeList()));
     }
-
     if (dto.getForKindergarten() != null) {
       whereCondition.and(resumeContact.forKindergarten.eq(dto.getForKindergarten()));
     }
