@@ -69,21 +69,17 @@ public class ResumeContactRepositoryImpl extends QuerydslRepositorySupportCustom
     JPAQuery<ResumeContactVO> jpaQuery = query.select(
         new QResumeContactVO(
             resumeContact.id,
-            resumeContact.interestReason,
-            resumeContact.appealMessage,
-            resumeContact.additionalMessage,
-            resumeContact.contactEmail,
             resumeContact.resumeId,
             resumeContact.resumeTitle,
             resumeContact.firstName,
             resumeContact.lastName,
             resumeContact.email,
-            resumeContact.degree,
-            resumeContact.major,
-            resumeContact.genderType,
-            resumeContact.birthDate,
             resumeContact.hasVisa,
             resumeContact.visaType,
+            resumeContact.genderType,
+            resumeContact.birthDate,
+            resumeContact.createdAt,
+            resumeContact.updatedAt,
             resumeContact.forKindergarten,
             resumeContact.forElementary,
             resumeContact.forMiddleSchool,
@@ -91,10 +87,9 @@ public class ResumeContactRepositoryImpl extends QuerydslRepositorySupportCustom
             resumeContact.forAdult,
             country.id,
             country.countryNameEn,
+            country.countryCode,
             resumeContact.teacher.id,
-            resumeContact.academyUser.id,
-            resumeContact.createdAt,
-            resumeContact.updatedAt
+            resumeContact.academyUser.id
         ))
         .from(resumeContact)
         .leftJoin(resumeContact.country, country)

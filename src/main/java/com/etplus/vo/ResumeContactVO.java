@@ -9,35 +9,30 @@ import java.time.LocalDateTime;
 public record ResumeContactVO(
     Long id,
 
-    String interestReason,
-    String appealMessage,
-    String additionalMessage,
-    String contactEmail,
-
     Long resumeId,
     String resumeTitle,
     String firstName,
     String lastName,
     String email,
-    String degree,
-    String major,
+    boolean hasVisa,
+    VisaType visaType,
     GenderType genderType,
     LocalDate birthDate,
-    Boolean hasVisa,
-    VisaType visaType,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+
     Boolean forKindergarten,
     Boolean forElementary,
     Boolean forMiddleSchool,
     Boolean forHighSchool,
     Boolean forAdult,
-
+    // Country
     Long countryId,
     String countryNameEn,
+    String countryCode,
 
     Long teacherId,
-    Long academyUserId,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    Long academyUserId
 ) {
 
   @QueryProjection
