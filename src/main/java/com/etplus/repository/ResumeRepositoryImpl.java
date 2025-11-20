@@ -85,12 +85,10 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
       whereCondition.and(country.id.in(dto.getCountryIdList()));
     }
     if (dto.getFromAge() != null) {
-      // fromAge 이상: 현재 날짜에서 fromAge년 전 이전에 태어난 사람들
-      whereCondition.and(resume.birthDate.goe(LocalDate.now().minusYears(dto.getFromAge())));
+      whereCondition.and(resume.birthDate.loe(LocalDate.now().minusYears(dto.getFromAge() + 1)));
     }
     if (dto.getToAge() != null) {
-      // toAge 이하: 현재 날짜에서 (toAge+1)년 전 이후에 태어난 사람들
-      whereCondition.and(resume.birthDate.loe(LocalDate.now().minusYears(dto.getToAge() + 1)));
+      whereCondition.and(resume.birthDate.goe(LocalDate.now().minusYears(dto.getToAge())));
     }
     if (dto.getVisaTypeList() != null && !dto.getVisaTypeList().isEmpty()) {
       whereCondition.and(resume.visaType.in(dto.getVisaTypeList()));
