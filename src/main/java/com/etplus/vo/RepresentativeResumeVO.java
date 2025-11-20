@@ -11,7 +11,6 @@ public record RepresentativeResumeVO(
     String title,
     String firstName,
     String lastName,
-    String email,
     boolean hasVisa,
     VisaType visaType,
     GenderType genderType,

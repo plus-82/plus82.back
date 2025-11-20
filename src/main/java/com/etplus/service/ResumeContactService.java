@@ -38,7 +38,7 @@ public class ResumeContactService {
       throw new AuthException(AuthExceptionCode.ACCESS_DENIED);
     }
 
-    return ResumeContactDetailVO.valueOf(contact);
+    return ResumeContactDetailVO.valueOfWithMasking(contact);
   }
 }
 

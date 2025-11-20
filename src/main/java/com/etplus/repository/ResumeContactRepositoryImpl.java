@@ -73,7 +73,6 @@ public class ResumeContactRepositoryImpl extends QuerydslRepositorySupportCustom
             resumeContact.resumeTitle,
             resumeContact.firstName,
             resumeContact.lastName,
-            resumeContact.email,
             resumeContact.hasVisa,
             resumeContact.visaType,
             resumeContact.genderType,

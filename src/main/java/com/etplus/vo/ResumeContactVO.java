@@ -13,7 +13,6 @@ public record ResumeContactVO(
     String resumeTitle,
     String firstName,
     String lastName,
-    String email,
     boolean hasVisa,
     VisaType visaType,
     GenderType genderType,

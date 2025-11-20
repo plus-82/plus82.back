@@ -117,7 +117,6 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
             resume.title,
             resume.firstName,
             resume.lastName,
-            resume.email,
             resume.hasVisa,
             resume.visaType,
             resume.genderType,

@@ -3,6 +3,7 @@ package com.etplus.vo;
 import com.etplus.repository.domain.ResumeContactEntity;
 import com.etplus.repository.domain.code.GenderType;
 import com.etplus.repository.domain.code.VisaType;
+import com.etplus.util.MaskingUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -56,7 +57,7 @@ public record ResumeContactDetailVO (
     LocalDateTime updatedAt
 ) {
 
-  public static ResumeContactDetailVO valueOf(ResumeContactEntity entity) {
+  public static ResumeContactDetailVO valueOfWithMasking(ResumeContactEntity entity) {
     return new ResumeContactDetailVO(
         entity.getId(),
         entity.getInterestReason(),
@@ -67,7 +68,7 @@ public record ResumeContactDetailVO (
         entity.getResumeTitle(),
         entity.getFirstName(),
         entity.getLastName(),
-        entity.getEmail(),
+        MaskingUtil.maskEmail(entity.getEmail()),
         entity.getDegree(),
         entity.getMajor(),
         entity.getGenderType(),
