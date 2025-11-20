@@ -134,6 +134,7 @@ public class ResumeRepositoryImpl extends QuerydslRepositorySupportCustom
         .from(resume)
         .where(whereCondition
             .and(resume.isRepresentative.isTrue())
+            .and(resume.user.representativeResumePublic.isTrue())
         )
         .leftJoin(resume.country, country)
         .orderBy(resume.updatedAt.desc());
