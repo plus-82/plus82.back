@@ -58,7 +58,8 @@ public class UserService {
         country == null ? null : country.getCountryCode(),
         country == null ? null : country.getCountryCallingCode(),
         country == null ? null : country.getFlag(),
-        profileImage == null ? null : profileImage.getPath()
+        profileImage == null ? null : profileImage.getPath(),
+        user.isRepresentativeResumePublic()
     );
   }
 

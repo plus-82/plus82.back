@@ -21,7 +21,10 @@ public record UserVO(
     String flag,
 
     // file
-    String profileImagePath
+    String profileImagePath,
+
+    // setting
+    boolean representativeResumePublic
 ) {
 
   @QueryProjection

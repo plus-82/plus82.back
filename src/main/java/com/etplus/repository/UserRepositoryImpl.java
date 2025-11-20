@@ -62,7 +62,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 country.countryCode,
                 country.countryCallingCode,
                 country.flag,
-                profileImage.path
+                profileImage.path,
+                user.representativeResumePublic
             ))
         .from(user)
         .leftJoin(user.country, country)
