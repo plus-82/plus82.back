@@ -102,7 +102,8 @@ public class AcademyAuthService {
         true,
         RoleType.ACADEMY,
         null,
-        null
+        null,
+        false
     ));
 
     // 학원 저장

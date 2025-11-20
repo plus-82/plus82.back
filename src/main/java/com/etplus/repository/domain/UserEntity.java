@@ -49,6 +49,9 @@ public class UserEntity extends BaseEntity {
   @Column(nullable = false)
   private LocalDateTime lastNotificationReadAt;
 
+  @Column(nullable = false)
+  private boolean representativeResumePublic;
+
 //  @Enumerated(EnumType.STRING)
 //  private OauthProviderType providerType;
 //  private String providerId;
@@ -71,7 +74,7 @@ public class UserEntity extends BaseEntity {
 
   public UserEntity(Long id, String firstName, String lastName, String fullName, String name,
       GenderType genderType, LocalDate birthDate, String email, String password, boolean allowEmail,
-      RoleType roleType, CountryEntity country, FileEntity profileImage) {
+      RoleType roleType, CountryEntity country, FileEntity profileImage, boolean representativeResumePublic) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -86,5 +89,6 @@ public class UserEntity extends BaseEntity {
     this.roleType = roleType;
     this.country = country;
     this.profileImage = profileImage;
+    this.representativeResumePublic = representativeResumePublic;
   }
 }

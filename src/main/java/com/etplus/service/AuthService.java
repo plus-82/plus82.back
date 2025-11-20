@@ -100,7 +100,8 @@ public class AuthService {
         true,
         RoleType.TEACHER,
         country,
-        null
+        null,
+        true
     );
     userRepository.save(userEntity);
 

@@ -4,6 +4,7 @@ import com.etplus.controller.dto.SearchUserDTO;
 import com.etplus.controller.dto.UpdateAcademyUserDto;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateProfileImageDTO;
+import com.etplus.controller.dto.UpdateRepresentativeResumePublicDto;
 import com.etplus.controller.dto.UpdateUserDto;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
@@ -81,7 +82,8 @@ public class UserService {
         true,
         RoleType.ADMIN,
         null,
-        null
+        null,
+        false
     );
     userRepository.save(userEntity);
   }
@@ -170,6 +172,16 @@ public class UserService {
 
     userEntity.setPassword(passwordProvider.encode(dto.newPassword()));
     userRepository.save(userEntity);
+  }
+
+  @Transactional
+  public void updateRepresentativeResumePublic(long userId, UpdateRepresentativeResumePublicDto dto) {
+    log.info("updateRepresentativeResumePublic. userId: {}, representativeResumePublic: {}", userId, dto.representativeResumePublic());
+    UserEntity user = userRepository.findByIdAndDeletedIsFalse(userId).orElseThrow(
+        () -> new ResourceNotFoundException(ResourceNotFoundExceptionCode.USER_NOT_FOUND));
+
+    user.setRepresentativeResumePublic(dto.representativeResumePublic());
+    userRepository.save(user);
   }
 
 }

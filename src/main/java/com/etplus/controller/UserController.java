@@ -4,10 +4,10 @@ import com.etplus.common.AuthUser;
 import com.etplus.common.CommonResponse;
 import com.etplus.common.CommonResponseCode;
 import com.etplus.common.LoginUser;
-import com.etplus.controller.dto.SearchUserDTO;
 import com.etplus.controller.dto.UpdateAcademyUserDto;
 import com.etplus.controller.dto.UpdatePasswordDto;
 import com.etplus.controller.dto.UpdateProfileImageDTO;
+import com.etplus.controller.dto.UpdateRepresentativeResumePublicDto;
 import com.etplus.controller.dto.UpdateUserDto;
 import com.etplus.repository.domain.code.RoleType;
 import com.etplus.service.UserService;
@@ -97,6 +97,14 @@ public class UserController {
       @AuthUser({RoleType.ACADEMY, RoleType.TEACHER}) LoginUser loginUser,
       @RequestBody @Valid UpdatePasswordDto dto) {
     userService.updatePassword(loginUser.userId(), dto);
+    return new CommonResponse(CommonResponseCode.SUCCESS);
+  }
+
+  @PutMapping("/me/representative-resume-public")
+  public CommonResponse<Void> updateRepresentativeResumePublic(
+      @AuthUser({RoleType.TEACHER}) LoginUser loginUser,
+      @RequestBody @Valid UpdateRepresentativeResumePublicDto dto) {
+    userService.updateRepresentativeResumePublic(loginUser.userId(), dto);
     return new CommonResponse(CommonResponseCode.SUCCESS);
   }
 }
