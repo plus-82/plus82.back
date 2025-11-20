@@ -126,12 +126,12 @@ public class ResumeController {
   }
 
   @PostMapping("/representatives/{resume-id}/contact")
-  public CommonResponse<Void> contactResume(
+  public CommonResponse<Long> contactResume(
       @PathVariable("resume-id") Long resumeId,
       @AuthUser({RoleType.ACADEMY}) LoginUser loginUser,
       @RequestBody @Valid ContactResumeDTO dto) {
-    resumeService.contactResume(resumeId, loginUser.userId(), dto);
-    return new CommonResponse<>(CommonResponseCode.SUCCESS);
+    Long contactId = resumeService.contactResume(resumeId, loginUser.userId(), dto);
+    return new CommonResponse<>(contactId, CommonResponseCode.SUCCESS);
   }
 
 }

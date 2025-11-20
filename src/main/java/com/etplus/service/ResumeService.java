@@ -372,7 +372,7 @@ public class ResumeService {
   }
 
   @Transactional
-  public void contactResume(long resumeId, long userId, ContactResumeDTO dto) {
+  public Long contactResume(long resumeId, long userId, ContactResumeDTO dto) {
     log.info("Contacting resume - resumeId: {}, userId: {}", resumeId, userId);
     ResumeEntity resume = resumeRepository.findById(resumeId)
         .orElseThrow(() -> new ResourceNotFoundException(
@@ -425,5 +425,6 @@ public class ResumeService {
     resumeContactRepository.save(contact);
     log.info("Resume contact created successfully - contactId: {}, resumeId: {}, academyUserId: {}",
         contact.getId(), resumeId, userId);
+    return contact.getId();
   }
 }
