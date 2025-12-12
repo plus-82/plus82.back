@@ -1,7 +1,7 @@
 package com.etplus.service;
 
-import com.etplus.cache.RedisStorage;
 import com.etplus.common.LoginUser;
+import com.etplus.provider.RefreshTokenProvider;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestReIssueTokenDTO;
 import com.etplus.controller.dto.RequestResetPasswordDto;
@@ -62,7 +62,7 @@ public class AuthService {
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
   private final JwtProvider jwtProvider;
-  private final RedisStorage redisStorage;
+  private final RefreshTokenProvider refreshTokenProvider;
   private final DiscordNotificationProvider discordNotificationProvider;
 
   @Transactional
@@ -155,8 +155,7 @@ public class AuthService {
     TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
     // TODO key 에 deviceId 추가?
-    redisStorage.save("RefreshToken::userId=" + user.getId(),
-        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    refreshTokenProvider.save(user.getId(), tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
     
     log.info("signIn 완료 - userId: {}, email: {}", user.getId(), dto.email());
     return tokenVO;
@@ -168,8 +167,8 @@ public class AuthService {
     // token 검증
     Long userId = jwtProvider.getId(dto.refreshToken());
 
-    // redis 에 저장된 refreshToken 확인
-    String refreshToken = redisStorage.get("RefreshToken::userId=" + userId);
+    // DB에 저장된 refreshToken 확인
+    String refreshToken = refreshTokenProvider.get(userId);
     if (refreshToken == null) {
       throw new AuthException(AuthExceptionCode.EXPIRED_TOKEN);
     }
@@ -182,8 +181,7 @@ public class AuthService {
     TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
     // TODO key 에 deviceId 추가?
-    redisStorage.save("RefreshToken::userId=" + user.getId(),
-        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    refreshTokenProvider.save(user.getId(), tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
     return tokenVO;
   }
 

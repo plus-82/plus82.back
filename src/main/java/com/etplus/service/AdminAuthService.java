@@ -1,7 +1,7 @@
 package com.etplus.service;
 
-import com.etplus.cache.RedisStorage;
 import com.etplus.common.LoginUser;
+import com.etplus.provider.RefreshTokenProvider;
 import com.etplus.controller.dto.SignInDto;
 import com.etplus.exception.AuthException;
 import com.etplus.exception.AuthException.AuthExceptionCode;
@@ -21,7 +21,7 @@ public class AdminAuthService {
   private final UserRepository userRepository;
   private final PasswordProvider passwordProvider;
   private final JwtProvider jwtProvider;
-  private final RedisStorage redisStorage;
+  private final RefreshTokenProvider refreshTokenProvider;
 
   public TokenVO signIn(SignInDto dto) {
     UserEntity user = userRepository.findByEmail(dto.email()).orElseThrow(
@@ -43,8 +43,7 @@ public class AdminAuthService {
     TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
     // TODO key 에 deviceId 추가?
-    redisStorage.save("RefreshToken::userId=" + user.getId(),
-        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    refreshTokenProvider.save(user.getId(), tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
     return tokenVO;
   }
 }

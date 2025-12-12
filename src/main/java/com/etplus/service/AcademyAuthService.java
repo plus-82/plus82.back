@@ -1,7 +1,7 @@
 package com.etplus.service;
 
-import com.etplus.cache.RedisStorage;
 import com.etplus.common.LoginUser;
+import com.etplus.provider.RefreshTokenProvider;
 import com.etplus.controller.dto.RequestEmailVerificationDto;
 import com.etplus.controller.dto.RequestResetPasswordDto;
 import com.etplus.controller.dto.SignInDto;
@@ -61,7 +61,7 @@ public class AcademyAuthService {
   private final PasswordProvider passwordProvider;
   private final EmailProvider emailProvider;
   private final JwtProvider jwtProvider;
-  private final RedisStorage redisStorage;
+  private final RefreshTokenProvider refreshTokenProvider;
   private final DiscordNotificationProvider discordNotificationProvider;
 
   @Transactional
@@ -168,8 +168,7 @@ public class AcademyAuthService {
     TokenVO tokenVO = jwtProvider.generateToken(new LoginUser(user.getId(), user.getEmail(), user.getRoleType()));
 
     // TODO key 에 deviceId 추가?
-    redisStorage.save("RefreshToken::userId=" + user.getId(),
-        tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
+    refreshTokenProvider.save(user.getId(), tokenVO.refreshToken(), tokenVO.refreshTokenExpireTime());
     return tokenVO;
   }
 
